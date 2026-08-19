@@ -461,8 +461,9 @@ class CompensationCalculator {
     void addLine(String? materiauLabel, double superficie) {
       if (materiauLabel == null ||
           materiauLabel.isEmpty ||
-          materiauLabel == 'Aucun')
+          materiauLabel == 'Aucun') {
         return;
+      }
       final priceRow = _ref.structureByDesignation(materiauLabel);
       if (priceRow == null) return;
       final prixUnitaire = (priceRow['prix_unitaire'] as num?)?.toDouble() ?? 0;
