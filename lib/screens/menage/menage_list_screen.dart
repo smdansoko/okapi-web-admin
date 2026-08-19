@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../services/app_data_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+import 'menage_form_screen.dart';
 
 class MenageListScreen extends StatelessWidget {
   const MenageListScreen({super.key});
@@ -14,9 +15,9 @@ class MenageListScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Enquête Ménages')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            content: Text('Formulaire de saisie ménage — à compléter dans la prochaine itération'),
-          ));
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const MenageFormScreen()),
+          );
         },
         icon: const Icon(Icons.add),
         label: const Text('Nouveau ménage'),
@@ -38,7 +39,37 @@ class MenageListScreen extends StatelessWidget {
                     subtitle: Text('${m.codeMenage} — ${m.village}, ${m.sousPrefecture}\n'
                         '${m.individus.length} membre(s)'),
                     isThreeLine: true,
-                    trailing: Text(Formatters.date(m.dateEnquete)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(Formatters.date(m.dateEnquete)),
+                        IconButton(
+                          icon: const Icon(Icons.edit, color: OkapiColors.info),
+                          onPressed: () => Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => MenageFormScreen(existing: m)),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline, color: OkapiColors.error),
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Supprimer ?'),
+                                content: Text('Supprimer le ménage "${m.codeMenage}" et tous ses membres ?'),
+                                actions: [
+                                  TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Annuler')),
+                                  ElevatedButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Supprimer')),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              await context.read<AppDataProvider>().deleteMenage(m.id);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
