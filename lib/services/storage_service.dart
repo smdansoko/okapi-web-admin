@@ -78,7 +78,9 @@ class StorageService {
   // ---------------- Enquêtes Structures ----------------
   List<EnqueteStructure> getAllStructures() {
     return _structuresBox.values
-        .map((e) => EnqueteStructure.fromMap(Map<String, dynamic>.from(e as Map)))
+        .map(
+          (e) => EnqueteStructure.fromMap(Map<String, dynamic>.from(e as Map)),
+        )
         .toList()
       ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
   }

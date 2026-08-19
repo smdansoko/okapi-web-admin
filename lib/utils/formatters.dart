@@ -34,5 +34,6 @@ class Formatters {
 
   static String? dateToIso(DateTime? d) => d?.toIso8601String();
 
-  static DateTime? isoToDate(String? s) => s == null || s.isEmpty ? null : DateTime.tryParse(s);
+  static DateTime? isoToDate(String? s) =>
+      s == null || s.isEmpty ? null : DateTime.tryParse(s);
 }

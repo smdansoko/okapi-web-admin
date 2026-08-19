@@ -8,7 +8,8 @@ class ChoiceItem {
   factory ChoiceItem.fromJson(Map<String, dynamic> json) {
     return ChoiceItem(
       name: json['name'] as String? ?? '',
-      label: (json['label'] as String?)?.trim() ?? (json['name'] as String? ?? ''),
+      label:
+          (json['label'] as String?)?.trim() ?? (json['name'] as String? ?? ''),
       type: json['type'] as String?,
     );
   }

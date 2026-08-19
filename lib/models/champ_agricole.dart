@@ -25,30 +25,30 @@ class ChampAgricole {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'numOrdreChamps': numOrdreChamps,
-        'etatChamps': etatChamps,
-        'culture': culture,
-        'autreCulture': autreCulture,
-        'propUsager': propUsager,
-        'menageExploitant': menageExploitant,
-        'codeExploitant': codeExploitant,
-        'superficieChamps': superficieChamps,
-        'observation': observation,
-      };
+    'id': id,
+    'numOrdreChamps': numOrdreChamps,
+    'etatChamps': etatChamps,
+    'culture': culture,
+    'autreCulture': autreCulture,
+    'propUsager': propUsager,
+    'menageExploitant': menageExploitant,
+    'codeExploitant': codeExploitant,
+    'superficieChamps': superficieChamps,
+    'observation': observation,
+  };
 
   factory ChampAgricole.fromMap(Map map) => ChampAgricole(
-        id: map['id'] as String,
-        numOrdreChamps: map['numOrdreChamps'] as int? ?? 1,
-        etatChamps: map['etatChamps'] as String? ?? '',
-        culture: map['culture'] as String? ?? '',
-        autreCulture: map['autreCulture'] as String?,
-        propUsager: map['propUsager'] as String? ?? 'Oui',
-        menageExploitant: map['menageExploitant'] as String?,
-        codeExploitant: map['codeExploitant'] as String?,
-        superficieChamps: (map['superficieChamps'] as num?)?.toDouble() ?? 0,
-        observation: map['observation'] as String? ?? '',
-      );
+    id: map['id'] as String,
+    numOrdreChamps: map['numOrdreChamps'] as int? ?? 1,
+    etatChamps: map['etatChamps'] as String? ?? '',
+    culture: map['culture'] as String? ?? '',
+    autreCulture: map['autreCulture'] as String?,
+    propUsager: map['propUsager'] as String? ?? 'Oui',
+    menageExploitant: map['menageExploitant'] as String?,
+    codeExploitant: map['codeExploitant'] as String?,
+    superficieChamps: (map['superficieChamps'] as num?)?.toDouble() ?? 0,
+    observation: map['observation'] as String? ?? '',
+  );
 }
 
 /// Arbre dans une parcelle agricole (4. Liste des arbres)
@@ -90,42 +90,42 @@ class ArbreParcelle {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'typeArbre': typeArbre,
-        'especeArbre': especeArbre,
-        'autreTypeArbre': autreTypeArbre,
-        'nombreDePieds': nombreDePieds,
-        'nombrePlante': nombrePlante,
-        'nombreJeuneNp': nombreJeuneNp,
-        'nombreJeuneP': nombreJeuneP,
-        'nombreMature': nombreMature,
-        'nombreAdulteDeclinant': nombreAdulteDeclinant,
-        'hauteur': hauteur,
-        'circonference': circonference,
-        'propPropArbre': propPropArbre,
-        'menageProArbre': menageProArbre,
-        'idPropArbre': idPropArbre,
-        'observation': observation,
-      };
+    'id': id,
+    'typeArbre': typeArbre,
+    'especeArbre': especeArbre,
+    'autreTypeArbre': autreTypeArbre,
+    'nombreDePieds': nombreDePieds,
+    'nombrePlante': nombrePlante,
+    'nombreJeuneNp': nombreJeuneNp,
+    'nombreJeuneP': nombreJeuneP,
+    'nombreMature': nombreMature,
+    'nombreAdulteDeclinant': nombreAdulteDeclinant,
+    'hauteur': hauteur,
+    'circonference': circonference,
+    'propPropArbre': propPropArbre,
+    'menageProArbre': menageProArbre,
+    'idPropArbre': idPropArbre,
+    'observation': observation,
+  };
 
   factory ArbreParcelle.fromMap(Map map) => ArbreParcelle(
-        id: map['id'] as String,
-        typeArbre: map['typeArbre'] as String? ?? '',
-        especeArbre: map['especeArbre'] as String? ?? '',
-        autreTypeArbre: map['autreTypeArbre'] as String?,
-        nombreDePieds: map['nombreDePieds'] as int?,
-        nombrePlante: map['nombrePlante'] as int?,
-        nombreJeuneNp: map['nombreJeuneNp'] as int?,
-        nombreJeuneP: map['nombreJeuneP'] as int?,
-        nombreMature: map['nombreMature'] as int?,
-        nombreAdulteDeclinant: map['nombreAdulteDeclinant'] as int?,
-        hauteur: (map['hauteur'] as num?)?.toDouble(),
-        circonference: (map['circonference'] as num?)?.toDouble(),
-        propPropArbre: map['propPropArbre'] as String? ?? 'Oui',
-        menageProArbre: map['menageProArbre'] as String?,
-        idPropArbre: map['idPropArbre'] as String?,
-        observation: map['observation'] as String? ?? '',
-      );
+    id: map['id'] as String,
+    typeArbre: map['typeArbre'] as String? ?? '',
+    especeArbre: map['especeArbre'] as String? ?? '',
+    autreTypeArbre: map['autreTypeArbre'] as String?,
+    nombreDePieds: map['nombreDePieds'] as int?,
+    nombrePlante: map['nombrePlante'] as int?,
+    nombreJeuneNp: map['nombreJeuneNp'] as int?,
+    nombreJeuneP: map['nombreJeuneP'] as int?,
+    nombreMature: map['nombreMature'] as int?,
+    nombreAdulteDeclinant: map['nombreAdulteDeclinant'] as int?,
+    hauteur: (map['hauteur'] as num?)?.toDouble(),
+    circonference: (map['circonference'] as num?)?.toDouble(),
+    propPropArbre: map['propPropArbre'] as String? ?? 'Oui',
+    menageProArbre: map['menageProArbre'] as String?,
+    idPropArbre: map['idPropArbre'] as String?,
+    observation: map['observation'] as String? ?? '',
+  );
 }
 
 /// Ressource naturelle (5. Liste des ressources naturelles)
@@ -149,24 +149,24 @@ class RessourceNaturelle {
   });
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'typeRessource': typeRessource,
-        'ressource': ressource,
-        'autreRessource': autreRessource,
-        'uniteMesure': uniteMesure,
-        'quantite': quantite,
-        'observation': observation,
-      };
+    'id': id,
+    'typeRessource': typeRessource,
+    'ressource': ressource,
+    'autreRessource': autreRessource,
+    'uniteMesure': uniteMesure,
+    'quantite': quantite,
+    'observation': observation,
+  };
 
   factory RessourceNaturelle.fromMap(Map map) => RessourceNaturelle(
-        id: map['id'] as String,
-        typeRessource: map['typeRessource'] as String? ?? '',
-        ressource: map['ressource'] as String?,
-        autreRessource: map['autreRessource'] as String?,
-        uniteMesure: map['uniteMesure'] as String?,
-        quantite: map['quantite'] as int?,
-        observation: map['observation'] as String? ?? '',
-      );
+    id: map['id'] as String,
+    typeRessource: map['typeRessource'] as String? ?? '',
+    ressource: map['ressource'] as String?,
+    autreRessource: map['autreRessource'] as String?,
+    uniteMesure: map['uniteMesure'] as String?,
+    quantite: map['quantite'] as int?,
+    observation: map['observation'] as String? ?? '',
+  );
 }
 
 /// Parcelle agricole (2. Identification des parcelles agricoles)
@@ -187,30 +187,30 @@ class ParcelleAgricole {
     List<ChampAgricole>? champs,
     this.arbreDansParcelle = 'Non',
     List<ArbreParcelle>? arbres,
-  })  : champs = champs ?? [],
-        arbres = arbres ?? [];
+  }) : champs = champs ?? [],
+       arbres = arbres ?? [];
 
   Map<String, dynamic> toMap() => {
-        'id': id,
-        'numOrdreParcelle': numOrdreParcelle,
-        'typeDeTerrain': typeDeTerrain,
-        'superficieParcelle': superficieParcelle,
-        'champs': champs.map((e) => e.toMap()).toList(),
-        'arbreDansParcelle': arbreDansParcelle,
-        'arbres': arbres.map((e) => e.toMap()).toList(),
-      };
+    'id': id,
+    'numOrdreParcelle': numOrdreParcelle,
+    'typeDeTerrain': typeDeTerrain,
+    'superficieParcelle': superficieParcelle,
+    'champs': champs.map((e) => e.toMap()).toList(),
+    'arbreDansParcelle': arbreDansParcelle,
+    'arbres': arbres.map((e) => e.toMap()).toList(),
+  };
 
   factory ParcelleAgricole.fromMap(Map map) => ParcelleAgricole(
-        id: map['id'] as String,
-        numOrdreParcelle: map['numOrdreParcelle'] as int? ?? 1,
-        typeDeTerrain: map['typeDeTerrain'] as String? ?? '',
-        superficieParcelle: (map['superficieParcelle'] as num?)?.toDouble() ?? 0,
-        champs: (map['champs'] as List? ?? [])
-            .map((e) => ChampAgricole.fromMap(e as Map))
-            .toList(),
-        arbreDansParcelle: map['arbreDansParcelle'] as String? ?? 'Non',
-        arbres: (map['arbres'] as List? ?? [])
-            .map((e) => ArbreParcelle.fromMap(e as Map))
-            .toList(),
-      );
+    id: map['id'] as String,
+    numOrdreParcelle: map['numOrdreParcelle'] as int? ?? 1,
+    typeDeTerrain: map['typeDeTerrain'] as String? ?? '',
+    superficieParcelle: (map['superficieParcelle'] as num?)?.toDouble() ?? 0,
+    champs: (map['champs'] as List? ?? [])
+        .map((e) => ChampAgricole.fromMap(e as Map))
+        .toList(),
+    arbreDansParcelle: map['arbreDansParcelle'] as String? ?? 'Non',
+    arbres: (map['arbres'] as List? ?? [])
+        .map((e) => ArbreParcelle.fromMap(e as Map))
+        .toList(),
+  );
 }

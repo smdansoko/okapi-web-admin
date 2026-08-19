@@ -36,7 +36,10 @@ class ReferenceDataService {
     final adminJson = jsonDecode(adminRaw) as Map<String, dynamic>;
     _adminDivisions = adminJson.map((region, prefMap) {
       final prefs = (prefMap as Map<String, dynamic>).map((pref, spList) {
-        return MapEntry(pref, (spList as List).map((e) => e.toString()).toList());
+        return MapEntry(
+          pref,
+          (spList as List).map((e) => e.toString()).toList(),
+        );
       });
       return MapEntry(region, prefs);
     });

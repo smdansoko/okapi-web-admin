@@ -1,17 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
+import '../../models/individu.dart';
+import '../../models/menage.dart';
 import '../../services/app_data_provider.dart';
+import '../../services/compensation_calculator.dart';
+import '../../services/contract_pdf_generator.dart';
 import '../../theme/app_theme.dart';
 
 /// Contracts hub: Propriétaire (Ménage) / Lignage / Communautaire.
-/// Full PDF generation matching the official WCAG agreement templates
-/// (using the `pdf` package) is the next implementation step — see summary.
+/// Generates the "Accord de compensation" PDF matching the official
+/// WCAG/AMC agreement templates, using [ContractPdfGenerator].
 class ContractsScreen extends StatelessWidget {
   const ContractsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final data = context.watch<AppDataProvider>();
+
+    // Group Lignage / Communautaire champs by (codeMenage, codeProprietaire)
+    // so we generate a single contract per owner rather than one per parcelle.
+    final lignageOwners = <String, _OwnerRef>{};
+    final communautaireOwners = <String, _OwnerRef>{};
+    for (final c in data.champs) {
+      final key = '${c.codeMenage}|${c.codeProprietaire}';
+      final ref = _OwnerRef(
+        codeMenage: c.codeMenage,
+        codeProprietaire: c.codeProprietaire,
+        nom: c.proprietaireNom,
+        region: c.region,
+        prefecture: c.prefecture,
+        sousPrefecture: c.sousPrefecture,
+        district: c.district,
+        village: c.village,
+        dateEnquete: c.dateEnquete,
+      );
+      if (c.typeDePropriete == 'Lignage') {
+        lignageOwners[key] = ref;
+      } else if (c.typeDePropriete == 'Communautaire') {
+        communautaireOwners[key] = ref;
+      }
+    }
+
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -28,26 +58,50 @@ class ContractsScreen extends StatelessWidget {
         body: TabBarView(
           children: [
             _ContractTab(
-              emptyLabel: 'Aucun ménage disponible pour générer un accord Propriétaire.',
+              emptyLabel:
+                  'Aucun ménage disponible pour générer un accord Propriétaire.',
               items: data.menages
-                  .map((m) => _ContractRow(
-                        title: m.nomChefMenage.isEmpty ? m.codeMenage : m.nomChefMenage,
-                        subtitle: m.codeMenage,
-                      ))
+                  .map(
+                    (m) => _ContractEntry(
+                      title: m.nomChefMenage.isEmpty
+                          ? m.codeMenage
+                          : m.nomChefMenage,
+                      subtitle: m.codeMenage,
+                      onGenerate: () => _generateMenageContract(context, m),
+                    ),
+                  )
                   .toList(),
             ),
             _ContractTab(
               emptyLabel: 'Aucune enquête de type Lignage disponible.',
-              items: data.champs
-                  .where((c) => c.typeDePropriete == 'Lignage')
-                  .map((c) => _ContractRow(title: c.proprietaireNom, subtitle: c.id))
+              items: lignageOwners.values
+                  .map(
+                    (o) => _ContractEntry(
+                      title: o.nom,
+                      subtitle: o.codeMenage,
+                      onGenerate: () => _generateOwnerContract(
+                        context,
+                        ContractType.lignage,
+                        o,
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
             _ContractTab(
               emptyLabel: 'Aucune enquête de type Communautaire disponible.',
-              items: data.champs
-                  .where((c) => c.typeDePropriete == 'Communautaire')
-                  .map((c) => _ContractRow(title: c.proprietaireNom, subtitle: c.id))
+              items: communautaireOwners.values
+                  .map(
+                    (o) => _ContractEntry(
+                      title: o.nom,
+                      subtitle: o.codeMenage,
+                      onGenerate: () => _generateOwnerContract(
+                        context,
+                        ContractType.communautaire,
+                        o,
+                      ),
+                    ),
+                  )
                   .toList(),
             ),
           ],
@@ -55,23 +109,155 @@ class ContractsScreen extends StatelessWidget {
       ),
     );
   }
+
+  Future<void> _generateMenageContract(
+    BuildContext context,
+    Menage menage,
+  ) async {
+    final data = context.read<AppDataProvider>();
+    final chef = menage.chefDeMenage;
+    if (chef == null) {
+      _showError(
+        context,
+        'Ce ménage n\'a aucun membre enregistré (chef de ménage introuvable).',
+      );
+      return;
+    }
+    final summary = CompensationCalculator.computeForOwner(
+      champsEnquetes: data.champs,
+      structureEnquetes: data.structures,
+      codeProprietaire: chef.id,
+    );
+    final contractData = ContractData.fromMenage(
+      menage: menage,
+      summary: summary,
+    );
+    await _previewContract(context, contractData);
+  }
+
+  Future<void> _generateOwnerContract(
+    BuildContext context,
+    ContractType type,
+    _OwnerRef ref,
+  ) async {
+    final data = context.read<AppDataProvider>();
+    final menage = data.menageById(ref.codeMenage);
+    Individu? proprietaire;
+    if (menage != null) {
+      try {
+        proprietaire = menage.individus.firstWhere(
+          (i) => i.id == ref.codeProprietaire,
+        );
+      } catch (_) {
+        proprietaire = null;
+      }
+    }
+    proprietaire ??= Individu(
+      id: ref.codeProprietaire,
+      numOrdreIndividu: 1,
+      nomPrenom: ref.nom,
+    );
+
+    final summary = CompensationCalculator.computeForOwner(
+      champsEnquetes: data.champs,
+      structureEnquetes: data.structures,
+      codeProprietaire: ref.codeProprietaire,
+    );
+    final contractData = ContractData.fromChampOwner(
+      type: type,
+      numeroLot: ref.codeMenage,
+      region: ref.region,
+      prefecture: ref.prefecture,
+      sousPrefecture: ref.sousPrefecture,
+      district: ref.district,
+      village: ref.village,
+      codeMenage: ref.codeMenage,
+      proprietaire: proprietaire,
+      dateEnquete: ref.dateEnquete,
+      summary: summary,
+    );
+    await _previewContract(context, contractData);
+  }
+
+  Future<void> _previewContract(
+    BuildContext context,
+    ContractData contractData,
+  ) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+    try {
+      final bytes = await ContractPdfGenerator.generate(contractData);
+      if (!context.mounted) return;
+      Navigator.of(context).pop(); // close loading dialog
+      await Printing.layoutPdf(
+        onLayout: (format) async => bytes,
+        name: 'Accord_${contractData.referenceCode}.pdf',
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      Navigator.of(context).pop();
+      _showError(context, 'Erreur lors de la génération du contrat : $e');
+    }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
 }
 
-class _ContractRow {
+class _OwnerRef {
+  final String codeMenage;
+  final String codeProprietaire;
+  final String nom;
+  final String region;
+  final String prefecture;
+  final String sousPrefecture;
+  final String district;
+  final String village;
+  final DateTime dateEnquete;
+  _OwnerRef({
+    required this.codeMenage,
+    required this.codeProprietaire,
+    required this.nom,
+    required this.region,
+    required this.prefecture,
+    required this.sousPrefecture,
+    required this.district,
+    required this.village,
+    required this.dateEnquete,
+  });
+}
+
+class _ContractEntry {
   final String title;
   final String subtitle;
-  _ContractRow({required this.title, required this.subtitle});
+  final VoidCallback onGenerate;
+  _ContractEntry({
+    required this.title,
+    required this.subtitle,
+    required this.onGenerate,
+  });
 }
 
 class _ContractTab extends StatelessWidget {
   final String emptyLabel;
-  final List<_ContractRow> items;
+  final List<_ContractEntry> items;
   const _ContractTab({required this.emptyLabel, required this.items});
 
   @override
   Widget build(BuildContext context) {
     if (items.isEmpty) {
-      return Center(child: Padding(padding: const EdgeInsets.all(24), child: Text(emptyLabel, textAlign: TextAlign.center)));
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(emptyLabel, textAlign: TextAlign.center),
+        ),
+      );
     }
     return ListView.builder(
       padding: const EdgeInsets.all(12),
@@ -87,11 +273,7 @@ class _ContractTab extends StatelessWidget {
             title: Text(it.title),
             subtitle: Text(it.subtitle),
             trailing: OutlinedButton.icon(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text('Génération PDF de l\'accord — à compléter dans la prochaine itération'),
-                ));
-              },
+              onPressed: it.onGenerate,
               icon: const Icon(Icons.picture_as_pdf, size: 16),
               label: const Text('Générer'),
             ),

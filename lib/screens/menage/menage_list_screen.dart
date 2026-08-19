@@ -15,9 +15,9 @@ class MenageListScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Enquête Ménages')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const MenageFormScreen()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const MenageFormScreen()));
         },
         icon: const Icon(Icons.add),
         label: const Text('Nouveau ménage'),
@@ -35,9 +35,13 @@ class MenageListScreen extends StatelessWidget {
                       backgroundColor: OkapiColors.primary,
                       child: Icon(Icons.home, color: Colors.white),
                     ),
-                    title: Text(m.nomChefMenage.isEmpty ? m.codeMenage : m.nomChefMenage),
-                    subtitle: Text('${m.codeMenage} — ${m.village}, ${m.sousPrefecture}\n'
-                        '${m.individus.length} membre(s)'),
+                    title: Text(
+                      m.nomChefMenage.isEmpty ? m.codeMenage : m.nomChefMenage,
+                    ),
+                    subtitle: Text(
+                      '${m.codeMenage} — ${m.village}, ${m.sousPrefecture}\n'
+                      '${m.individus.length} membre(s)',
+                    ),
                     isThreeLine: true,
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -46,25 +50,42 @@ class MenageListScreen extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.edit, color: OkapiColors.info),
                           onPressed: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => MenageFormScreen(existing: m)),
+                            MaterialPageRoute(
+                              builder: (_) => MenageFormScreen(existing: m),
+                            ),
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, color: OkapiColors.error),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: OkapiColors.error,
+                          ),
                           onPressed: () async {
                             final confirm = await showDialog<bool>(
                               context: context,
                               builder: (ctx) => AlertDialog(
                                 title: const Text('Supprimer ?'),
-                                content: Text('Supprimer le ménage "${m.codeMenage}" et tous ses membres ?'),
+                                content: Text(
+                                  'Supprimer le ménage "${m.codeMenage}" et tous ses membres ?',
+                                ),
                                 actions: [
-                                  TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text('Annuler')),
-                                  ElevatedButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text('Supprimer')),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(false),
+                                    child: const Text('Annuler'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () =>
+                                        Navigator.of(ctx).pop(true),
+                                    child: const Text('Supprimer'),
+                                  ),
                                 ],
                               ),
                             );
-                            if (confirm == true) {
-                              await context.read<AppDataProvider>().deleteMenage(m.id);
+                            if (confirm == true && context.mounted) {
+                              await context
+                                  .read<AppDataProvider>()
+                                  .deleteMenage(m.id);
                             }
                           },
                         ),

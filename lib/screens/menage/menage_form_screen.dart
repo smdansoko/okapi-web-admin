@@ -44,15 +44,13 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
   void initState() {
     super.initState();
     final e = widget.existing;
-    _menage = e ??
-        Menage(
-          id: _uuid.v4(),
-          dateEnquete: DateTime.now(),
-        );
+    _menage = e ?? Menage(id: _uuid.v4(), dateEnquete: DateTime.now());
     _location = LocationPickerData(
       region: _menage.region.isEmpty ? null : _menage.region,
       prefecture: _menage.prefecture.isEmpty ? null : _menage.prefecture,
-      sousPrefecture: _menage.sousPrefecture.isEmpty ? null : _menage.sousPrefecture,
+      sousPrefecture: _menage.sousPrefecture.isEmpty
+          ? null
+          : _menage.sousPrefecture,
       district: _menage.district,
       village: _menage.village,
     );
@@ -60,13 +58,21 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     _datePieceRepondant = Formatters.isoToDate(_menage.datePieceRepondant);
 
     _enqueteursCtrl = TextEditingController(text: _menage.enqueteurs);
-    _numOrdreCtrl = TextEditingController(text: _menage.numOrdreMenage.toString());
+    _numOrdreCtrl = TextEditingController(
+      text: _menage.numOrdreMenage.toString(),
+    );
     _codeMenageCtrl = TextEditingController(text: _menage.codeMenage);
     _latCtrl = TextEditingController(text: _menage.latitude?.toString() ?? '');
     _lonCtrl = TextEditingController(text: _menage.longitude?.toString() ?? '');
-    _nomRepondantCtrl = TextEditingController(text: _menage.nomPrenomRepondant ?? '');
-    _telRepondantCtrl = TextEditingController(text: _menage.telephoneRepondant ?? '');
-    _numeroPieceRepondantCtrl = TextEditingController(text: _menage.numeroPieceRepondant ?? '');
+    _nomRepondantCtrl = TextEditingController(
+      text: _menage.nomPrenomRepondant ?? '',
+    );
+    _telRepondantCtrl = TextEditingController(
+      text: _menage.telephoneRepondant ?? '',
+    );
+    _numeroPieceRepondantCtrl = TextEditingController(
+      text: _menage.numeroPieceRepondant ?? '',
+    );
   }
 
   @override
@@ -86,9 +92,15 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     if (_dateEnquete == null) return;
     final tablette = _menage.tablette.isEmpty ? '0' : _menage.tablette;
     final villagePart = _location.village.isNotEmpty
-        ? _location.village.substring(0, _location.village.length > 3 ? 3 : _location.village.length).toUpperCase()
+        ? _location.village
+              .substring(
+                0,
+                _location.village.length > 3 ? 3 : _location.village.length,
+              )
+              .toUpperCase()
         : 'VIL';
-    final code = '$villagePart$tablette-${Formatters.dateCode(_dateEnquete!)}-${_numOrdreCtrl.text}';
+    final code =
+        '$villagePart$tablette-${Formatters.dateCode(_dateEnquete!)}-${_numOrdreCtrl.text}';
     setState(() => _codeMenageCtrl.text = code);
   }
 
@@ -107,12 +119,22 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
 
   Future<Individu?> _showIndividuDialog({Individu? existing}) async {
     final nomCtrl = TextEditingController(text: existing?.nomPrenom ?? '');
-    final numeroPieceCtrl = TextEditingController(text: existing?.numeroPiece ?? '');
+    final numeroPieceCtrl = TextEditingController(
+      text: existing?.numeroPiece ?? '',
+    );
     final telCtrl = TextEditingController(text: existing?.telephone ?? '');
-    final nbFemmesCtrl = TextEditingController(text: existing?.nombreFemmes?.toString() ?? '');
-    final autreEthnieCtrl = TextEditingController(text: existing?.autreGroupeEthnique ?? '');
-    final autreNatCtrl = TextEditingController(text: existing?.autreNationalite ?? '');
-    final handicapPrecisCtrl = TextEditingController(text: existing?.handicapPrecis ?? '');
+    final nbFemmesCtrl = TextEditingController(
+      text: existing?.nombreFemmes?.toString() ?? '',
+    );
+    final autreEthnieCtrl = TextEditingController(
+      text: existing?.autreGroupeEthnique ?? '',
+    );
+    final autreNatCtrl = TextEditingController(
+      text: existing?.autreNationalite ?? '',
+    );
+    final handicapPrecisCtrl = TextEditingController(
+      text: existing?.handicapPrecis ?? '',
+    );
 
     String sexe = existing?.sexe ?? '';
     String relationCdm = existing?.relationCdm ?? '';
@@ -122,155 +144,213 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     String nationalite = existing?.nationalite ?? '';
     String handicap = existing?.handicap ?? 'Non';
     DateTime? dateNaissance = Formatters.isoToDate(existing?.dateNaissance);
-    DateTime? dateEtablissementPiece = Formatters.isoToDate(existing?.dateEtablissementPiece);
+    DateTime? dateEtablissementPiece = Formatters.isoToDate(
+      existing?.dateEtablissementPiece,
+    );
 
     return showDialog<Individu>(
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
         final formKey = GlobalKey<FormState>();
-        return StatefulBuilder(builder: (ctx, setDialogState) {
-          return AlertDialog(
-            title: Text(existing == null ? 'Ajouter un membre' : 'Modifier le membre'),
-            content: SizedBox(
-              width: 480,
-              child: Form(
-                key: formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      LabeledTextField(label: 'Prénom et Nom', controller: nomCtrl, required: true),
-                      const SizedBox(height: 12),
-                      ChoiceDropdown(
-                        listName: 'sexe',
-                        label: 'Sexe',
-                        value: sexe.isEmpty ? null : sexe,
-                        required: true,
-                        onChanged: (v) => setDialogState(() => sexe = v ?? ''),
-                      ),
-                      const SizedBox(height: 12),
-                      ChoiceDropdown(
-                        listName: 'relation_cdm',
-                        label: 'Lien de parenté avec le chef de ménage',
-                        value: relationCdm.isEmpty ? null : relationCdm,
-                        required: true,
-                        onChanged: (v) => setDialogState(() => relationCdm = v ?? ''),
-                      ),
-                      const SizedBox(height: 12),
-                      DateField(
-                        label: 'Date de naissance',
-                        value: dateNaissance,
-                        onChanged: (v) => setDialogState(() => dateNaissance = v),
-                      ),
-                      const SizedBox(height: 12),
-                      ChoiceDropdown(
-                        listName: 'type_piece',
-                        label: 'Type de pièce d\'identité',
-                        value: typeDePiece.isEmpty ? null : typeDePiece,
-                        required: true,
-                        onChanged: (v) => setDialogState(() => typeDePiece = v ?? ''),
-                      ),
-                      const SizedBox(height: 12),
-                      LabeledTextField(label: 'Numéro de la pièce', controller: numeroPieceCtrl),
-                      const SizedBox(height: 12),
-                      DateField(
-                        label: 'Date d\'établissement de la pièce',
-                        value: dateEtablissementPiece,
-                        onChanged: (v) => setDialogState(() => dateEtablissementPiece = v),
-                      ),
-                      const SizedBox(height: 12),
-                      LabeledTextField(label: 'Téléphone', controller: telCtrl, keyboardType: TextInputType.phone),
-                      const SizedBox(height: 12),
-                      ChoiceDropdown(
-                        listName: 'matrimoniale',
-                        label: 'Situation matrimoniale',
-                        value: situationMatrimoniale.isEmpty ? null : situationMatrimoniale,
-                        onChanged: (v) => setDialogState(() => situationMatrimoniale = v ?? ''),
-                      ),
-                      if (situationMatrimoniale == 'Marie polygame') ...[
+        return StatefulBuilder(
+          builder: (ctx, setDialogState) {
+            return AlertDialog(
+              title: Text(
+                existing == null ? 'Ajouter un membre' : 'Modifier le membre',
+              ),
+              content: SizedBox(
+                width: 480,
+                child: Form(
+                  key: formKey,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LabeledTextField(
+                          label: 'Prénom et Nom',
+                          controller: nomCtrl,
+                          required: true,
+                        ),
+                        const SizedBox(height: 12),
+                        ChoiceDropdown(
+                          listName: 'sexe',
+                          label: 'Sexe',
+                          value: sexe.isEmpty ? null : sexe,
+                          required: true,
+                          onChanged: (v) =>
+                              setDialogState(() => sexe = v ?? ''),
+                        ),
+                        const SizedBox(height: 12),
+                        ChoiceDropdown(
+                          listName: 'relation_cdm',
+                          label: 'Lien de parenté avec le chef de ménage',
+                          value: relationCdm.isEmpty ? null : relationCdm,
+                          required: true,
+                          onChanged: (v) =>
+                              setDialogState(() => relationCdm = v ?? ''),
+                        ),
+                        const SizedBox(height: 12),
+                        DateField(
+                          label: 'Date de naissance',
+                          value: dateNaissance,
+                          onChanged: (v) =>
+                              setDialogState(() => dateNaissance = v),
+                        ),
+                        const SizedBox(height: 12),
+                        ChoiceDropdown(
+                          listName: 'type_piece',
+                          label: 'Type de pièce d\'identité',
+                          value: typeDePiece.isEmpty ? null : typeDePiece,
+                          required: true,
+                          onChanged: (v) =>
+                              setDialogState(() => typeDePiece = v ?? ''),
+                        ),
                         const SizedBox(height: 12),
                         LabeledTextField(
-                          label: 'Nombre de femmes',
-                          controller: nbFemmesCtrl,
-                          keyboardType: TextInputType.number,
+                          label: 'Numéro de la pièce',
+                          controller: numeroPieceCtrl,
                         ),
-                      ],
-                      const SizedBox(height: 12),
-                      ChoiceDropdown(
-                        listName: 'ethnie',
-                        label: 'Groupe ethnique',
-                        value: groupeEthnique.isEmpty ? null : groupeEthnique,
-                        onChanged: (v) => setDialogState(() => groupeEthnique = v ?? ''),
-                      ),
-                      if (groupeEthnique == 'Autre') ...[
                         const SizedBox(height: 12),
-                        LabeledTextField(label: 'Précisez le groupe ethnique', controller: autreEthnieCtrl),
-                      ],
-                      const SizedBox(height: 12),
-                      ChoiceDropdown(
-                        listName: 'nationalite',
-                        label: 'Nationalité',
-                        value: nationalite.isEmpty ? null : nationalite,
-                        onChanged: (v) => setDialogState(() => nationalite = v ?? ''),
-                      ),
-                      if (nationalite == 'Autre') ...[
+                        DateField(
+                          label: 'Date d\'établissement de la pièce',
+                          value: dateEtablissementPiece,
+                          onChanged: (v) =>
+                              setDialogState(() => dateEtablissementPiece = v),
+                        ),
                         const SizedBox(height: 12),
-                        LabeledTextField(label: 'Précisez la nationalité', controller: autreNatCtrl),
-                      ],
-                      const SizedBox(height: 12),
-                      ChoiceDropdown(
-                        listName: 'handicap',
-                        label: 'Handicap',
-                        value: handicap.isEmpty ? 'Non' : handicap,
-                        onChanged: (v) => setDialogState(() => handicap = v ?? 'Non'),
-                      ),
-                      if (handicap != 'Non') ...[
+                        LabeledTextField(
+                          label: 'Téléphone',
+                          controller: telCtrl,
+                          keyboardType: TextInputType.phone,
+                        ),
                         const SizedBox(height: 12),
-                        LabeledTextField(label: 'Précisez le handicap', controller: handicapPrecisCtrl),
+                        ChoiceDropdown(
+                          listName: 'matrimoniale',
+                          label: 'Situation matrimoniale',
+                          value: situationMatrimoniale.isEmpty
+                              ? null
+                              : situationMatrimoniale,
+                          onChanged: (v) => setDialogState(
+                            () => situationMatrimoniale = v ?? '',
+                          ),
+                        ),
+                        if (situationMatrimoniale == 'Marie polygame') ...[
+                          const SizedBox(height: 12),
+                          LabeledTextField(
+                            label: 'Nombre de femmes',
+                            controller: nbFemmesCtrl,
+                            keyboardType: TextInputType.number,
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        ChoiceDropdown(
+                          listName: 'ethnie',
+                          label: 'Groupe ethnique',
+                          value: groupeEthnique.isEmpty ? null : groupeEthnique,
+                          onChanged: (v) =>
+                              setDialogState(() => groupeEthnique = v ?? ''),
+                        ),
+                        if (groupeEthnique == 'Autre') ...[
+                          const SizedBox(height: 12),
+                          LabeledTextField(
+                            label: 'Précisez le groupe ethnique',
+                            controller: autreEthnieCtrl,
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        ChoiceDropdown(
+                          listName: 'nationalite',
+                          label: 'Nationalité',
+                          value: nationalite.isEmpty ? null : nationalite,
+                          onChanged: (v) =>
+                              setDialogState(() => nationalite = v ?? ''),
+                        ),
+                        if (nationalite == 'Autre') ...[
+                          const SizedBox(height: 12),
+                          LabeledTextField(
+                            label: 'Précisez la nationalité',
+                            controller: autreNatCtrl,
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        ChoiceDropdown(
+                          listName: 'handicap',
+                          label: 'Handicap',
+                          value: handicap.isEmpty ? 'Non' : handicap,
+                          onChanged: (v) =>
+                              setDialogState(() => handicap = v ?? 'Non'),
+                        ),
+                        if (handicap != 'Non') ...[
+                          const SizedBox(height: 12),
+                          LabeledTextField(
+                            label: 'Précisez le handicap',
+                            controller: handicapPrecisCtrl,
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            actions: [
-              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Annuler')),
-              ElevatedButton(
-                onPressed: () {
-                  if (nomCtrl.text.isEmpty || sexe.isEmpty || relationCdm.isEmpty || typeDePiece.isEmpty) {
-                    ScaffoldMessenger.of(ctx).showSnackBar(
-                      const SnackBar(content: Text('Veuillez remplir les champs obligatoires.')),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Annuler'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (nomCtrl.text.isEmpty ||
+                        sexe.isEmpty ||
+                        relationCdm.isEmpty ||
+                        typeDePiece.isEmpty) {
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Veuillez remplir les champs obligatoires.',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
+                    final result = Individu(
+                      id: existing?.id ?? _uuid.v4(),
+                      numOrdreIndividu:
+                          existing?.numOrdreIndividu ??
+                          (_menage.individus.length + 1),
+                      nomPrenom: nomCtrl.text,
+                      sexe: sexe,
+                      relationCdm: relationCdm,
+                      typeDePiece: typeDePiece,
+                      numeroPiece: numeroPieceCtrl.text,
+                      dateEtablissementPiece: Formatters.dateToIso(
+                        dateEtablissementPiece,
+                      ),
+                      dateNaissance: Formatters.dateToIso(dateNaissance),
+                      telephone: telCtrl.text,
+                      situationMatrimoniale: situationMatrimoniale,
+                      nombreFemmes: int.tryParse(nbFemmesCtrl.text),
+                      groupeEthnique: groupeEthnique,
+                      autreGroupeEthnique: autreEthnieCtrl.text.isEmpty
+                          ? null
+                          : autreEthnieCtrl.text,
+                      nationalite: nationalite,
+                      autreNationalite: autreNatCtrl.text.isEmpty
+                          ? null
+                          : autreNatCtrl.text,
+                      handicap: handicap,
+                      handicapPrecis: handicapPrecisCtrl.text.isEmpty
+                          ? null
+                          : handicapPrecisCtrl.text,
                     );
-                    return;
-                  }
-                  final result = Individu(
-                    id: existing?.id ?? _uuid.v4(),
-                    numOrdreIndividu: existing?.numOrdreIndividu ?? (_menage.individus.length + 1),
-                    nomPrenom: nomCtrl.text,
-                    sexe: sexe,
-                    relationCdm: relationCdm,
-                    typeDePiece: typeDePiece,
-                    numeroPiece: numeroPieceCtrl.text,
-                    dateEtablissementPiece: Formatters.dateToIso(dateEtablissementPiece),
-                    dateNaissance: Formatters.dateToIso(dateNaissance),
-                    telephone: telCtrl.text,
-                    situationMatrimoniale: situationMatrimoniale,
-                    nombreFemmes: int.tryParse(nbFemmesCtrl.text),
-                    groupeEthnique: groupeEthnique,
-                    autreGroupeEthnique: autreEthnieCtrl.text.isEmpty ? null : autreEthnieCtrl.text,
-                    nationalite: nationalite,
-                    autreNationalite: autreNatCtrl.text.isEmpty ? null : autreNatCtrl.text,
-                    handicap: handicap,
-                    handicapPrecis: handicapPrecisCtrl.text.isEmpty ? null : handicapPrecisCtrl.text,
-                  );
-                  Navigator.of(ctx).pop(result);
-                },
-                child: const Text('Enregistrer'),
-              ),
-            ],
-          );
-        });
+                    Navigator.of(ctx).pop(result);
+                  },
+                  child: const Text('Enregistrer'),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -279,14 +359,22 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     if (_menage.individus.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez ajouter au moins un membre du ménage (le chef de ménage).')),
+        const SnackBar(
+          content: Text(
+            'Veuillez ajouter au moins un membre du ménage (le chef de ménage).',
+          ),
+        ),
       );
       return;
     }
-    final hasChef = _menage.individus.any((i) => i.relationCdm == 'Chef de menage');
+    final hasChef = _menage.individus.any(
+      (i) => i.relationCdm == 'Chef de menage',
+    );
     if (!hasChef) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez désigner un membre comme "Chef de ménage".')),
+        const SnackBar(
+          content: Text('Veuillez désigner un membre comme "Chef de ménage".'),
+        ),
       );
       return;
     }
@@ -299,12 +387,20 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     _menage.sousPrefecture = _location.sousPrefecture ?? '';
     _menage.district = _location.district;
     _menage.village = _location.village;
-    _menage.codeMenage = _codeMenageCtrl.text.isEmpty ? _menage.id : _codeMenageCtrl.text;
+    _menage.codeMenage = _codeMenageCtrl.text.isEmpty
+        ? _menage.id
+        : _codeMenageCtrl.text;
     _menage.latitude = double.tryParse(_latCtrl.text);
     _menage.longitude = double.tryParse(_lonCtrl.text);
-    _menage.nomPrenomRepondant = _nomRepondantCtrl.text.isEmpty ? null : _nomRepondantCtrl.text;
-    _menage.telephoneRepondant = _telRepondantCtrl.text.isEmpty ? null : _telRepondantCtrl.text;
-    _menage.numeroPieceRepondant = _numeroPieceRepondantCtrl.text.isEmpty ? null : _numeroPieceRepondantCtrl.text;
+    _menage.nomPrenomRepondant = _nomRepondantCtrl.text.isEmpty
+        ? null
+        : _nomRepondantCtrl.text;
+    _menage.telephoneRepondant = _telRepondantCtrl.text.isEmpty
+        ? null
+        : _telRepondantCtrl.text;
+    _menage.numeroPieceRepondant = _numeroPieceRepondantCtrl.text.isEmpty
+        ? null
+        : _numeroPieceRepondantCtrl.text;
     _menage.datePieceRepondant = Formatters.dateToIso(_datePieceRepondant);
     // id key must equal codeMenage so other forms can reference it consistently
     _menage.id = _menage.codeMenage;
@@ -317,14 +413,21 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.existing == null ? 'Nouvelle enquête ménage' : 'Modifier l\'enquête ménage'),
+        title: Text(
+          widget.existing == null
+              ? 'Nouvelle enquête ménage'
+              : 'Modifier l\'enquête ménage',
+        ),
       ),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            const SectionHeader(title: '1. Identification du ménage', icon: Icons.home_rounded),
+            const SectionHeader(
+              title: '1. Identification du ménage',
+              icon: Icons.home_rounded,
+            ),
             DateField(
               label: 'Date de l\'enquête',
               value: _dateEnquete,
@@ -332,7 +435,11 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
               onChanged: (v) => setState(() => _dateEnquete = v),
             ),
             const SizedBox(height: 12),
-            LabeledTextField(label: 'Enquêteur(s)', controller: _enqueteursCtrl, required: true),
+            LabeledTextField(
+              label: 'Enquêteur(s)',
+              controller: _enqueteursCtrl,
+              required: true,
+            ),
             const SizedBox(height: 12),
             ChoiceDropdown(
               listName: 'tablette',
@@ -367,7 +474,10 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                 const SizedBox(width: 8),
                 IconButton(
                   tooltip: 'Générer automatiquement',
-                  icon: const Icon(Icons.auto_fix_high, color: OkapiColors.primary),
+                  icon: const Icon(
+                    Icons.auto_fix_high,
+                    color: OkapiColors.primary,
+                  ),
                   onPressed: _generateCodeMenage,
                 ),
               ],
@@ -376,7 +486,8 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
             OuiNonField(
               label: 'Résidence principale ?',
               value: _menage.residencePrincipale,
-              onChanged: (v) => setState(() => _menage.residencePrincipale = v ?? 'Oui'),
+              onChanged: (v) =>
+                  setState(() => _menage.residencePrincipale = v ?? 'Oui'),
             ),
             const SizedBox(height: 12),
             ChoiceDropdown(
@@ -393,7 +504,10 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                   child: LabeledTextField(
                     label: 'Latitude (GPS)',
                     controller: _latCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                      signed: true,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -401,21 +515,31 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                   child: LabeledTextField(
                     label: 'Longitude (GPS)',
                     controller: _lonCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                      signed: true,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            const SectionHeader(title: 'Répondant', icon: Icons.record_voice_over_rounded),
+            const SectionHeader(
+              title: 'Répondant',
+              icon: Icons.record_voice_over_rounded,
+            ),
             OuiNonField(
               label: 'Le répondant est-il le chef de ménage ?',
               value: _menage.repondantCdm,
-              onChanged: (v) => setState(() => _menage.repondantCdm = v ?? 'Oui'),
+              onChanged: (v) =>
+                  setState(() => _menage.repondantCdm = v ?? 'Oui'),
             ),
             if (_menage.repondantCdm == 'Non') ...[
               const SizedBox(height: 12),
-              LabeledTextField(label: 'Prénom et Nom du répondant', controller: _nomRepondantCtrl),
+              LabeledTextField(
+                label: 'Prénom et Nom du répondant',
+                controller: _nomRepondantCtrl,
+              ),
               const SizedBox(height: 12),
               ChoiceDropdown(
                 listName: 'relation_cdm',
@@ -425,19 +549,23 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
               ),
               const SizedBox(height: 12),
               LabeledTextField(
-                  label: 'Téléphone du répondant',
-                  controller: _telRepondantCtrl,
-                  keyboardType: TextInputType.phone),
+                label: 'Téléphone du répondant',
+                controller: _telRepondantCtrl,
+                keyboardType: TextInputType.phone,
+              ),
               const SizedBox(height: 12),
               ChoiceDropdown(
                 listName: 'type_piece',
                 label: 'Type de pièce du répondant',
                 value: _menage.typeDePieceRepondant,
-                onChanged: (v) => setState(() => _menage.typeDePieceRepondant = v),
+                onChanged: (v) =>
+                    setState(() => _menage.typeDePieceRepondant = v),
               ),
               const SizedBox(height: 12),
               LabeledTextField(
-                  label: 'Numéro de pièce du répondant', controller: _numeroPieceRepondantCtrl),
+                label: 'Numéro de pièce du répondant',
+                controller: _numeroPieceRepondantCtrl,
+              ),
               const SizedBox(height: 12),
               DateField(
                 label: 'Date d\'établissement de la pièce du répondant',
@@ -454,7 +582,8 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
               itemTitle: (item, i) => '${i + 1}. ${item.nomPrenom}',
               itemSubtitle: (item, i) => item.displayLabel,
               onAdd: () => _addOrEditIndividu(),
-              onEdit: (i) => _addOrEditIndividu(existing: _menage.individus[i], index: i),
+              onEdit: (i) =>
+                  _addOrEditIndividu(existing: _menage.individus[i], index: i),
               onDelete: (i) => setState(() => _menage.individus.removeAt(i)),
             ),
             const SizedBox(height: 24),

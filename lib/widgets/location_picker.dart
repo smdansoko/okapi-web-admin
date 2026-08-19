@@ -23,7 +23,11 @@ class LocationPickerField extends StatefulWidget {
   final LocationPickerData data;
   final ValueChanged<LocationPickerData> onChanged;
 
-  const LocationPickerField({super.key, required this.data, required this.onChanged});
+  const LocationPickerField({
+    super.key,
+    required this.data,
+    required this.onChanged,
+  });
 
   @override
   State<LocationPickerField> createState() => _LocationPickerFieldState();
@@ -54,15 +58,22 @@ class _LocationPickerFieldState extends State<LocationPickerField> {
   Widget build(BuildContext context) {
     final regions = _ref.regions;
     final prefectures = _ref.prefecturesFor(widget.data.region);
-    final sousPrefs = _ref.sousPrefecturesFor(widget.data.region, widget.data.prefecture);
+    final sousPrefs = _ref.sousPrefecturesFor(
+      widget.data.region,
+      widget.data.prefecture,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DropdownButtonFormField<String>(
-          initialValue: regions.contains(widget.data.region) ? widget.data.region : null,
+          initialValue: regions.contains(widget.data.region)
+              ? widget.data.region
+              : null,
           decoration: const InputDecoration(labelText: 'Région *'),
-          items: regions.map((r) => DropdownMenuItem(value: r, child: Text(r))).toList(),
+          items: regions
+              .map((r) => DropdownMenuItem(value: r, child: Text(r)))
+              .toList(),
           onChanged: (v) {
             setState(() {
               widget.data.region = v;
@@ -75,9 +86,13 @@ class _LocationPickerFieldState extends State<LocationPickerField> {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
-          initialValue: prefectures.contains(widget.data.prefecture) ? widget.data.prefecture : null,
+          initialValue: prefectures.contains(widget.data.prefecture)
+              ? widget.data.prefecture
+              : null,
           decoration: const InputDecoration(labelText: 'Préfecture *'),
-          items: prefectures.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+          items: prefectures
+              .map((p) => DropdownMenuItem(value: p, child: Text(p)))
+              .toList(),
           onChanged: widget.data.region == null
               ? null
               : (v) {
@@ -91,9 +106,13 @@ class _LocationPickerFieldState extends State<LocationPickerField> {
         ),
         const SizedBox(height: 12),
         DropdownButtonFormField<String>(
-          initialValue: sousPrefs.contains(widget.data.sousPrefecture) ? widget.data.sousPrefecture : null,
+          initialValue: sousPrefs.contains(widget.data.sousPrefecture)
+              ? widget.data.sousPrefecture
+              : null,
           decoration: const InputDecoration(labelText: 'Sous-préfecture *'),
-          items: sousPrefs.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+          items: sousPrefs
+              .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+              .toList(),
           onChanged: widget.data.prefecture == null
               ? null
               : (v) {

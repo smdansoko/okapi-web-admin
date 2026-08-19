@@ -7,7 +7,8 @@ import 'reference_data_service.dart';
 /// the "RÉCAPITULATIF DES COMPENSATIONS" table of the OKAPI/WCAG contracts.
 class CompensationSummary {
   double parcelles = 0; // Compensation des parcelles (foncier)
-  double champsCulturesAnnuelles = 0; // Compensation des champs (cultures annuelles)
+  double champsCulturesAnnuelles =
+      0; // Compensation des champs (cultures annuelles)
   double culturesPerennes = 0; // Compensation des cultures pérennes
   double especesSauvages = 0; // Compensation des espèces sauvages
   double boisDoeuvre = 0; // Compensation des bois d'oeuvre
@@ -25,10 +26,24 @@ class CompensationSummary {
 
   // Detail lines for annex generation
   final List<ParcelleDetail> parcelleDetails = [];
+  final List<CultureAnnuelleDetail> cultureAnnuelleDetails = [];
   final List<CulturePerenneDetail> culturePerenneDetails = [];
   final List<EspeceSauvageDetail> especeSauvageDetails = [];
   final List<BoisDoeuvreDetail> boisDoeuvreDetails = [];
   final List<StructureDetail> structureDetails = [];
+}
+
+class CultureAnnuelleDetail {
+  final String culture;
+  final double superficieHa;
+  final double revenuHa;
+  final double montant;
+  CultureAnnuelleDetail({
+    required this.culture,
+    required this.superficieHa,
+    required this.revenuHa,
+    required this.montant,
+  });
 }
 
 class ParcelleDetail {
@@ -36,7 +51,12 @@ class ParcelleDetail {
   final double superficie;
   final double coutM2;
   final double montant;
-  ParcelleDetail(this.typeDeTerrain, this.superficie, this.coutM2, this.montant);
+  ParcelleDetail(
+    this.typeDeTerrain,
+    this.superficie,
+    this.coutM2,
+    this.montant,
+  );
 }
 
 class CulturePerenneDetail {
@@ -46,7 +66,11 @@ class CulturePerenneDetail {
   final int jeunesP;
   final int matures;
   final int adulteDeclinant;
-  final double prixPlante, prixJeuneNp, prixJeuneP, prixAdulte, prixAdulteDeclinant;
+  final double prixPlante,
+      prixJeuneNp,
+      prixJeuneP,
+      prixAdulte,
+      prixAdulteDeclinant;
   final double montant;
   CulturePerenneDetail({
     required this.espece,
@@ -131,18 +155,42 @@ class CompensationCalculator {
   }) {
     final summary = CompensationSummary();
 
-    for (final enquete in champsEnquetes.where((e) => e.codeProprietaire == codeProprietaire)) {
+    for (final enquete in champsEnquetes.where(
+      (e) => e.codeProprietaire == codeProprietaire,
+    )) {
       _accumulateChampsEnquete(summary, enquete);
     }
 
-    for (final enquete in structureEnquetes.where((e) => e.proprietaireStructure == codeProprietaire)) {
+    for (final enquete in structureEnquetes.where(
+      (e) => e.proprietaireStructure == codeProprietaire,
+    )) {
       _accumulateStructureEnquete(summary, enquete);
     }
 
     return summary;
   }
 
-  static void _accumulateChampsEnquete(CompensationSummary summary, EnqueteChamp enquete) {
+  /// Aggregates the compensation across ALL recorded champs/structures
+  /// surveys (no owner filtering). Used for the dashboard's global
+  /// compensation breakdown chart.
+  static CompensationSummary computeGlobal({
+    required List<EnqueteChamp> champsEnquetes,
+    required List<es.EnqueteStructure> structureEnquetes,
+  }) {
+    final summary = CompensationSummary();
+    for (final enquete in champsEnquetes) {
+      _accumulateChampsEnquete(summary, enquete);
+    }
+    for (final enquete in structureEnquetes) {
+      _accumulateStructureEnquete(summary, enquete);
+    }
+    return summary;
+  }
+
+  static void _accumulateChampsEnquete(
+    CompensationSummary summary,
+    EnqueteChamp enquete,
+  ) {
     for (final parcelle in enquete.parcelles) {
       // ---- Foncier (parcelle) ----
       final terrain = _ref.terrainByType(parcelle.typeDeTerrain);
@@ -150,12 +198,14 @@ class CompensationCalculator {
       final montantParcelle = coutM2 * parcelle.superficieParcelle;
       summary.parcelles += montantParcelle;
       if (parcelle.superficieParcelle > 0) {
-        summary.parcelleDetails.add(ParcelleDetail(
-          parcelle.typeDeTerrain,
-          parcelle.superficieParcelle,
-          coutM2,
-          montantParcelle,
-        ));
+        summary.parcelleDetails.add(
+          ParcelleDetail(
+            parcelle.typeDeTerrain,
+            parcelle.superficieParcelle,
+            coutM2,
+            montantParcelle,
+          ),
+        );
       }
 
       // ---- Cultures annuelles (champs) ----
@@ -164,9 +214,21 @@ class CompensationCalculator {
           (c) => c['culture'] == champ.culture,
         );
         if (culture != null) {
-          final revenuHa = (culture['revenu_annuel_ha'] as num?)?.toDouble() ?? 0;
+          final revenuHa =
+              (culture['revenu_annuel_ha'] as num?)?.toDouble() ?? 0;
           // superficie is entered in hectares to match the price matrix (GNF/ha)
-          summary.champsCulturesAnnuelles += revenuHa * champ.superficieChamps;
+          final montant = revenuHa * champ.superficieChamps;
+          summary.champsCulturesAnnuelles += montant;
+          if (montant > 0) {
+            summary.cultureAnnuelleDetails.add(
+              CultureAnnuelleDetail(
+                culture: champ.culture,
+                superficieHa: champ.superficieChamps,
+                revenuHa: revenuHa,
+                montant: montant,
+              ),
+            );
+          }
         }
       }
 
@@ -189,14 +251,19 @@ class CompensationCalculator {
     // matrix for these items (matches official contracts which show 0 GNF).
   }
 
-  static void _accumulateCulturePerenne(CompensationSummary summary, String espece, dynamic arbre) {
+  static void _accumulateCulturePerenne(
+    CompensationSummary summary,
+    String espece,
+    dynamic arbre,
+  ) {
     final data = _ref.culturePerenneByName(espece);
     if (data == null) return;
     final prixPlante = (data['prix_plante'] as num?)?.toDouble() ?? 0;
     final prixJeuneNp = (data['prix_jeune_non_prod'] as num?)?.toDouble() ?? 0;
     final prixJeuneP = (data['prix_jeune_prod'] as num?)?.toDouble() ?? 0;
     final prixAdulte = (data['prix_adulte'] as num?)?.toDouble() ?? 0;
-    final prixAdulteDecl = (data['prix_adulte_declinant'] as num?)?.toDouble() ?? 0;
+    final prixAdulteDecl =
+        (data['prix_adulte_declinant'] as num?)?.toDouble() ?? 0;
 
     final plantules = (arbre.nombrePlante as int?) ?? 0;
     final jeunesNp = (arbre.nombreJeuneNp as int?) ?? 0;
@@ -204,7 +271,8 @@ class CompensationCalculator {
     final matures = (arbre.nombreMature as int?) ?? 0;
     final adulteDecl = (arbre.nombreAdulteDeclinant as int?) ?? 0;
 
-    final montant = plantules * prixPlante +
+    final montant =
+        plantules * prixPlante +
         jeunesNp * prixJeuneNp +
         jeunesP * prixJeuneP +
         matures * prixAdulte +
@@ -212,28 +280,36 @@ class CompensationCalculator {
 
     summary.culturesPerennes += montant;
     if (montant > 0) {
-      summary.culturePerenneDetails.add(CulturePerenneDetail(
-        espece: espece,
-        plantules: plantules,
-        jeunesNp: jeunesNp,
-        jeunesP: jeunesP,
-        matures: matures,
-        adulteDeclinant: adulteDecl,
-        prixPlante: prixPlante,
-        prixJeuneNp: prixJeuneNp,
-        prixJeuneP: prixJeuneP,
-        prixAdulte: prixAdulte,
-        prixAdulteDeclinant: prixAdulteDecl,
-        montant: montant,
-      ));
+      summary.culturePerenneDetails.add(
+        CulturePerenneDetail(
+          espece: espece,
+          plantules: plantules,
+          jeunesNp: jeunesNp,
+          jeunesP: jeunesP,
+          matures: matures,
+          adulteDeclinant: adulteDecl,
+          prixPlante: prixPlante,
+          prixJeuneNp: prixJeuneNp,
+          prixJeuneP: prixJeuneP,
+          prixAdulte: prixAdulte,
+          prixAdulteDeclinant: prixAdulteDecl,
+          montant: montant,
+        ),
+      );
     }
   }
 
-  static void _accumulateEspeceSauvage(CompensationSummary summary, String espece, dynamic arbre) {
+  static void _accumulateEspeceSauvage(
+    CompensationSummary summary,
+    String espece,
+    dynamic arbre,
+  ) {
     final data = _ref.especeSauvageByName(espece);
     if (data == null) return;
-    final prixNp = (data['indemnisation_plant_non_productif'] as num?)?.toDouble() ?? 0;
-    final prixP = (data['revenu_brut_annuel_plant_productif'] as num?)?.toDouble() ?? 0;
+    final prixNp =
+        (data['indemnisation_plant_non_productif'] as num?)?.toDouble() ?? 0;
+    final prixP =
+        (data['revenu_brut_annuel_plant_productif'] as num?)?.toDouble() ?? 0;
 
     final jeunesNp = (arbre.nombreJeuneNp as int?) ?? 0;
     final jeunesP = (arbre.nombreJeuneP as int?) ?? 0;
@@ -241,18 +317,24 @@ class CompensationCalculator {
     final montant = jeunesNp * prixNp + jeunesP * prixP;
     summary.especesSauvages += montant;
     if (montant > 0) {
-      summary.especeSauvageDetails.add(EspeceSauvageDetail(
-        espece: espece,
-        jeunesNp: jeunesNp,
-        jeunesP: jeunesP,
-        prixNp: prixNp,
-        prixP: prixP,
-        montant: montant,
-      ));
+      summary.especeSauvageDetails.add(
+        EspeceSauvageDetail(
+          espece: espece,
+          jeunesNp: jeunesNp,
+          jeunesP: jeunesP,
+          prixNp: prixNp,
+          prixP: prixP,
+          montant: montant,
+        ),
+      );
     }
   }
 
-  static void _accumulateBoisDoeuvre(CompensationSummary summary, String espece, dynamic arbre) {
+  static void _accumulateBoisDoeuvre(
+    CompensationSummary summary,
+    String espece,
+    dynamic arbre,
+  ) {
     final data = _ref.boisDoeuvreByName(espece);
     if (data == null) return;
     final valeurM3 = (data['valeur_bois_m3'] as num?)?.toDouble() ?? 0;
@@ -265,46 +347,72 @@ class CompensationCalculator {
 
     // Volume unitaire (m3) = (PI/4) * (circonference/PI)^2 * hauteur
     final rayonEquivalent = circonference / math.pi;
-    final volumeUnitaire = (math.pi / 4) * (rayonEquivalent * rayonEquivalent) * hauteur;
+    final volumeUnitaire =
+        (math.pi / 4) * (rayonEquivalent * rayonEquivalent) * hauteur;
     final volumeTotal = volumeUnitaire * nombrePieds;
     final montant = volumeTotal * valeurM3;
 
     summary.boisDoeuvre += montant;
-    summary.boisDoeuvreDetails.add(BoisDoeuvreDetail(
-      espece: espece,
-      circonference: circonference,
-      hauteur: hauteur,
-      volumeUnitaire: volumeUnitaire,
-      nombrePieds: nombrePieds,
-      volumeTotal: volumeTotal,
-      prixUnitaire: valeurM3,
-      montant: montant,
-    ));
+    summary.boisDoeuvreDetails.add(
+      BoisDoeuvreDetail(
+        espece: espece,
+        circonference: circonference,
+        hauteur: hauteur,
+        volumeUnitaire: volumeUnitaire,
+        nombrePieds: nombrePieds,
+        volumeTotal: volumeTotal,
+        prixUnitaire: valeurM3,
+        montant: montant,
+      ),
+    );
   }
 
   /// Mapping from the `type_structure` XLSForm choice name to the matching
   /// row designation in the "Structures" price matrix sheet + the unit of
   /// measurement used to interpret the survey's dimension fields.
   static const Map<String, _AutreStructureMapping> _autresStructuresMap = {
-    'Douche Moderne (Piece)': _AutreStructureMapping('Douche moderne', _Qty.piece),
+    'Douche Moderne (Piece)': _AutreStructureMapping(
+      'Douche moderne',
+      _Qty.piece,
+    ),
     'WC traditionnel': _AutreStructureMapping('WC traditionnel', _Qty.piece),
     'WC modeme': _AutreStructureMapping('WC moderne (avec ciment)', _Qty.piece),
-    'Fosse septique étayée mètre cube': _AutreStructureMapping('Fosse septique étayée', _Qty.sol),
+    'Fosse septique étayée mètre cube': _AutreStructureMapping(
+      'Fosse septique étayée',
+      _Qty.sol,
+    ),
     'Dalle de fosse en béton armé (avec ou sans trappe métallique m2)':
-        _AutreStructureMapping('Dalle de fosse en béton armé (avec ou sans trappe métallique)', _Qty.sol),
-    'Puits traditionnel étayé mètre linéaire':
-        _AutreStructureMapping('Puits traditionnel / Fosse septique étayée', _Qty.longueur),
-    'Puits moderne busé avec pompe manuelle pièce':
-        _AutreStructureMapping('Puits moderne busé avec pompe manuelle', _Qty.piece),
-    'Abris pour animaux en tôles et planches m2':
-        _AutreStructureMapping('Abris pour animaux en tôles et planches', _Qty.sol),
-    'Poulailler en brique creuse et toles piece':
-        _AutreStructureMapping('Poulailler en briques creuses et toles', _Qty.piece),
+        _AutreStructureMapping(
+          'Dalle de fosse en béton armé (avec ou sans trappe métallique)',
+          _Qty.sol,
+        ),
+    'Puits traditionnel étayé mètre linéaire': _AutreStructureMapping(
+      'Puits traditionnel / Fosse septique étayée',
+      _Qty.longueur,
+    ),
+    'Puits moderne busé avec pompe manuelle pièce': _AutreStructureMapping(
+      'Puits moderne busé avec pompe manuelle',
+      _Qty.piece,
+    ),
+    'Abris pour animaux en tôles et planches m2': _AutreStructureMapping(
+      'Abris pour animaux en tôles et planches',
+      _Qty.sol,
+    ),
+    'Poulailler en brique creuse et toles piece': _AutreStructureMapping(
+      'Poulailler en briques creuses et toles',
+      _Qty.piece,
+    ),
     'Hutte temporaire - abris dans les champs paille et bois':
-        _AutreStructureMapping('Hutte temporaire - abris dans les champs paille et bois', _Qty.piece),
+        _AutreStructureMapping(
+          'Hutte temporaire - abris dans les champs paille et bois',
+          _Qty.piece,
+        ),
   };
 
-  static void _accumulateStructureEnquete(CompensationSummary summary, es.EnqueteStructure enquete) {
+  static void _accumulateStructureEnquete(
+    CompensationSummary summary,
+    es.EnqueteStructure enquete,
+  ) {
     for (final s in enquete.structures) {
       if (s.usesMateriaux) {
         _accumulateHabitation(summary, s);
@@ -313,7 +421,8 @@ class CompensationCalculator {
         if (mapping == null) continue;
         final priceRow = _ref.structureByDesignation(mapping.designation);
         if (priceRow == null) continue;
-        final prixUnitaire = (priceRow['prix_unitaire'] as num?)?.toDouble() ?? 0;
+        final prixUnitaire =
+            (priceRow['prix_unitaire'] as num?)?.toDouble() ?? 0;
         double quantite;
         switch (mapping.qty) {
           case _Qty.piece:
@@ -329,36 +438,46 @@ class CompensationCalculator {
         final montant = prixUnitaire * quantite;
         summary.structures += montant;
         if (montant > 0) {
-          summary.structureDetails.add(StructureDetail(
-            designation: mapping.designation,
-            unite: (priceRow['unite'] as String?) ?? '',
-            quantite: quantite,
-            prixUnitaire: prixUnitaire,
-            montant: montant,
-          ));
+          summary.structureDetails.add(
+            StructureDetail(
+              designation: mapping.designation,
+              unite: (priceRow['unite'] as String?) ?? '',
+              quantite: quantite,
+              prixUnitaire: prixUnitaire,
+              montant: montant,
+            ),
+          );
         }
       }
     }
   }
 
-  static void _accumulateHabitation(CompensationSummary summary, es.StructureItem s) {
+  static void _accumulateHabitation(
+    CompensationSummary summary,
+    es.StructureItem s,
+  ) {
     double montantTotal = 0;
 
     void addLine(String? materiauLabel, double superficie) {
-      if (materiauLabel == null || materiauLabel.isEmpty || materiauLabel == 'Aucun') return;
+      if (materiauLabel == null ||
+          materiauLabel.isEmpty ||
+          materiauLabel == 'Aucun')
+        return;
       final priceRow = _ref.structureByDesignation(materiauLabel);
       if (priceRow == null) return;
       final prixUnitaire = (priceRow['prix_unitaire'] as num?)?.toDouble() ?? 0;
       final montant = prixUnitaire * superficie;
       montantTotal += montant;
       if (montant > 0) {
-        summary.structureDetails.add(StructureDetail(
-          designation: materiauLabel,
-          unite: (priceRow['unite'] as String?) ?? 'm²',
-          quantite: superficie,
-          prixUnitaire: prixUnitaire,
-          montant: montant,
-        ));
+        summary.structureDetails.add(
+          StructureDetail(
+            designation: materiauLabel,
+            unite: (priceRow['unite'] as String?) ?? 'm²',
+            quantite: superficie,
+            prixUnitaire: prixUnitaire,
+            montant: montant,
+          ),
+        );
       }
     }
 

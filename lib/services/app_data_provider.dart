@@ -97,11 +97,16 @@ class AppDataProvider extends ChangeNotifier {
 
   // -------- Aggregates for dashboard --------
   int get totalMenages => _menages.length;
-  int get totalIndividus => _menages.fold(0, (sum, m) => sum + m.individus.length);
-  int get totalParcelles => _champs.fold(0, (sum, c) => sum + c.parcelles.length);
+  int get totalIndividus =>
+      _menages.fold(0, (sum, m) => sum + m.individus.length);
+  int get totalParcelles =>
+      _champs.fold(0, (sum, c) => sum + c.parcelles.length);
   int get totalStructures =>
       _structures.fold(0, (sum, s) => sum + s.structures.length);
 
   double get totalSuperficieParcelles => _champs.fold(
-      0.0, (sum, c) => sum + c.parcelles.fold(0.0, (s2, p) => s2 + p.superficieParcelle));
+    0.0,
+    (sum, c) =>
+        sum + c.parcelles.fold(0.0, (s2, p) => s2 + p.superficieParcelle),
+  );
 }

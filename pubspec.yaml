@@ -90,6 +90,7 @@ flutter:
     - lib/data/choices.json
     - lib/data/guinea_admin.json
     - assets/images/
+    - assets/fonts/
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

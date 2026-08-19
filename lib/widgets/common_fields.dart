@@ -26,18 +26,29 @@ class ChoiceDropdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final items = ReferenceDataService.instance.choicesFiltered(listName, filterType);
+    final items = ReferenceDataService.instance.choicesFiltered(
+      listName,
+      filterType,
+    );
     final validValue = items.any((c) => c.name == value) ? value : null;
     return DropdownButtonFormField<String>(
       initialValue: validValue,
       isExpanded: true,
       decoration: InputDecoration(label: Text(required ? '$label *' : label)),
       items: items
-          .map((c) => DropdownMenuItem(value: c.name, child: Text(c.label, overflow: TextOverflow.ellipsis)))
+          .map(
+            (c) => DropdownMenuItem(
+              value: c.name,
+              child: Text(c.label, overflow: TextOverflow.ellipsis),
+            ),
+          )
           .toList(),
       onChanged: onChanged,
-      validator: validator ??
-          (required ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null : null),
+      validator:
+          validator ??
+          (required
+              ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null
+              : null),
     );
   }
 }
@@ -81,7 +92,11 @@ class LabeledTextField extends StatelessWidget {
         fillColor: readOnly ? Colors.grey.shade100 : null,
       ),
       onChanged: onChanged,
-      validator: validator ?? (required ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null : null),
+      validator:
+          validator ??
+          (required
+              ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null
+              : null),
     );
   }
 }
@@ -113,7 +128,9 @@ class DateField extends StatelessWidget {
         label: Text(required ? '$label *' : label),
         suffixIcon: const Icon(Icons.calendar_today, size: 18),
       ),
-      validator: required ? (v) => (value == null) ? 'Champ requis' : null : null,
+      validator: required
+          ? (v) => (value == null) ? 'Champ requis' : null
+          : null,
       onTap: () async {
         final picked = await showDatePicker(
           context: context,
@@ -187,5 +204,6 @@ class OuiNonField extends StatelessWidget {
 }
 
 class ChoiceItemList {
-  static List<ChoiceItem> of(String listName) => ReferenceDataService.instance.choices(listName);
+  static List<ChoiceItem> of(String listName) =>
+      ReferenceDataService.instance.choices(listName);
 }

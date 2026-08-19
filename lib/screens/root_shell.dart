@@ -59,16 +59,24 @@ class _RootShellState extends State<RootShell> {
                       child: const Icon(Icons.eco, color: Colors.white),
                     ),
                     const SizedBox(height: 6),
-                    const Text('OKAPI', style: TextStyle(fontWeight: FontWeight.bold, color: OkapiColors.primary)),
+                    const Text(
+                      'OKAPI',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: OkapiColors.primary,
+                      ),
+                    ),
                   ],
                 ),
               ),
               destinations: _items
-                  .map((e) => NavigationRailDestination(
-                        icon: Icon(e.icon),
-                        selectedIcon: Icon(e.icon, color: OkapiColors.primary),
-                        label: Text(e.label),
-                      ))
+                  .map(
+                    (e) => NavigationRailDestination(
+                      icon: Icon(e.icon),
+                      selectedIcon: Icon(e.icon, color: OkapiColors.primary),
+                      label: Text(e.label),
+                    ),
+                  )
                   .toList(),
             ),
             const VerticalDivider(width: 1),
@@ -84,7 +92,10 @@ class _RootShellState extends State<RootShell> {
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
         items: _items
-            .map((e) => BottomNavigationBarItem(icon: Icon(e.icon), label: e.label))
+            .map(
+              (e) =>
+                  BottomNavigationBarItem(icon: Icon(e.icon), label: e.label),
+            )
             .toList(),
       ),
     );

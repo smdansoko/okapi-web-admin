@@ -85,7 +85,10 @@ class AppTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -109,7 +112,9 @@ class AppTheme {
           backgroundColor: OkapiColors.primary,
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           elevation: 0,
           textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
         ),
@@ -119,7 +124,9 @@ class AppTheme {
           foregroundColor: OkapiColors.primary,
           side: const BorderSide(color: OkapiColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
       textButtonTheme: TextButtonThemeData(
@@ -131,7 +138,10 @@ class AppTheme {
       ),
       chipTheme: ChipThemeData(
         backgroundColor: OkapiColors.primary.withValues(alpha: 0.08),
-        labelStyle: const TextStyle(color: OkapiColors.primary, fontWeight: FontWeight.w600),
+        labelStyle: const TextStyle(
+          color: OkapiColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
         side: BorderSide.none,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
@@ -150,7 +160,10 @@ class AppTheme {
       navigationRailTheme: const NavigationRailThemeData(
         backgroundColor: Colors.white,
         selectedIconTheme: IconThemeData(color: OkapiColors.primary),
-        selectedLabelTextStyle: TextStyle(color: OkapiColors.primary, fontWeight: FontWeight.w600),
+        selectedLabelTextStyle: TextStyle(
+          color: OkapiColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       dividerTheme: DividerThemeData(color: Colors.grey.shade200, thickness: 1),
       snackBarTheme: SnackBarThemeData(

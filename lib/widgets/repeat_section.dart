@@ -42,8 +42,13 @@ class RepeatSection<T> extends StatelessWidget {
                 Icon(icon, color: OkapiColors.primary, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(title,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                  ),
                 ),
                 TextButton.icon(
                   onPressed: onAdd,
@@ -55,7 +60,10 @@ class RepeatSection<T> extends StatelessWidget {
             if (items.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('Aucun élément ajouté.', style: TextStyle(color: OkapiColors.textLight)),
+                child: Text(
+                  'Aucun élément ajouté.',
+                  style: TextStyle(color: OkapiColors.textLight),
+                ),
               )
             else
               ...List.generate(items.length, (i) {
@@ -69,18 +77,31 @@ class RepeatSection<T> extends StatelessWidget {
                   ),
                   child: ListTile(
                     dense: true,
-                    title: Text(itemTitle(item, i), style: const TextStyle(fontWeight: FontWeight.w600)),
-                    subtitle: itemSubtitle != null ? Text(itemSubtitle!(item, i)) : null,
+                    title: Text(
+                      itemTitle(item, i),
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: itemSubtitle != null
+                        ? Text(itemSubtitle!(item, i))
+                        : null,
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         if (trailingBuilder != null) trailingBuilder!(item, i),
                         IconButton(
-                          icon: const Icon(Icons.edit, size: 18, color: OkapiColors.info),
+                          icon: const Icon(
+                            Icons.edit,
+                            size: 18,
+                            color: OkapiColors.info,
+                          ),
                           onPressed: () => onEdit(i),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.delete_outline, size: 18, color: OkapiColors.error),
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: OkapiColors.error,
+                          ),
                           onPressed: () => onDelete(i),
                         ),
                       ],
@@ -117,7 +138,10 @@ Future<T?> showFormDialog<T>({
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Annuler')),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Annuler'),
+          ),
           ElevatedButton(
             onPressed: () {
               if (formKey.currentState?.validate() ?? true) {
