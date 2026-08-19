@@ -1,0 +1,1305 @@
+{
+  "sexe": [
+    {
+      "name": "Masculin",
+      "label": "Masculin"
+    },
+    {
+      "name": "Feminin",
+      "label": "Feminin"
+    }
+  ],
+  "oui_non": [
+    {
+      "name": "Oui",
+      "label": "Oui"
+    },
+    {
+      "name": "Non",
+      "label": "Non"
+    }
+  ],
+  "type_piece": [
+    {
+      "name": "Pas de document",
+      "label": "Pas de document"
+    },
+    {
+      "name": "Carte didentite nationale",
+      "label": "Carte didentite nationale"
+    },
+    {
+      "name": "Passeport",
+      "label": "Passeport"
+    },
+    {
+      "name": "Acte de naissance",
+      "label": "Extrait de naissance"
+    },
+    {
+      "name": "Carte consulaire",
+      "label": "Carte consulaire"
+    },
+    {
+      "name": "Carte etudiant",
+      "label": "Carte étudiant"
+    },
+    {
+      "name": "Carte scolaire",
+      "label": "Carte scolaire"
+    },
+    {
+      "name": "Permis de Conduire",
+      "label": "Permis de Conduire"
+    },
+    {
+      "name": "Carte electeur",
+      "label": "Carte d'électeur"
+    }
+  ],
+  "matrimoniale": [
+    {
+      "name": "Marie monogame",
+      "label": "Marié monogame"
+    },
+    {
+      "name": "Marie polygame",
+      "label": "Marié polygame"
+    },
+    {
+      "name": "Veuf ou Veuve",
+      "label": "Veuf ou Veuve"
+    },
+    {
+      "name": "Divorce ou separe",
+      "label": "Divorcé"
+    },
+    {
+      "name": "Celibataire",
+      "label": "Célibataire"
+    },
+    {
+      "name": "Non applicable",
+      "label": "Non applicable"
+    }
+  ],
+  "ethnie": [
+    {
+      "name": "Malinke",
+      "label": "Malinké"
+    },
+    {
+      "name": "Djallonke",
+      "label": "Djallonké"
+    },
+    {
+      "name": "Peulh",
+      "label": "Peulh"
+    },
+    {
+      "name": "Konianke",
+      "label": "Konianké"
+    },
+    {
+      "name": "Kouranko",
+      "label": "Kouranko"
+    },
+    {
+      "name": "Bambara",
+      "label": "Bambara"
+    },
+    {
+      "name": "Soussou",
+      "label": "Soussou"
+    },
+    {
+      "name": "Diakhanke",
+      "label": "Diakhanké"
+    },
+    {
+      "name": "Guerze",
+      "label": "Guèrzé"
+    },
+    {
+      "name": "Kissi",
+      "label": "Kissi"
+    },
+    {
+      "name": "Toma",
+      "label": "Toma"
+    },
+    {
+      "name": "Manon",
+      "label": "Manon"
+    },
+    {
+      "name": "Konon",
+      "label": "Konon"
+    },
+    {
+      "name": "Lele",
+      "label": "Lélé"
+    },
+    {
+      "name": "Autre",
+      "label": "Autre"
+    }
+  ],
+  "handicap": [
+    {
+      "name": "Non",
+      "label": "Non"
+    },
+    {
+      "name": "Handicap moteur",
+      "label": "Handicap moteur"
+    },
+    {
+      "name": "Handicap sensoriel",
+      "label": "Handicap sensoriel"
+    },
+    {
+      "name": "Handicap mental",
+      "label": "Handicap mental"
+    },
+    {
+      "name": "Maladie invalidante",
+      "label": "Maladie invalidante"
+    }
+  ],
+  "relation_cdm": [
+    {
+      "name": "Chef de menage",
+      "label": "Chef de ménage"
+    },
+    {
+      "name": "epouse",
+      "label": "Épouse"
+    },
+    {
+      "name": "Fils ou fille",
+      "label": "Fils ou fille"
+    },
+    {
+      "name": "Petit fils ou petite fille",
+      "label": "Petit fils ou petite fille"
+    },
+    {
+      "name": "Frere ou Soeur",
+      "label": "Frère ou Sœur"
+    },
+    {
+      "name": "Parent",
+      "label": "Parent"
+    },
+    {
+      "name": "Grand parent",
+      "label": "Grand parent"
+    },
+    {
+      "name": "Niece ou Neveu",
+      "label": "Nièce ou Neveu"
+    },
+    {
+      "name": "Oncle ou Tante",
+      "label": "Oncle ou Tante"
+    },
+    {
+      "name": "Cousin ou Cousine",
+      "label": "Cousin ou Cousine"
+    },
+    {
+      "name": "Beau Fils ou Belle Fille",
+      "label": "Beau Fils ou Belle Fille"
+    },
+    {
+      "name": "Beau Frere ou Belle soeur",
+      "label": "Beau Frère ou Belle sœur"
+    },
+    {
+      "name": "Pere ou mere",
+      "label": "Père ou mère"
+    },
+    {
+      "name": "Employe",
+      "label": "Employe"
+    },
+    {
+      "name": "Voisin",
+      "label": "Voisin"
+    },
+    {
+      "name": "Ami",
+      "label": "Ami"
+    },
+    {
+      "name": "Non Parente",
+      "label": "Non Parenté"
+    }
+  ],
+  "nationalite": [
+    {
+      "name": "Guineenne",
+      "label": "Guinéenne"
+    },
+    {
+      "name": "Malienne",
+      "label": "Malienne"
+    },
+    {
+      "name": "Burkinabe",
+      "label": "Burkinabé"
+    },
+    {
+      "name": "Senegalais",
+      "label": "Sénégalais"
+    },
+    {
+      "name": "Nigerien",
+      "label": "Nigérien"
+    },
+    {
+      "name": "Nigeriant",
+      "label": "Nigériant"
+    },
+    {
+      "name": "Ghaneenne",
+      "label": "Ghanéenne"
+    },
+    {
+      "name": "Mauritanienne",
+      "label": "Mauritanienne"
+    },
+    {
+      "name": "Ivoiriens",
+      "label": "Ivoiriens"
+    },
+    {
+      "name": "Beninois",
+      "label": "Béninois"
+    },
+    {
+      "name": "Togolais",
+      "label": "Togolais"
+    },
+    {
+      "name": "Autre",
+      "label": "Autre"
+    }
+  ],
+  "statut_menage": [
+    {
+      "name": "Proprietaire",
+      "label": "Propriétaire"
+    },
+    {
+      "name": "Locataire payant",
+      "label": "Locataire payant"
+    },
+    {
+      "name": "Locataire gratuit",
+      "label": "Locataire gratuit"
+    }
+  ],
+  "tablette": [
+    {
+      "name": "1",
+      "label": "Tablette 1"
+    },
+    {
+      "name": "2",
+      "label": "Tablette 2"
+    },
+    {
+      "name": "3",
+      "label": "Tablette 3"
+    },
+    {
+      "name": "4",
+      "label": "Tablette 4"
+    },
+    {
+      "name": "5",
+      "label": "Tablette 5"
+    },
+    {
+      "name": "6",
+      "label": "Tablette 6"
+    },
+    {
+      "name": "7",
+      "label": "Tablette 7"
+    },
+    {
+      "name": "8",
+      "label": "Tablette 8"
+    },
+    {
+      "name": "9",
+      "label": "Tablette 9"
+    },
+    {
+      "name": "10",
+      "label": "Tablette 10"
+    },
+    {
+      "name": "11",
+      "label": "Tablette 11"
+    },
+    {
+      "name": "12",
+      "label": "Tablette 12"
+    },
+    {
+      "name": "13",
+      "label": "Tablette 13"
+    },
+    {
+      "name": "14",
+      "label": "Tablette 14"
+    },
+    {
+      "name": "15",
+      "label": "Tablette 15"
+    },
+    {
+      "name": "16",
+      "label": "Tablette 16"
+    },
+    {
+      "name": "17",
+      "label": "Tablette 17"
+    },
+    {
+      "name": "18",
+      "label": "Tablette 18"
+    },
+    {
+      "name": "19",
+      "label": "Tablette 19"
+    },
+    {
+      "name": "20",
+      "label": "Tablette 20"
+    },
+    {
+      "name": "21",
+      "label": "Tablette 21"
+    },
+    {
+      "name": "22",
+      "label": "Tablette 22"
+    },
+    {
+      "name": "23",
+      "label": "Tablette 23"
+    },
+    {
+      "name": "24",
+      "label": "Tablette 24"
+    },
+    {
+      "name": "25",
+      "label": "Tablette 25"
+    },
+    {
+      "name": "26",
+      "label": "Tablette 26"
+    },
+    {
+      "name": "27",
+      "label": "Tablette 27"
+    },
+    {
+      "name": "28",
+      "label": "Tablette 28"
+    },
+    {
+      "name": "29",
+      "label": "Tablette 29"
+    },
+    {
+      "name": "30",
+      "label": "Tablette 30"
+    }
+  ],
+  "type_champs": [
+    {
+      "name": "Champs de case",
+      "label": "Champs de case"
+    },
+    {
+      "name": "Champs de brousse",
+      "label": "Champs de brousse"
+    }
+  ],
+  "etat_champs": [
+    {
+      "name": "Cultive",
+      "label": "Cultivé"
+    },
+    {
+      "name": "Jachere1",
+      "label": "Jachères (hors arbres productifs) <10 ans"
+    },
+    {
+      "name": "Jachere2",
+      "label": "Jachères (hors arbres productifs) >10 ans"
+    }
+  ],
+  "maturite": [
+    {
+      "name": "Plantules",
+      "label": "Plantules"
+    },
+    {
+      "name": "Jeunes non productifs",
+      "label": "Jeunes non productifs"
+    },
+    {
+      "name": "Jeunes productifs",
+      "label": "Jeunes productifs"
+    },
+    {
+      "name": "Matures",
+      "label": "Matures"
+    }
+  ],
+  "culture": [
+    {
+      "name": "Arachide (graine)",
+      "label": "Arachide (graine)"
+    },
+    {
+      "name": "Ananas",
+      "label": "Ananas"
+    },
+    {
+      "name": "Aubergine longue",
+      "label": "Aubergine longue"
+    },
+    {
+      "name": "Aubergine ronde",
+      "label": "Aubergine ronde"
+    },
+    {
+      "name": "Chou pommé",
+      "label": "Chou pommé"
+    },
+    {
+      "name": "Concombre",
+      "label": "Concombre"
+    },
+    {
+      "name": "Courge",
+      "label": "Courge"
+    },
+    {
+      "name": "Fonio",
+      "label": "Fonio"
+    },
+    {
+      "name": "Gingembre",
+      "label": "Gingembre"
+    },
+    {
+      "name": "Gombo",
+      "label": "Gombo"
+    },
+    {
+      "name": "Haricot",
+      "label": "Haricot"
+    },
+    {
+      "name": "Igname",
+      "label": "Igname"
+    },
+    {
+      "name": "Laitue",
+      "label": "Laitue"
+    },
+    {
+      "name": "Mais (sec)",
+      "label": "Mais (sec)"
+    },
+    {
+      "name": "Manioc",
+      "label": "Manioc"
+    },
+    {
+      "name": "Mil",
+      "label": "Mil"
+    },
+    {
+      "name": "Niébé (et autres légunemineuses à grains)",
+      "label": "Niébé (et autres légunemineuses à grains)"
+    },
+    {
+      "name": "Oignon",
+      "label": "Oignon"
+    },
+    {
+      "name": "Patate",
+      "label": "Patate"
+    },
+    {
+      "name": "Pastèque",
+      "label": "Pastèque"
+    },
+    {
+      "name": "Piment Gros (Frais)",
+      "label": "Piment Gros (Frais)"
+    },
+    {
+      "name": "Piment sec Petit (Sec)",
+      "label": "Piment sec Petit (Sec)"
+    },
+    {
+      "name": "Riz de Bas-fond",
+      "label": "Riz de Bas-fond"
+    },
+    {
+      "name": "Riz de coteau",
+      "label": "Riz de coteau"
+    },
+    {
+      "name": "Riz de mangrove",
+      "label": "Riz de mangrove"
+    },
+    {
+      "name": "Riz de plaine de mangrove",
+      "label": "Riz de plaine de mangrove"
+    },
+    {
+      "name": "Sésame",
+      "label": "Sésame"
+    },
+    {
+      "name": "Sorgho",
+      "label": "Sorgho"
+    },
+    {
+      "name": "Taro",
+      "label": "Taro"
+    },
+    {
+      "name": "Tomate",
+      "label": "Tomate"
+    },
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    }
+  ],
+  "type_speculation": [
+    {
+      "name": "Unique",
+      "label": "Unique"
+    },
+    {
+      "name": "Multiple",
+      "label": "Multiple"
+    }
+  ],
+  "type_terrain": [
+    {
+      "name": "Terres non cultivables",
+      "label": "Terres non cultivables : bowés, savanes herbeuses, affleurements rocheux, éboulis"
+    },
+    {
+      "name": "Coteau et autres terres cultivables hors bas-fonds",
+      "label": "Coteau et autres terres cultivables hors bas-fonds"
+    },
+    {
+      "name": "Plaines inondees",
+      "label": "Plaines inondées : plaines alluviales, plaines de mangrove"
+    },
+    {
+      "name": "Bas-fonds",
+      "label": "Bas-fonds"
+    },
+    {
+      "name": "Jacheres de plus de 10 ans, ilots boises, forets galeries et forets villageoises",
+      "label": "Jachères de plus de 10 ans, îlots boisés, forêts galeries et forêts villageoises"
+    },
+    {
+      "name": "Terroir pour habitation villageoise",
+      "label": "Terroir pour habitation villageoise : hors zone de tension de marché"
+    },
+    {
+      "name": "Terrain construit et/ou constructible en zone de tension de marche",
+      "label": "Terrain construit et/ou constructible en zone de tension de marché : corridor de 30 mètres de part en part de la route nationale, routes minières"
+    }
+  ],
+  "type_arbre": [
+    {
+      "name": "cultures_perennes",
+      "label": "Cultures pérennes"
+    },
+    {
+      "name": "bois_doeuvre",
+      "label": "Bois d'œuvre"
+    },
+    {
+      "name": "especes_sauvages",
+      "label": "Espèces sauvages"
+    }
+  ],
+  "espece_arbre": [
+    {
+      "name": "Citronnier",
+      "label": "Citronnier (Citrus limom)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Oranger",
+      "label": "Oranger (Citrus sp)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Pamplemoussier",
+      "label": "Pamplemoussier (Citrus sp)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Anacardier",
+      "label": "Anacardier (Anacardium occidentale)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Jacquier/Arbre à pain",
+      "label": "Jacquier/Arbre à pain (Artocarpus sp)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Avocatier",
+      "label": "Avocatier (Perseau sp)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Bananier",
+      "label": "Bananier (Musa paradiaca)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Bananier plantain",
+      "label": "Bananier plantain (Musa paradiaca)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Calebassier",
+      "label": "Calebassier (Crescentia cujete)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Cocotier",
+      "label": "Cocotier (Cocos nucirera)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Colatier",
+      "label": "Colatier (Cola nitida)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Corossolier (Sop-sop)",
+      "label": "Corossolier (Sop-sop) (Annona muricat)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Goyavier",
+      "label": "Goyavier (Psidium guajava)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Loukhouré",
+      "label": "Loukhouré (Spondias Mombin)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Manguier ordinaire",
+      "label": "Manguier ordinaire (Mangifera indica)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Manguier greffé",
+      "label": "Manguier greffé (Mangifera indica)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Papayer",
+      "label": "Papayer (Carcia papaya)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Tamarinier",
+      "label": "Tamarinier (Tamarindus indica)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Palmier amélioré",
+      "label": "Palmier amélioré (Eleais guinensis)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Palmier local planté",
+      "label": "Palmier local planté (Eleais guinensis)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Palmier local spontané",
+      "label": "Palmier local spontané (Eleais guinensis)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Mèmè/Malanga",
+      "label": "Mèmè/Malanga (Lophira lanceolata)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Tamarinier noir (Méko)",
+      "label": "Tamarinier noir (Méko) (Dialium Guineense)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Kantinyi/Kansi",
+      "label": "Kantinyi/Kansi (Anisophyllea laurina)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Baobab/Kiri",
+      "label": "Baobab/Kiri (Adansonia digitata)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Sougué/Koura",
+      "label": "Sougué/Koura (Parinari excelsa)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Néré",
+      "label": "Néré (Parkia biglobosa)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Piment noir/Siminyi",
+      "label": "Piment noir/Siminyi (Xylopia ethiopica)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Mandarinier",
+      "label": "Mandarinier (Citrus reticulata)",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Doundakhè",
+      "label": "Doundakhè (Sarcocephalus esculentus)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Foré",
+      "label": "Foré (Landolphia dulcis)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Gbamgba",
+      "label": "Gbamgba (Cassia siberiana)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Mèkhèmèkhènyi",
+      "label": "Mèkhèmèkhènyi (Craterispermum laurinum)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Mokè",
+      "label": "Mokè (Dialium guineense)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Moronda",
+      "label": "Moronda (Uvaria chamae)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Sikhignè",
+      "label": "Sikhignè (Gardenia aquala)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Laaré",
+      "label": "Laaré (Saba senegalinsis)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Tolinyi",
+      "label": "Tolinyi (Bridelia ferruginea)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Tola",
+      "label": "Tola (Beilschmiedia mannii)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Gbessé",
+      "label": "Gbessé (Lophira lanceolata)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Boulen",
+      "label": "Boulen (Entanda africana)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Kolokolo",
+      "label": "Kolokolo (Pericopsis laxiflora)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Gobi",
+      "label": "Gobi (Carapa procera)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Kantoungni",
+      "label": "Kantoungni (AnisophyIlea laurina)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Kinkirissi",
+      "label": "Kinkirissi (Salacia senegalensis)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Wobé",
+      "label": "Wobé (Harungana madagascariensis)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Teck",
+      "label": "Teck (Tectona grandis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Gmelina",
+      "label": "Gmelina (Gmelina arborea)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Frake/Framire",
+      "label": "Frake/Framire (Terminalia ivorensis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Vène",
+      "label": "Vène (Pterocarpus erinaceus)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Acajou",
+      "label": "Acajou (Khaya senegalensis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Lengué",
+      "label": "Lengué (Afzelia africana)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Yatanza",
+      "label": "Yatanza ( Albizzia sp)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Acacia",
+      "label": "Acacia (Acacia mangium)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Koura",
+      "label": "Koura (Acacia auriculoformis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Iroko",
+      "label": "Iroko (Chlorophora excelsa)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Sandan",
+      "label": "Sandan (Chlorophora excelsa ou Milicia)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Boto",
+      "label": "Boto (Milicia reggia)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Bahia/Popo",
+      "label": "Bahia/Popo (Detarium senegalensis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Limbi",
+      "label": "Limbi (Combretum glutinosum)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Tinkelin-nafa",
+      "label": "Tinkelin-nafa (Anthocleista nobilis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Fromager",
+      "label": "Fromager (Ceiba pentendra)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Kapokier",
+      "label": "Kapokier (Bombax costatum)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Sau rouge",
+      "label": "Sau rouge (Isoberlinia doka)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Dissa Woury",
+      "label": "Dissa Woury (Anthocieista procera)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Popo",
+      "label": "Popo (Mytragina stipulosa)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Gbelen",
+      "label": "Gbelen (Prosopis africana)",
+      "type": "bois_doeuvre"
+    }
+  ],
+  "type_ressource": [
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    },
+    {
+      "name": "cueillette",
+      "label": "Produits de la cueillette"
+    },
+    {
+      "name": "chasse",
+      "label": "Produits de la chasse"
+    },
+    {
+      "name": "peche",
+      "label": "Produits de la pêche"
+    }
+  ],
+  "ressource": [
+    {
+      "name": "Natte",
+      "label": "Natte",
+      "type": "cueillette"
+    },
+    {
+      "name": "Huile rouge",
+      "label": "Huile rouge",
+      "type": "cueillette"
+    },
+    {
+      "name": "Vin de raphia",
+      "label": "Vin de raphia",
+      "type": "cueillette"
+    },
+    {
+      "name": "Vin de palm",
+      "label": "Vin de palm",
+      "type": "cueillette"
+    },
+    {
+      "name": "Néré",
+      "label": "Néré",
+      "type": "cueillette"
+    },
+    {
+      "name": "Sée",
+      "label": "Sée",
+      "type": "cueillette"
+    },
+    {
+      "name": "Miel",
+      "label": "Miel",
+      "type": "cueillette"
+    },
+    {
+      "name": "Autre1",
+      "label": "Autre",
+      "type": "cueillette"
+    },
+    {
+      "name": "Agouti",
+      "label": "Agouti",
+      "type": "chasse"
+    },
+    {
+      "name": "Porc-épic",
+      "label": "Porc-épic",
+      "type": "chasse"
+    },
+    {
+      "name": "Autre2",
+      "label": "Autre",
+      "type": "chasse"
+    },
+    {
+      "name": "Carpe",
+      "label": "Carpe",
+      "type": "peche"
+    },
+    {
+      "name": "Silure",
+      "label": "Silure",
+      "type": "peche"
+    },
+    {
+      "name": "Autre3",
+      "label": "Autre",
+      "type": "peche"
+    }
+  ],
+  "unite": [
+    {
+      "name": "Littre",
+      "label": "Littre"
+    },
+    {
+      "name": "Nombre",
+      "label": "Nombre"
+    },
+    {
+      "name": "Kilogramme",
+      "label": "Kilogramme"
+    },
+    {
+      "name": "Sacs",
+      "label": "Sacs"
+    }
+  ],
+  "type_propriete": [
+    {
+      "name": "Lignage",
+      "label": "Lignage"
+    },
+    {
+      "name": "Propriétaire",
+      "label": "Propriétaire"
+    },
+    {
+      "name": "Communautaire",
+      "label": "Communautaire"
+    }
+  ],
+  "compensation": [
+    {
+      "name": "Nature",
+      "label": "Nature"
+    },
+    {
+      "name": "Espèce",
+      "label": "Espèce"
+    }
+  ],
+  "type_structure": [
+    {
+      "name": "Habitation et bien immobiliers",
+      "label": "Habitation et bien immobiliers"
+    },
+    {
+      "name": "Douche Moderne (Piece)",
+      "label": "Douche Moderne (Piece)"
+    },
+    {
+      "name": "WC traditionnel",
+      "label": "WC traditionnel (Piece)"
+    },
+    {
+      "name": "WC modeme",
+      "label": "WC modeme (Piece)"
+    },
+    {
+      "name": "Fosse septique étayée mètre cube",
+      "label": "Fosse septique étayée mètre cube (m3)"
+    },
+    {
+      "name": "Dalle de fosse en béton armé (avec ou sans trappe métallique m2)",
+      "label": "Dalle de fosse en béton armé avec ou sans trappe métallique (m2)"
+    },
+    {
+      "name": "Puits traditionnel étayé mètre linéaire",
+      "label": "Puits traditionnel étayé (mètre linéaire)"
+    },
+    {
+      "name": "Puits moderne busé avec pompe manuelle pièce",
+      "label": "Puits moderne busé avec pompe manuelle (Piece)"
+    },
+    {
+      "name": "Abris pour animaux en tôles et planches m2",
+      "label": "Abris pour animaux en tôles et planches (m2)"
+    },
+    {
+      "name": "Poulailler en brique creuse et toles piece",
+      "label": "Poulailler en brique creuse et toles piece (Piece)"
+    },
+    {
+      "name": "Hutte temporaire - abris dans les champs paille et bois",
+      "label": "Hutte temporaire - abris dans les champs paille et bois (Piece)"
+    },
+    {
+      "name": "Autre",
+      "label": "Autre"
+    }
+  ],
+  "materiaux_toit": [
+    {
+      "name": "Chaume avec charpente en bois d'œuvre",
+      "label": "Chaume avec charpente en bois d'œuvre"
+    },
+    {
+      "name": "Chaume avec charpente en bois de ceuillette",
+      "label": "Chaume avec charpente en bois de ceuillette"
+    },
+    {
+      "name": "Tôles avec charpente en bois de ceuillette",
+      "label": "Tôles avec charpente en bois de ceuillette"
+    },
+    {
+      "name": "Tôles avec charpente en bois",
+      "label": "Tôles avec charpente en bois"
+    },
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    }
+  ],
+  "materiaux_mur": [
+    {
+      "name": "Mur en banco",
+      "label": "Mur en banco"
+    },
+    {
+      "name": "Mur en planche de bois",
+      "label": "Mur en planche de bois"
+    },
+    {
+      "name": "Mur en petit bois",
+      "label": "Mur en petit bois"
+    },
+    {
+      "name": "Mur en brique crue non crépi",
+      "label": "Mur en brique crue non crépi"
+    },
+    {
+      "name": "Mur en brique crue crépi",
+      "label": "Mur en brique crue crépi"
+    },
+    {
+      "name": "Mur en brique cuite crépi",
+      "label": "Mur en brique cuite crépi"
+    },
+    {
+      "name": "Mur en brique cuite non crépi",
+      "label": "Mur en brique cuite non crépi"
+    },
+    {
+      "name": "Mur en parpaing crépi",
+      "label": "Mur en parpaing crépi"
+    },
+    {
+      "name": "Mur en parpaing non crépi",
+      "label": "Mur en parpaing non crépi"
+    }
+  ],
+  "materiaux_carrelage": [
+    {
+      "name": "Carrelage au sol",
+      "label": "Carrelage au sol"
+    },
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    }
+  ],
+  "materiaux_sol": [
+    {
+      "name": "Terre battue non surélevée",
+      "label": "Terre battue non surélevée"
+    },
+    {
+      "name": "Soubassement en briques crues, sol en terre damée",
+      "label": "Soubassement en briques crues, sol en terre damée"
+    },
+    {
+      "name": "Soubassement en briques crues avec chape de béton",
+      "label": "Soubassement en briques crues avec chape de béton"
+    },
+    {
+      "name": "Soubassement en béton cyclopéen avec chape de béton",
+      "label": "Soubassement en béton cyclopéen avec chape de béton"
+    },
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    }
+  ],
+  "materiaux_fermeture": [
+    {
+      "name": "Portes et fenêtres en bois simple de petites dimensions",
+      "label": "Portes et fenêtres en bois simple de petites dimensions"
+    },
+    {
+      "name": "Portes et fenêtresde grandes dimensions en bois ouvré ou métal",
+      "label": "Portes et fenêtresde grandes dimensions en bois ouvré ou métal"
+    },
+    {
+      "name": "Antivol grille métallique",
+      "label": "Antivol grille métallique"
+    },
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    }
+  ],
+  "materiaux_peinture": [
+    {
+      "name": "Peinture intérieure et/ou extérieure",
+      "label": "Peinture intérieure et/ou extérieure"
+    },
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    }
+  ],
+  "etat_structure": [
+    {
+      "name": "En construction",
+      "label": "En construction"
+    },
+    {
+      "name": "Complete / Bon etat",
+      "label": "Complète / Bon état"
+    },
+    {
+      "name": "Complete / Mauvais etat",
+      "label": "Complète / Mauvais état"
+    },
+    {
+      "name": "Ruine",
+      "label": "Ruine"
+    }
+  ]
+}
