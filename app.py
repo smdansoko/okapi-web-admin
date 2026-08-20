@@ -26,6 +26,25 @@ app.config["JSON_AS_ASCII"] = False
 db.init_db()
 
 
+@app.after_request
+def _add_cors_headers(response):
+    """Allow the OKAPI Survey mobile app (incl. its Flutter Web preview,
+    served from a different origin/port) to call /api/sync and other
+    endpoints via cross-origin requests."""
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = (
+        "Content-Type, X-Device-Id, X-Device-Name"
+    )
+    return response
+
+
+@app.route("/api/sync", methods=["OPTIONS"])
+@app.route("/api/status", methods=["OPTIONS"])
+def _cors_preflight():
+    return ("", 204)
+
+
 @app.template_filter("fromjson")
 def _fromjson_filter(s):
     try:
