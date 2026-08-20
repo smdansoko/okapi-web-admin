@@ -5,6 +5,7 @@ import 'menage/menage_list_screen.dart';
 import 'champs/champs_list_screen.dart';
 import 'structures/structures_list_screen.dart';
 import 'contracts/contracts_screen.dart';
+import 'sync/sync_screen.dart';
 
 class RootShell extends StatefulWidget {
   const RootShell({super.key});
@@ -22,6 +23,7 @@ class _RootShellState extends State<RootShell> {
     ChampsListScreen(),
     StructuresListScreen(),
     ContractsScreen(),
+    SyncScreen(),
   ];
 
   final _items = const [
@@ -30,6 +32,7 @@ class _RootShellState extends State<RootShell> {
     _NavItem(icon: Icons.grass_rounded, label: 'Champs'),
     _NavItem(icon: Icons.home_work_rounded, label: 'Structures'),
     _NavItem(icon: Icons.description_rounded, label: 'Contrats'),
+    _NavItem(icon: Icons.cloud_upload_rounded, label: 'Synchroniser'),
   ];
 
   @override
@@ -91,6 +94,10 @@ class _RootShellState extends State<RootShell> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
+        type: BottomNavigationBarType.fixed,
+        selectedFontSize: 11,
+        unselectedFontSize: 11,
+        iconSize: 22,
         items: _items
             .map(
               (e) =>

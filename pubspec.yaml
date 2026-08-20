@@ -59,6 +59,9 @@ dependencies:
   # Photo capture (profile + ID document photos), Web + Android compatible
   image_picker: ^1.1.2
 
+  # HTTP client for synchronizing data with the OKAPI Web Admin server
+  http: ^1.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

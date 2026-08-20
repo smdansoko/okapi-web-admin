@@ -7,6 +7,8 @@ import '../../services/app_data_provider.dart';
 import '../../services/compensation_calculator.dart';
 import '../../services/contract_pdf_generator.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/sync_status_banner.dart';
+import '../sync/sync_screen.dart';
 
 /// Contracts hub: Propriétaire (Ménage) / Lignage / Communautaire.
 /// Generates the "Accord de compensation" PDF matching the official
@@ -66,6 +68,15 @@ class ContractsScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Contrats de compensation'),
+          actions: [
+            IconButton(
+              tooltip: 'Synchroniser',
+              icon: const Icon(Icons.cloud_upload_rounded),
+              onPressed: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const SyncScreen())),
+            ),
+          ],
           bottom: const TabBar(
             tabs: [
               Tab(text: 'Propriétaire'),
@@ -74,72 +85,81 @@ class ContractsScreen extends StatelessWidget {
             ],
           ),
         ),
-        body: TabBarView(
+        body: Column(
           children: [
-            _ContractTab(
-              emptyLabel:
-                  'Aucun ménage disponible pour générer un accord Propriétaire.',
-              items:
-                  [
-                    ...proprietaireOwners.values.map(
-                      (o) => _ContractEntry(
-                        title: o.nom,
-                        subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
-                        sortKey: o.numBatch,
-                        onGenerate: () => _generateOwnerContract(
-                          context,
-                          ContractType.proprietaire,
-                          o,
+            const SyncStatusBanner(),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _ContractTab(
+                    emptyLabel:
+                        'Aucun ménage disponible pour générer un accord Propriétaire.',
+                    items: [
+                      ...proprietaireOwners.values.map(
+                        (o) => _ContractEntry(
+                          title: o.nom,
+                          subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
+                          sortKey: o.numBatch,
+                          onGenerate: () => _generateOwnerContract(
+                            context,
+                            ContractType.proprietaire,
+                            o,
+                          ),
                         ),
                       ),
-                    ),
-                    ...fallbackMenages.map(
-                      (m) => _ContractEntry(
-                        title: m.nomChefMenage.isEmpty
-                            ? m.codeMenage
-                            : m.nomChefMenage,
-                        subtitle: m.codeMenage,
-                        sortKey: m.codeMenage,
-                        onGenerate: () => _generateMenageContract(context, m),
+                      ...fallbackMenages.map(
+                        (m) => _ContractEntry(
+                          title: m.nomChefMenage.isEmpty
+                              ? m.codeMenage
+                              : m.nomChefMenage,
+                          subtitle: m.codeMenage,
+                          sortKey: m.codeMenage,
+                          onGenerate: () => _generateMenageContract(context, m),
+                        ),
                       ),
-                    ),
-                  ].toList()..sort(
-                    (a, b) => a.sortKey.compareTo(b.sortKey),
+                    ].toList()..sort((a, b) => a.sortKey.compareTo(b.sortKey)),
                   ),
-            ),
-            _ContractTab(
-              emptyLabel: 'Aucune enquête de type Lignage disponible.',
-              items: lignageOwners.values
-                  .map(
-                    (o) => _ContractEntry(
-                      title: o.nom,
-                      subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
-                      sortKey: o.numBatch,
-                      onGenerate: () => _generateOwnerContract(
-                        context,
-                        ContractType.lignage,
-                        o,
-                      ),
-                    ),
-                  )
-                  .toList()..sort((a, b) => a.sortKey.compareTo(b.sortKey)),
-            ),
-            _ContractTab(
-              emptyLabel: 'Aucune enquête de type Communautaire disponible.',
-              items: communautaireOwners.values
-                  .map(
-                    (o) => _ContractEntry(
-                      title: o.nom,
-                      subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
-                      sortKey: o.numBatch,
-                      onGenerate: () => _generateOwnerContract(
-                        context,
-                        ContractType.communautaire,
-                        o,
-                      ),
-                    ),
-                  )
-                  .toList()..sort((a, b) => a.sortKey.compareTo(b.sortKey)),
+                  _ContractTab(
+                    emptyLabel: 'Aucune enquête de type Lignage disponible.',
+                    items:
+                        lignageOwners.values
+                            .map(
+                              (o) => _ContractEntry(
+                                title: o.nom,
+                                subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
+                                sortKey: o.numBatch,
+                                onGenerate: () => _generateOwnerContract(
+                                  context,
+                                  ContractType.lignage,
+                                  o,
+                                ),
+                              ),
+                            )
+                            .toList()
+                          ..sort((a, b) => a.sortKey.compareTo(b.sortKey)),
+                  ),
+                  _ContractTab(
+                    emptyLabel:
+                        'Aucune enquête de type Communautaire disponible.',
+                    items:
+                        communautaireOwners.values
+                            .map(
+                              (o) => _ContractEntry(
+                                title: o.nom,
+                                subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
+                                sortKey: o.numBatch,
+                                onGenerate: () => _generateOwnerContract(
+                                  context,
+                                  ContractType.communautaire,
+                                  o,
+                                ),
+                              ),
+                            )
+                            .toList()
+                          ..sort((a, b) => a.sortKey.compareTo(b.sortKey)),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

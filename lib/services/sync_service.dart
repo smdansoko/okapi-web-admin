@@ -1,0 +1,186 @@
+import 'dart:convert';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../models/menage.dart';
+import '../models/enquete_champ.dart';
+import '../models/structure.dart';
+
+/// Result of a synchronization attempt with the OKAPI Web Admin server.
+class SyncResult {
+  final bool success;
+  final String message;
+  final Map<String, dynamic>? serverTotals;
+  final Map<String, dynamic>? received;
+  final DateTime timestamp;
+
+  SyncResult({
+    required this.success,
+    required this.message,
+    this.serverTotals,
+    this.received,
+    DateTime? timestamp,
+  }) : timestamp = timestamp ?? DateTime.now();
+}
+
+/// Handles sending locally-saved data (Ménages, Enquêtes Champs, Enquêtes
+/// Structures) from the OKAPI Survey mobile app to the separate OKAPI Web
+/// Admin server (Flask app), via a simple JSON POST to /api/sync.
+///
+/// The server URL is configurable and persisted locally (SharedPreferences)
+/// so it can be pointed at any deployment (sandbox preview, production
+/// server, local network address of the admin PC, etc.) without rebuilding
+/// the app.
+class SyncService {
+  SyncService._();
+  static final SyncService instance = SyncService._();
+
+  static const _prefKeyServerUrl = 'sync_server_url';
+  static const _prefKeyLastSyncAt = 'sync_last_at';
+  static const _prefKeyDeviceId = 'sync_device_id';
+  static const _prefKeyDeviceName = 'sync_device_name';
+
+  String? _cachedServerUrl;
+  String? _cachedDeviceId;
+
+  /// Default OKAPI Web Admin server address (sandbox preview deployment).
+  /// Update this value once the server is deployed to a permanent address.
+  static const String defaultServerUrl =
+      'https://5070-i1bw6quvtj3j3sq04mntj-dfc00ec5.sandbox.novita.ai';
+
+  Future<String> get serverUrl async {
+    if (_cachedServerUrl != null) return _cachedServerUrl!;
+    final prefs = await SharedPreferences.getInstance();
+    _cachedServerUrl = prefs.getString(_prefKeyServerUrl) ?? defaultServerUrl;
+    return _cachedServerUrl!;
+  }
+
+  Future<void> setServerUrl(String url) async {
+    final normalized = url.trim().replaceAll(RegExp(r'/+$'), '');
+    _cachedServerUrl = normalized;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefKeyServerUrl, normalized);
+  }
+
+  Future<DateTime?> get lastSyncAt async {
+    final prefs = await SharedPreferences.getInstance();
+    final iso = prefs.getString(_prefKeyLastSyncAt);
+    if (iso == null) return null;
+    return DateTime.tryParse(iso);
+  }
+
+  Future<void> _setLastSyncAt(DateTime dt) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefKeyLastSyncAt, dt.toIso8601String());
+  }
+
+  Future<String> get deviceId async {
+    if (_cachedDeviceId != null) return _cachedDeviceId!;
+    final prefs = await SharedPreferences.getInstance();
+    var id = prefs.getString(_prefKeyDeviceId);
+    if (id == null || id.isEmpty) {
+      id = 'device-${DateTime.now().millisecondsSinceEpoch}';
+      await prefs.setString(_prefKeyDeviceId, id);
+    }
+    _cachedDeviceId = id;
+    return id;
+  }
+
+  Future<String> get deviceName async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString(_prefKeyDeviceName);
+    if (saved != null && saved.isNotEmpty) return saved;
+    String platformLabel;
+    if (kIsWeb) {
+      platformLabel = 'Web';
+    } else {
+      try {
+        platformLabel = Platform.isAndroid
+            ? 'Android'
+            : Platform.operatingSystem;
+      } catch (_) {
+        platformLabel = 'Mobile';
+      }
+    }
+    return 'Tablette OKAPI ($platformLabel)';
+  }
+
+  Future<void> setDeviceName(String name) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefKeyDeviceName, name);
+  }
+
+  /// Sends all provided data to the configured server's /api/sync endpoint.
+  Future<SyncResult> syncAll({
+    required List<Menage> menages,
+    required List<EnqueteChamp> champs,
+    required List<EnqueteStructure> structures,
+  }) async {
+    final url = await serverUrl;
+    if (url.isEmpty) {
+      return SyncResult(
+        success: false,
+        message:
+            'Aucune adresse de serveur configurée. Veuillez renseigner l\'URL du serveur Web Admin OKAPI.',
+      );
+    }
+
+    final endpoint = Uri.parse('$url/api/sync');
+    final payload = {
+      'deviceId': await deviceId,
+      'deviceName': await deviceName,
+      'menages': menages.map((m) => m.toMap()).toList(),
+      'champs': champs.map((c) => c.toMap()).toList(),
+      'structures': structures.map((s) => s.toMap()).toList(),
+    };
+
+    try {
+      final response = await http
+          .post(
+            endpoint,
+            headers: {'Content-Type': 'application/json; charset=utf-8'},
+            body: jsonEncode(payload),
+          )
+          .timeout(const Duration(seconds: 45));
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final body =
+            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+        await _setLastSyncAt(DateTime.now());
+        return SyncResult(
+          success: true,
+          message: 'Synchronisation réussie.',
+          serverTotals: body['server_totals'] as Map<String, dynamic>?,
+          received: body['received'] as Map<String, dynamic>?,
+        );
+      } else {
+        return SyncResult(
+          success: false,
+          message:
+              'Erreur du serveur (code ${response.statusCode}). Vérifiez l\'adresse ou réessayez plus tard.',
+        );
+      }
+    } catch (e) {
+      return SyncResult(
+        success: false,
+        message:
+            'Connexion impossible au serveur. Vérifiez votre connexion internet/réseau et l\'adresse configurée.\n\nDétail : $e',
+      );
+    }
+  }
+
+  /// Quick connectivity/health check against /api/status.
+  Future<bool> testConnection(String url) async {
+    try {
+      final normalized = url.trim().replaceAll(RegExp(r'/+$'), '');
+      final endpoint = Uri.parse('$normalized/api/status');
+      final response = await http
+          .get(endpoint)
+          .timeout(const Duration(seconds: 10));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+}

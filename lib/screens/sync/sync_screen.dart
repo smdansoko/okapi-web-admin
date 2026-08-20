@@ -1,0 +1,533 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../services/app_data_provider.dart';
+import '../../services/sync_service.dart';
+import '../../theme/app_theme.dart';
+import '../../utils/formatters.dart';
+
+/// "Synchroniser" tab: lets the field team push all locally collected data
+/// (Ménages, Enquêtes Champs, Enquêtes Structures — including the recent
+/// updates: member photos/CNI, numéro de lot from numBatch, etc.) to the
+/// separate OKAPI Web Admin server, where it becomes available for
+/// contract PDF export and compensation table (Excel) export.
+class SyncScreen extends StatefulWidget {
+  const SyncScreen({super.key});
+
+  @override
+  State<SyncScreen> createState() => _SyncScreenState();
+}
+
+class _SyncScreenState extends State<SyncScreen> {
+  final _urlController = TextEditingController();
+  final _deviceNameController = TextEditingController();
+
+  bool _loadingPrefs = true;
+  bool _syncing = false;
+  bool _testingConnection = false;
+  bool? _connectionOk;
+  DateTime? _lastSyncAt;
+  SyncResult? _lastResult;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPrefs();
+  }
+
+  Future<void> _loadPrefs() async {
+    final url = await SyncService.instance.serverUrl;
+    final name = await SyncService.instance.deviceName;
+    final last = await SyncService.instance.lastSyncAt;
+    if (!mounted) return;
+    setState(() {
+      _urlController.text = url;
+      _deviceNameController.text = name;
+      _lastSyncAt = last;
+      _loadingPrefs = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _urlController.dispose();
+    _deviceNameController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _saveServerSettings() async {
+    await SyncService.instance.setServerUrl(_urlController.text);
+    await SyncService.instance.setDeviceName(_deviceNameController.text);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Paramètres de synchronisation enregistrés.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _testConnection() async {
+    setState(() {
+      _testingConnection = true;
+      _connectionOk = null;
+    });
+    final ok = await SyncService.instance.testConnection(_urlController.text);
+    if (!mounted) return;
+    setState(() {
+      _testingConnection = false;
+      _connectionOk = ok;
+    });
+  }
+
+  Future<void> _synchronize() async {
+    await _saveServerSettings();
+    if (!mounted) return;
+    final data = context.read<AppDataProvider>();
+
+    setState(() {
+      _syncing = true;
+      _lastResult = null;
+    });
+
+    final result = await SyncService.instance.syncAll(
+      menages: data.menages,
+      champs: data.champs,
+      structures: data.structures,
+    );
+
+    if (!mounted) return;
+    setState(() {
+      _syncing = false;
+      _lastResult = result;
+      if (result.success) _lastSyncAt = DateTime.now();
+    });
+
+    if (result.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Synchronisation réussie ✔'),
+          backgroundColor: OkapiColors.secondary,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = context.watch<AppDataProvider>();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                'assets/logo/okapi_logo_full.png',
+                height: 32,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text('Synchroniser', overflow: TextOverflow.ellipsis),
+            ),
+          ],
+        ),
+      ),
+      body: _loadingPrefs
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          'assets/logo/okapi_logo_full.png',
+                          height: 56,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ),
+                        const SizedBox(width: 16),
+                        const Expanded(
+                          child: Text(
+                            'Envoyez les données collectées sur le terrain vers le serveur '
+                            'OKAPI Web Admin : contrats PDF et tableau d\'indemnisation '
+                            'y sont générés automatiquement.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // ---- Données locales à synchroniser ----
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Données locales prêtes à synchroniser',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            _CountChip(
+                              icon: Icons.groups_rounded,
+                              label: 'Ménages',
+                              count: data.totalMenages,
+                              color: OkapiColors.primary,
+                            ),
+                            _CountChip(
+                              icon: Icons.person_rounded,
+                              label: 'Individus',
+                              count: data.totalIndividus,
+                              color: OkapiColors.secondary,
+                            ),
+                            _CountChip(
+                              icon: Icons.grass_rounded,
+                              label: 'Enquêtes Champs',
+                              count: data.champs.length,
+                              color: const Color(0xFFC77B00),
+                            ),
+                            _CountChip(
+                              icon: Icons.home_work_rounded,
+                              label: 'Enquêtes Structures',
+                              count: data.structures.length,
+                              color: const Color(0xFF1F5A8F),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        const Divider(),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.info_outline,
+                              size: 16,
+                              color: OkapiColors.textLight,
+                            ),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Inclut les photos (profil + CNI recto/verso), le numéro de lot '
+                                '(N° de batch) et toutes les informations des contrats.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey.shade700,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // ---- Configuration du serveur ----
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Serveur OKAPI Web Admin',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _urlController,
+                          keyboardType: TextInputType.url,
+                          decoration: const InputDecoration(
+                            labelText: 'Adresse du serveur (URL)',
+                            hintText: 'https://exemple.okapi-admin.com',
+                            prefixIcon: Icon(Icons.link),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        TextField(
+                          controller: _deviceNameController,
+                          decoration: const InputDecoration(
+                            labelText: 'Nom de cet appareil (optionnel)',
+                            hintText: 'ex: Tablette Enquêteur 1',
+                            prefixIcon: Icon(Icons.tablet_android),
+                            border: OutlineInputBorder(),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Row(
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: _testingConnection
+                                  ? null
+                                  : _testConnection,
+                              icon: _testingConnection
+                                  ? const SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.wifi_tethering),
+                              label: const Text('Tester la connexion'),
+                            ),
+                            const SizedBox(width: 12),
+                            if (_connectionOk == true)
+                              const Row(
+                                children: [
+                                  Icon(
+                                    Icons.check_circle,
+                                    color: OkapiColors.secondary,
+                                    size: 18,
+                                  ),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Serveur accessible',
+                                    style: TextStyle(
+                                      color: OkapiColors.secondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            if (_connectionOk == false)
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.error,
+                                    color: Colors.red.shade700,
+                                    size: 18,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Serveur injoignable',
+                                    style: TextStyle(
+                                      color: Colors.red.shade700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton.icon(
+                          onPressed: _saveServerSettings,
+                          icon: const Icon(Icons.save_outlined, size: 18),
+                          label: const Text('Enregistrer les paramètres'),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // ---- Dernier statut de synchronisation ----
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Statut',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.history,
+                              size: 18,
+                              color: OkapiColors.textLight,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              _lastSyncAt != null
+                                  ? 'Dernière synchronisation réussie : '
+                                        '${Formatters.date(_lastSyncAt!)} à '
+                                        '${_lastSyncAt!.hour.toString().padLeft(2, '0')}:'
+                                        '${_lastSyncAt!.minute.toString().padLeft(2, '0')}'
+                                  : 'Aucune synchronisation effectuée pour le moment.',
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ],
+                        ),
+                        if (_lastResult != null) ...[
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: _lastResult!.success
+                                  ? OkapiColors.secondary.withValues(
+                                      alpha: 0.08,
+                                    )
+                                  : Colors.red.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _lastResult!.success
+                                    ? OkapiColors.secondary.withValues(
+                                        alpha: 0.3,
+                                      )
+                                    : Colors.red.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _lastResult!.success
+                                      ? 'Synchronisation réussie'
+                                      : 'Échec de la synchronisation',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: _lastResult!.success
+                                        ? OkapiColors.secondary
+                                        : Colors.red.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _lastResult!.message,
+                                  style: const TextStyle(fontSize: 12.5),
+                                ),
+                                if (_lastResult!.received != null) ...[
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    'Envoyé — Ménages: ${_lastResult!.received!['menages'] ?? 0} · '
+                                    'Champs: ${_lastResult!.received!['champs'] ?? 0} · '
+                                    'Structures: ${_lastResult!.received!['structures'] ?? 0}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                                if (_lastResult!.serverTotals != null) ...[
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Total sur le serveur — Ménages: ${_lastResult!.serverTotals!['menages'] ?? 0} · '
+                                    'Champs: ${_lastResult!.serverTotals!['champs'] ?? 0} · '
+                                    'Structures: ${_lastResult!.serverTotals!['structures'] ?? 0}',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _syncing ? null : _synchronize,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: OkapiColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    icon: _syncing
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Icon(Icons.cloud_upload_rounded),
+                    label: Text(
+                      _syncing
+                          ? 'Synchronisation en cours…'
+                          : 'Synchroniser maintenant',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
+    );
+  }
+}
+
+class _CountChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final int count;
+  final Color color;
+  const _CountChip({
+    required this.icon,
+    required this.label,
+    required this.count,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18, color: color),
+          const SizedBox(width: 8),
+          Text(
+            '$count',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: color,
+              fontSize: 15,
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: 12.5, color: color)),
+        ],
+      ),
+    );
+  }
+}

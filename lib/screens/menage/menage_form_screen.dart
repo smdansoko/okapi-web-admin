@@ -238,10 +238,7 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                     ],
                   )
                 : const Center(
-                    child: Icon(
-                      Icons.add_a_photo_rounded,
-                      color: Colors.grey,
-                    ),
+                    child: Icon(Icons.add_a_photo_rounded, color: Colors.grey),
                   ),
           ),
         ),
@@ -385,9 +382,7 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                               onTap: () async {
                                 final b64 = await _pickPhotoBase64();
                                 if (b64 != null) {
-                                  setDialogState(
-                                    () => photoProfilBase64 = b64,
-                                  );
+                                  setDialogState(() => photoProfilBase64 = b64);
                                 }
                               },
                               onClear: () => setDialogState(
