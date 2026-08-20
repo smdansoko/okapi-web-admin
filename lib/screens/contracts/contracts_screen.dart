@@ -38,6 +38,7 @@ class ContractsScreen extends StatelessWidget {
         district: c.district,
         village: c.village,
         dateEnquete: c.dateEnquete,
+        numBatch: c.numBatch,
       );
       if (c.typeDePropriete == 'Propriétaire') {
         proprietaireOwners[key] = ref;
@@ -78,28 +79,33 @@ class ContractsScreen extends StatelessWidget {
             _ContractTab(
               emptyLabel:
                   'Aucun ménage disponible pour générer un accord Propriétaire.',
-              items: [
-                ...proprietaireOwners.values.map(
-                  (o) => _ContractEntry(
-                    title: o.nom,
-                    subtitle: o.codeMenage,
-                    onGenerate: () => _generateOwnerContract(
-                      context,
-                      ContractType.proprietaire,
-                      o,
+              items:
+                  [
+                    ...proprietaireOwners.values.map(
+                      (o) => _ContractEntry(
+                        title: o.nom,
+                        subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
+                        sortKey: o.numBatch,
+                        onGenerate: () => _generateOwnerContract(
+                          context,
+                          ContractType.proprietaire,
+                          o,
+                        ),
+                      ),
                     ),
+                    ...fallbackMenages.map(
+                      (m) => _ContractEntry(
+                        title: m.nomChefMenage.isEmpty
+                            ? m.codeMenage
+                            : m.nomChefMenage,
+                        subtitle: m.codeMenage,
+                        sortKey: m.codeMenage,
+                        onGenerate: () => _generateMenageContract(context, m),
+                      ),
+                    ),
+                  ].toList()..sort(
+                    (a, b) => a.sortKey.compareTo(b.sortKey),
                   ),
-                ),
-                ...fallbackMenages.map(
-                  (m) => _ContractEntry(
-                    title: m.nomChefMenage.isEmpty
-                        ? m.codeMenage
-                        : m.nomChefMenage,
-                    subtitle: m.codeMenage,
-                    onGenerate: () => _generateMenageContract(context, m),
-                  ),
-                ),
-              ],
             ),
             _ContractTab(
               emptyLabel: 'Aucune enquête de type Lignage disponible.',
@@ -107,7 +113,8 @@ class ContractsScreen extends StatelessWidget {
                   .map(
                     (o) => _ContractEntry(
                       title: o.nom,
-                      subtitle: o.codeMenage,
+                      subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
+                      sortKey: o.numBatch,
                       onGenerate: () => _generateOwnerContract(
                         context,
                         ContractType.lignage,
@@ -115,7 +122,7 @@ class ContractsScreen extends StatelessWidget {
                       ),
                     ),
                   )
-                  .toList(),
+                  .toList()..sort((a, b) => a.sortKey.compareTo(b.sortKey)),
             ),
             _ContractTab(
               emptyLabel: 'Aucune enquête de type Communautaire disponible.',
@@ -123,7 +130,8 @@ class ContractsScreen extends StatelessWidget {
                   .map(
                     (o) => _ContractEntry(
                       title: o.nom,
-                      subtitle: o.codeMenage,
+                      subtitle: 'Lot ${o.numBatch} · ${o.codeMenage}',
+                      sortKey: o.numBatch,
                       onGenerate: () => _generateOwnerContract(
                         context,
                         ContractType.communautaire,
@@ -131,7 +139,7 @@ class ContractsScreen extends StatelessWidget {
                       ),
                     ),
                   )
-                  .toList(),
+                  .toList()..sort((a, b) => a.sortKey.compareTo(b.sortKey)),
             ),
           ],
         ),
@@ -200,7 +208,7 @@ class ContractsScreen extends StatelessWidget {
     );
     final contractData = ContractData.fromChampOwner(
       type: type,
-      numeroLot: ref.codeMenage,
+      numeroLot: ref.numBatch.isEmpty ? ref.codeMenage : ref.numBatch,
       region: ref.region,
       prefecture: ref.prefecture,
       sousPrefecture: ref.sousPrefecture,
@@ -255,6 +263,7 @@ class _OwnerRef {
   final String district;
   final String village;
   final DateTime dateEnquete;
+  final String numBatch;
   _OwnerRef({
     required this.codeMenage,
     required this.codeProprietaire,
@@ -265,16 +274,19 @@ class _OwnerRef {
     required this.district,
     required this.village,
     required this.dateEnquete,
+    required this.numBatch,
   });
 }
 
 class _ContractEntry {
   final String title;
   final String subtitle;
+  final String sortKey;
   final VoidCallback onGenerate;
   _ContractEntry({
     required this.title,
     required this.subtitle,
+    required this.sortKey,
     required this.onGenerate,
   });
 }

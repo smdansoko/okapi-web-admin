@@ -19,6 +19,15 @@ class Individu {
   String handicap;
   String? handicapPrecis;
 
+  /// Photos captured for this member, stored as base64-encoded PNG/JPEG
+  /// strings so they work identically on Web (no filesystem) and Android
+  /// (Hive-persisted). Displayed in the generated contract PDF (page 1):
+  /// profile photo always shown when present; CNI recto/verso shown only
+  /// when [typeDePiece] denotes an actual identity document.
+  String? photoProfilBase64;
+  String? photoCniRectoBase64;
+  String? photoCniVersoBase64;
+
   Individu({
     required this.id,
     required this.numOrdreIndividu,
@@ -38,7 +47,16 @@ class Individu {
     this.autreNationalite,
     this.handicap = 'Non',
     this.handicapPrecis,
+    this.photoProfilBase64,
+    this.photoCniRectoBase64,
+    this.photoCniVersoBase64,
   });
+
+  /// True when [typeDePiece] denotes an actual identity document (i.e. not
+  /// empty and not the explicit "no document" choice), matching the rule
+  /// used in the official contract templates for showing CNI recto/verso.
+  bool get hasIdentityDocument =>
+      typeDePiece.isNotEmpty && typeDePiece != 'Pas de document';
 
   Map<String, dynamic> toMap() => {
     'id': id,
@@ -59,6 +77,9 @@ class Individu {
     'autreNationalite': autreNationalite,
     'handicap': handicap,
     'handicapPrecis': handicapPrecis,
+    'photoProfilBase64': photoProfilBase64,
+    'photoCniRectoBase64': photoCniRectoBase64,
+    'photoCniVersoBase64': photoCniVersoBase64,
   };
 
   factory Individu.fromMap(Map map) => Individu(
@@ -80,6 +101,9 @@ class Individu {
     autreNationalite: map['autreNationalite'] as String?,
     handicap: map['handicap'] as String? ?? 'Non',
     handicapPrecis: map['handicapPrecis'] as String?,
+    photoProfilBase64: map['photoProfilBase64'] as String?,
+    photoCniRectoBase64: map['photoCniRectoBase64'] as String?,
+    photoCniVersoBase64: map['photoCniVersoBase64'] as String?,
   );
 
   /// Label used in dropdown pickers: "Prénom NOM (numéro pièce) - relation"

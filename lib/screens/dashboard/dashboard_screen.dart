@@ -18,12 +18,59 @@ class DashboardScreen extends StatelessWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Tableau de bord — OKAPI Survey')),
+      appBar: AppBar(
+        title: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Image.asset(
+                'assets/logo/okapi_logo_full.png',
+                height: 36,
+                fit: BoxFit.contain,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+              ),
+            ),
+            const SizedBox(width: 10),
+            const Expanded(
+              child: Text(
+                'Tableau de bord — OKAPI Survey',
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: data.loadAll,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
+            Card(
+              margin: const EdgeInsets.only(bottom: 16),
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'assets/logo/okapi_logo_full.png',
+                      height: 64,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Text(
+                        'OKAPI Environnement Conseil\nSuivi des enquêtes et compensations — WCAG',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             GridView.count(
               crossAxisCount: MediaQuery.of(context).size.width > 700 ? 4 : 2,
               shrinkWrap: true,

@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/menage.dart';
@@ -127,6 +130,125 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     return '$prefix-${maxSuffix + 1}';
   }
 
+  /// Opens a camera/gallery chooser and returns the picked image as a
+  /// base64-encoded string (resized/compressed for storage efficiency), or
+  /// null if the user cancelled. Works identically on Web and Android.
+  Future<String?> _pickPhotoBase64() async {
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (c) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_rounded),
+              title: const Text('Prendre une photo'),
+              onTap: () => Navigator.of(c).pop(ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded),
+              title: const Text('Choisir dans la galerie'),
+              onTap: () => Navigator.of(c).pop(ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return null;
+    try {
+      final XFile? file = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 80,
+      );
+      if (file == null) return null;
+      final Uint8List bytes = await file.readAsBytes();
+      return base64Encode(bytes);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Impossible de capturer la photo : $e')),
+        );
+      }
+      return null;
+    }
+  }
+
+  /// A tappable square photo box used for profile/CNI photo capture inside
+  /// the member dialog. Shows the current image (decoded from base64) or an
+  /// "add photo" placeholder, plus a small clear (x) button when a photo is
+  /// already set.
+  Widget _photoPickerBox({
+    required String label,
+    required String? base64Data,
+    required VoidCallback onTap,
+    required VoidCallback onClear,
+  }) {
+    Uint8List? bytes;
+    if (base64Data != null && base64Data.isNotEmpty) {
+      try {
+        bytes = base64Decode(base64Data);
+      } catch (_) {
+        bytes = null;
+      }
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        ),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            width: 100,
+            height: 100,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade400),
+              borderRadius: BorderRadius.circular(8),
+              color: Colors.grey.shade100,
+            ),
+            child: bytes != null
+                ? Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.memory(bytes, fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        top: 2,
+                        right: 2,
+                        child: GestureDetector(
+                          onTap: onClear,
+                          child: const CircleAvatar(
+                            radius: 10,
+                            backgroundColor: Colors.black54,
+                            child: Icon(
+                              Icons.close_rounded,
+                              size: 14,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : const Center(
+                    child: Icon(
+                      Icons.add_a_photo_rounded,
+                      color: Colors.grey,
+                    ),
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Future<void> _addOrEditIndividu({Individu? existing, int? index}) async {
     final result = await _showIndividuDialog(existing: existing);
     if (result != null) {
@@ -170,6 +292,9 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     DateTime? dateEtablissementPiece = Formatters.isoToDate(
       existing?.dateEtablissementPiece,
     );
+    String? photoProfilBase64 = existing?.photoProfilBase64;
+    String? photoCniRectoBase64 = existing?.photoCniRectoBase64;
+    String? photoCniVersoBase64 = existing?.photoCniVersoBase64;
 
     return showDialog<Individu>(
       context: context,
@@ -240,6 +365,69 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                           value: dateEtablissementPiece,
                           onChanged: (v) =>
                               setDialogState(() => dateEtablissementPiece = v),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Photos',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            _photoPickerBox(
+                              label: 'Photo de profil',
+                              base64Data: photoProfilBase64,
+                              onTap: () async {
+                                final b64 = await _pickPhotoBase64();
+                                if (b64 != null) {
+                                  setDialogState(
+                                    () => photoProfilBase64 = b64,
+                                  );
+                                }
+                              },
+                              onClear: () => setDialogState(
+                                () => photoProfilBase64 = null,
+                              ),
+                            ),
+                            if (typeDePiece.isNotEmpty &&
+                                typeDePiece != 'Pas de document') ...[
+                              _photoPickerBox(
+                                label: 'Pièce d\'identité (recto)',
+                                base64Data: photoCniRectoBase64,
+                                onTap: () async {
+                                  final b64 = await _pickPhotoBase64();
+                                  if (b64 != null) {
+                                    setDialogState(
+                                      () => photoCniRectoBase64 = b64,
+                                    );
+                                  }
+                                },
+                                onClear: () => setDialogState(
+                                  () => photoCniRectoBase64 = null,
+                                ),
+                              ),
+                              _photoPickerBox(
+                                label: 'Pièce d\'identité (verso)',
+                                base64Data: photoCniVersoBase64,
+                                onTap: () async {
+                                  final b64 = await _pickPhotoBase64();
+                                  if (b64 != null) {
+                                    setDialogState(
+                                      () => photoCniVersoBase64 = b64,
+                                    );
+                                  }
+                                },
+                                onClear: () => setDialogState(
+                                  () => photoCniVersoBase64 = null,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 12),
                         LabeledTextField(
@@ -365,6 +553,9 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                       handicapPrecis: handicapPrecisCtrl.text.isEmpty
                           ? null
                           : handicapPrecisCtrl.text,
+                      photoProfilBase64: photoProfilBase64,
+                      photoCniRectoBase64: photoCniRectoBase64,
+                      photoCniVersoBase64: photoCniVersoBase64,
                     );
                     Navigator.of(ctx).pop(result);
                   },

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:pdf/pdf.dart';
@@ -104,6 +105,14 @@ class ContractData {
   final DateTime dateEnquete;
   final CompensationSummary summary;
 
+  /// Photos of the compensation beneficiary, stored as base64 strings on
+  /// [Individu] and passed through here for embedding in the PDF (page 1):
+  /// profile photo always shown when present; CNI recto/verso shown only
+  /// when [hasIdentityDocument] is true.
+  final String? photoProfilBase64;
+  final String? photoCniRectoBase64;
+  final String? photoCniVersoBase64;
+
   ContractData({
     required this.type,
     required this.numeroLot,
@@ -123,7 +132,16 @@ class ContractData {
     required this.telephone,
     required this.dateEnquete,
     required this.summary,
+    this.photoProfilBase64,
+    this.photoCniRectoBase64,
+    this.photoCniVersoBase64,
   });
+
+  /// True when [typeDePiece] denotes an actual identity document (mirrors
+  /// [Individu.hasIdentityDocument]) — controls whether the CNI recto/verso
+  /// photo row is rendered on the contract's page 1.
+  bool get hasIdentityDocument =>
+      typeDePiece.isNotEmpty && typeDePiece != 'Pas de document';
 
   /// Builds a ContractData for the "Propriétaire/Ménage" contract, using
   /// the household's chef de ménage as the compensation beneficiary.
@@ -153,6 +171,9 @@ class ContractData {
       telephone: chef?.telephone ?? '',
       dateEnquete: menage.dateEnquete,
       summary: summary,
+      photoProfilBase64: chef?.photoProfilBase64,
+      photoCniRectoBase64: chef?.photoCniRectoBase64,
+      photoCniVersoBase64: chef?.photoCniVersoBase64,
     );
   }
 
@@ -194,6 +215,9 @@ class ContractData {
       telephone: proprietaire.telephone,
       dateEnquete: dateEnquete,
       summary: summary,
+      photoProfilBase64: proprietaire.photoProfilBase64,
+      photoCniRectoBase64: proprietaire.photoCniRectoBase64,
+      photoCniVersoBase64: proprietaire.photoCniVersoBase64,
     );
   }
 
@@ -248,9 +272,13 @@ class ContractPdfGenerator {
       pw.NewPage(),
       ..._page5Signatures(d),
       pw.NewPage(),
-      ..._page6Annexe1(d),
+      // ANNEXE 1: all 6 asset categories flow together without a forced
+      // page break so they land on the same page whenever they fit; only
+      // pw.MultiPage's natural overflow pagination will push extra
+      // categories onto a following page when there are too many assets.
+      ..._annexe1AllAssets(d),
       pw.NewPage(),
-      ..._page7Annexe2(d),
+      ..._annexe2Text(d),
     ];
 
     doc.addPage(
@@ -441,8 +469,64 @@ class ContractPdfGenerator {
 
   // ---------------- Page 1: identification + preamble start ----------------
 
+  /// Decodes a base64-encoded photo string into a [pw.MemoryImage], or
+  /// returns null if [base64Data] is null/empty/invalid.
+  static pw.MemoryImage? _decodePhoto(String? base64Data) {
+    if (base64Data == null || base64Data.isEmpty) return null;
+    try {
+      return pw.MemoryImage(base64Decode(base64Data));
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// A bordered photo box matching the official template's layout: profile
+  /// photo (top-right of the identification table) or a CNI recto/verso
+  /// photo below the table. Shows the real image when available, else a
+  /// grey placeholder labelled with [placeholderLabel].
+  static pw.Widget _photoBox({
+    required pw.MemoryImage? image,
+    required double width,
+    required double height,
+    required String placeholderLabel,
+    String? caption,
+  }) {
+    final box = pw.Container(
+      width: width,
+      height: height,
+      decoration: pw.BoxDecoration(
+        border: pw.Border.all(color: greyBorder),
+        color: image == null ? greyLight : null,
+      ),
+      child: image == null
+          ? pw.Center(
+              child: pw.Text(
+                placeholderLabel,
+                style: pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
+              ),
+            )
+          : pw.Image(image, fit: pw.BoxFit.cover),
+    );
+    if (caption == null) return box;
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.center,
+      children: [
+        box,
+        pw.SizedBox(height: 2),
+        pw.Text(
+          caption,
+          style: pw.TextStyle(fontSize: 7.5, fontWeight: pw.FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
   static List<pw.Widget> _page1Identification(ContractData d) {
-    return [
+    final profileImage = _decodePhoto(d.photoProfilBase64);
+    final rectoImage = _decodePhoto(d.photoCniRectoBase64);
+    final versoImage = _decodePhoto(d.photoCniVersoBase64);
+
+    final widgets = <pw.Widget>[
       _title(
         'ACCORD DE COMPENSATION CONCLU ENTRE AMC ET ${d.type.titleSuffix}',
       ),
@@ -478,25 +562,49 @@ class ContractPdfGenerator {
           ),
           pw.SizedBox(width: 10),
           pw.Container(
-            width: 90,
-            height: 110,
             margin: const pw.EdgeInsets.only(top: 20),
-            decoration: pw.BoxDecoration(
-              border: pw.Border.all(color: greyBorder),
-              color: greyLight,
-            ),
-            child: pw.Center(
-              child: pw.Text(
-                'PHOTO',
-                style: pw.TextStyle(fontSize: 8, color: PdfColors.grey600),
-              ),
+            child: _photoBox(
+              image: profileImage,
+              width: 90,
+              height: 110,
+              placeholderLabel: 'PHOTO',
             ),
           ),
         ],
       ),
       pw.SizedBox(height: 14),
-      _preambleText(d),
     ];
+
+    // CNI recto/verso photos, shown only when an actual identity document
+    // was recorded for the beneficiary — matching the official templates.
+    if (d.hasIdentityDocument) {
+      widgets.add(
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            _photoBox(
+              image: rectoImage,
+              width: 220,
+              height: 140,
+              placeholderLabel: 'CNI - RECTO',
+              caption: 'Pièce d\'identité (recto)',
+            ),
+            pw.SizedBox(width: 12),
+            _photoBox(
+              image: versoImage,
+              width: 220,
+              height: 140,
+              placeholderLabel: 'CNI - VERSO',
+              caption: 'Pièce d\'identité (verso)',
+            ),
+          ],
+        ),
+      );
+      widgets.add(pw.SizedBox(height: 14));
+    }
+
+    widgets.add(_preambleText(d));
+    return widgets;
   }
 
   static pw.Widget _preambleText(ContractData d) {
@@ -958,9 +1066,15 @@ class ContractPdfGenerator {
     ];
   }
 
-  // ---------------- Page 6: ANNEXE 1 tables ----------------
+  // ---------------- ANNEXE 1: all asset categories (same page) ----------------
 
-  static List<pw.Widget> _page6Annexe1(ContractData d) {
+  /// Builds ALL 6 ANNEXE 1 asset-category tables (Parcelles agricoles,
+  /// Cultures annuelles, Bois d'œuvre, Cultures pérennes, Espèces sauvages,
+  /// Structures) as one continuous widget list with NO forced page break
+  /// between categories, so pw.MultiPage's natural flow keeps them on the
+  /// same page whenever they fit, only overflowing to a following page when
+  /// there are genuinely too many assets to fit on one page.
+  static List<pw.Widget> _annexe1AllAssets(ContractData d) {
     final s = d.summary;
     final widgets = <pw.Widget>[
       _sectionTitle('ANNEXE 1 – LISTE DES BIENS AFFECTÉS ET COMPENSATIONS'),
@@ -1105,15 +1219,9 @@ class ContractPdfGenerator {
       );
     }
 
-    return widgets;
-  }
-
-  static List<pw.Widget> _page7Annexe2(ContractData d) {
-    final s = d.summary;
-    final widgets = <pw.Widget>[];
-
     // -------- Cultures pérennes --------
     if (s.culturePerenneDetails.isNotEmpty) {
+      widgets.add(pw.SizedBox(height: 10));
       widgets.add(_annexSubtitle('CULTURES PÉRENNES'));
       double totalMontant = 0;
       final rows = <pw.TableRow>[
@@ -1246,15 +1354,12 @@ class ContractPdfGenerator {
 
     if (s.culturePerenneDetails.isEmpty &&
         s.especeSauvageDetails.isEmpty &&
-        s.structureDetails.isEmpty) {
-      widgets.add(
-        _annexSubtitle('CULTURES PÉRENNES / ESPÈCES SAUVAGES / STRUCTURES'),
-      );
+        s.structureDetails.isEmpty &&
+        s.parcelleDetails.isEmpty &&
+        s.cultureAnnuelleDetails.isEmpty &&
+        s.boisDoeuvreDetails.isEmpty) {
       widgets.add(_emptyAnnexNote());
     }
-
-    widgets.add(pw.SizedBox(height: 16));
-    widgets.addAll(_annexe2Text(d));
 
     return widgets;
   }

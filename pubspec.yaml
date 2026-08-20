@@ -56,6 +56,9 @@ dependencies:
   # Dashboard charts
   fl_chart: ^0.70.2
 
+  # Photo capture (profile + ID document photos), Web + Android compatible
+  image_picker: ^1.1.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -91,6 +94,7 @@ flutter:
     - lib/data/guinea_admin.json
     - assets/images/
     - assets/fonts/
+    - assets/logo/
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
