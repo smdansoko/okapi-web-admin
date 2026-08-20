@@ -40,9 +40,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (_passwordCtrl.text != _confirmPasswordCtrl.text) {
-      setState(
-        () => _errorMessage = 'Les mots de passe ne correspondent pas.',
-      );
+      setState(() => _errorMessage = 'Les mots de passe ne correspondent pas.');
       return;
     }
     setState(() {
@@ -132,9 +130,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               color: OkapiColors.error.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: OkapiColors.error.withValues(
-                                  alpha: 0.3,
-                                ),
+                                color: OkapiColors.error.withValues(alpha: 0.3),
                               ),
                             ),
                             child: Text(
@@ -198,8 +194,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               child: Text('Féminin'),
                             ),
                           ],
-                          onChanged: (v) =>
-                              setState(() => _sexe = v ?? _sexe),
+                          onChanged: (v) => setState(() => _sexe = v ?? _sexe),
                         ),
                         const SizedBox(height: 14),
                         DropdownButtonFormField<String>(
@@ -252,9 +247,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             prefixIcon: Icon(Icons.lock_outline),
                           ),
                           onFieldSubmitted: (_) => _submit(),
-                          validator: (v) => (v == null || v.isEmpty)
-                              ? 'Champ requis'
-                              : null,
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? 'Champ requis' : null,
                         ),
                         const SizedBox(height: 22),
                         SizedBox(

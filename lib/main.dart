@@ -29,7 +29,7 @@ class OkapiSurveyApp extends StatelessWidget {
         title: 'Okapi Survey',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
-        home: const RootShell(),
+        home: const AuthGate(),
       ),
     );
   }

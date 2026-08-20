@@ -76,9 +76,7 @@ class AuthService {
     final raw = prefs.getString(_prefKeyLoggedInUser);
     if (raw == null || raw.isEmpty) return null;
     try {
-      _cachedUser = AppUser.fromJson(
-        jsonDecode(raw) as Map<String, dynamic>,
-      );
+      _cachedUser = AppUser.fromJson(jsonDecode(raw) as Map<String, dynamic>);
     } catch (_) {
       _cachedUser = null;
     }

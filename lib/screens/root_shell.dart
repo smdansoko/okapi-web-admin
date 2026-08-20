@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/auth_service.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'menage/menage_list_screen.dart';
 import 'champs/champs_list_screen.dart';
@@ -8,7 +9,14 @@ import 'contracts/contracts_screen.dart';
 import 'sync/sync_screen.dart';
 
 class RootShell extends StatefulWidget {
-  const RootShell({super.key});
+  final AppUser currentUser;
+  final VoidCallback onLogout;
+
+  const RootShell({
+    super.key,
+    required this.currentUser,
+    required this.onLogout,
+  });
 
   @override
   State<RootShell> createState() => _RootShellState();
@@ -34,6 +42,31 @@ class _RootShellState extends State<RootShell> {
     _NavItem(icon: Icons.description_rounded, label: 'Contrats'),
     _NavItem(icon: Icons.cloud_upload_rounded, label: 'Synchroniser'),
   ];
+
+  Future<void> _confirmLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Déconnexion'),
+        content: Text(
+          'Voulez-vous vraiment vous déconnecter, ${widget.currentUser.nomPrenom} ?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Déconnexion'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) {
+      widget.onLogout();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +105,30 @@ class _RootShellState extends State<RootShell> {
                   ],
                 ),
               ),
+              trailing: Expanded(
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Column(
+                      children: [
+                        Text(
+                          widget.currentUser.nomPrenom,
+                          textAlign: TextAlign.center,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontSize: 11),
+                        ),
+                        IconButton(
+                          tooltip: 'Déconnexion',
+                          icon: const Icon(Icons.logout_rounded),
+                          onPressed: _confirmLogout,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               destinations: _items
                   .map(
                     (e) => NavigationRailDestination(
@@ -91,6 +148,14 @@ class _RootShellState extends State<RootShell> {
 
     return Scaffold(
       body: _screens[_index],
+      floatingActionButton: FloatingActionButton.small(
+        heroTag: 'logoutFab',
+        tooltip: 'Déconnexion (${widget.currentUser.nomPrenom})',
+        backgroundColor: OkapiColors.primary,
+        onPressed: _confirmLogout,
+        child: const Icon(Icons.logout_rounded, color: Colors.white),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
