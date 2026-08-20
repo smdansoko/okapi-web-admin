@@ -29,16 +29,45 @@ from reportlab.platypus import (
 )
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.utils import ImageReader
 
 from compensation import compute_for_owner, CompensationSummary
 
 _FONT_DIR = os.path.join(os.path.dirname(__file__), "fonts")
+_IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "img")
 _FONTS_REGISTERED = False
 
-MAROON = colors.HexColor("#6B1F1F")
-DARK_GREEN = colors.HexColor("#1F4A2E")
+# NOTE: Per client request, contracts no longer use branded colors (maroon /
+# dark green) anywhere except the two header logo images and the applicant's
+# photos. MAROON/DARK_GREEN are kept only as unused legacy aliases; all
+# styling below uses black / grey (achromatic) instead.
+MAROON = colors.black
+DARK_GREEN = colors.black
 GREY_LIGHT = colors.HexColor("#EDEDED")
+GREY_DARKER = colors.HexColor("#D9D9D9")
 GREY_BORDER = colors.HexColor("#BBBBBB")
+
+# Full usable page width (A4 width minus left/right margins used in
+# generate_contract_pdf: 210mm - 2*32pt). Tables use this so ANNEXE 1 and
+# other tables stretch left-aligned up to the page margins.
+FULL_WIDTH_MM = 186.0
+
+OKAPI_LOGO_PATH = os.path.join(_IMG_DIR, "okapi_header_logo.png")
+WCAG_LOGO_PATH = os.path.join(_IMG_DIR, "wcag_header_logo.png")
+# Hardcoded aspect ratios (width/height) of the trimmed logo assets, avoiding
+# a runtime image-library dependency just to measure them.
+OKAPI_LOGO_ASPECT = 644.0 / 324.0
+WCAG_LOGO_ASPECT = 1023.0 / 784.0
+
+
+def _scale_widths(widths_mm, total_mm=FULL_WIDTH_MM):
+    """Scales a list of column widths (in mm) proportionally so they sum to
+    `total_mm`, used to stretch ANNEXE 1 tables to the full page width."""
+    s = sum(widths_mm)
+    if s <= 0:
+        return widths_mm
+    factor = total_mm / s
+    return [w * factor for w in widths_mm]
 
 
 def _ensure_fonts():
@@ -231,6 +260,12 @@ def _styles():
         ),
         "small": ParagraphStyle("small", fontName="DejaVu", fontSize=9),
         "small_bold": ParagraphStyle("small_bold", fontName="DejaVu-Bold", fontSize=9),
+        "field_label": ParagraphStyle(
+            "field_label", fontName="DejaVu-Bold", fontSize=7.8, leading=9.5,
+        ),
+        "field_value": ParagraphStyle(
+            "field_value", fontName="DejaVu", fontSize=9, leading=10.5,
+        ),
         "caption": ParagraphStyle(
             "caption", fontName="DejaVu-Bold", fontSize=7.5, alignment=TA_CENTER,
         ),
@@ -244,23 +279,31 @@ def _styles():
     }
 
 
-def _field_row_table(rows, styles):
+def _field_row_table(rows, styles, label_width_mm=58, value_width_mm=76):
+    """Renders the PAP identification fields as a compact, left-aligned
+    two-column table. Labels use a slightly smaller font + wider column so
+    that long labels like "Numéro de la pièce d'identité" or "Date
+    d'établissement de la PI" always fit on a single line without wrapping.
+    Vertical spacing (row padding) is intentionally tight to reduce the
+    overall block height."""
     data = []
     for label, value in rows:
         data.append(
             [
-                Paragraph(f"<b>{label}</b>", styles["small_bold"]),
-                Paragraph(value if value else "-", styles["small"]),
+                Paragraph(label, styles["field_label"]),
+                Paragraph(value if value else "-", styles["field_value"]),
             ]
         )
-    t = Table(data, colWidths=[52 * mm, 82 * mm])
+    t = Table(data, colWidths=[label_width_mm * mm, value_width_mm * mm], hAlign="LEFT")
     t.setStyle(
         TableStyle(
             [
                 ("LINEBELOW", (0, 0), (-1, -2), 0.5, colors.HexColor("#DDDDDD")),
-                ("TOPPADDING", (0, 0), (-1, -1), 3),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+                ("TOPPADDING", (0, 0), (-1, -1), 1.5),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5),
+                ("LEFTPADDING", (0, 0), (-1, -1), 0),
                 ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("ALIGN", (0, 0), (-1, -1), "LEFT"),
             ]
         )
     )
@@ -268,9 +311,14 @@ def _field_row_table(rows, styles):
 
 
 def _annex_table(header, rows, total_row, col_widths):
+    """Renders an ANNEXE 1 asset-category table. `col_widths` (in mm) are
+    proportionally rescaled to always fill the full usable page width
+    (FULL_WIDTH_MM), and the table is explicitly left-aligned (hAlign) so it
+    sits flush against the left margin like the rest of the page content."""
     styles = _styles()
     data = [header] + rows + [total_row]
-    t = Table(data, colWidths=col_widths, repeatRows=1)
+    scaled_widths = [w * mm for w in _scale_widths(col_widths)]
+    t = Table(data, colWidths=scaled_widths, repeatRows=1, hAlign="LEFT")
     style = [
         ("GRID", (0, 0), (-1, -1), 0.5, GREY_BORDER),
         ("BACKGROUND", (0, 0), (-1, 0), GREY_LIGHT),
@@ -319,16 +367,19 @@ def _page1(d, styles):
     profile_img = _decode_photo(d.get("photoProfilBase64"), 90, 110)
     photo_cell = profile_img if profile_img else _placeholder_box("PHOTO", 90, 110)
 
-    header_row = Table(
-        [[Paragraph(f"<b>{IDENT_SECTION_TITLE[d['type']]}</b>", styles["small_bold"]), ""]],
-        colWidths=[134 * mm, 0],
-    )
-
+    # hAlign="LEFT" is required here: ReportLab Tables default to centering
+    # themselves horizontally on the page, which was causing the whole PAP
+    # identification block (région, préfecture, etc.) to appear centered
+    # instead of flush against the left margin.
     top = Table(
         [[ident_table, photo_cell]],
-        colWidths=[130 * mm, 32 * mm],
+        colWidths=[134 * mm, 32 * mm],
+        hAlign="LEFT",
     )
-    top.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
+    top.setStyle(TableStyle([
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("LEFTPADDING", (0, 0), (-1, -1), 0),
+    ]))
 
     story.append(Paragraph(f"<b>{IDENT_SECTION_TITLE[d['type']]}</b>", styles["small_bold"]))
     story.append(Spacer(1, 4))
@@ -342,17 +393,24 @@ def _page1(d, styles):
         verso = _decode_photo(d.get("photoCniVersoBase64"), 78 * mm, 46 * mm) or _placeholder_box(
             "CNI - VERSO", 78 * mm, 46 * mm
         )
+        # Extra empty spacer column between recto/verso to add breathing room
+        # between the two ID photos, per client request.
         cni_table = Table(
             [
-                [recto, verso],
+                [recto, "", verso],
                 [
                     Paragraph("Pièce d'identité (recto)", styles["caption"]),
+                    "",
                     Paragraph("Pièce d'identité (verso)", styles["caption"]),
                 ],
             ],
-            colWidths=[78 * mm, 78 * mm],
+            colWidths=[78 * mm, 10 * mm, 78 * mm],
+            hAlign="LEFT",
         )
-        cni_table.setStyle(TableStyle([("VALIGN", (0, 0), (-1, -1), "TOP")]))
+        cni_table.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "TOP"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 0),
+        ]))
         story.append(cni_table)
         story.append(Spacer(1, 10))
 
@@ -486,13 +544,17 @@ def _page4(d, summary, styles):
         ["Compensation des structures", fmt_number(summary.structures)],
         ["Total des compensations", fmt_number(summary.total)],
     ]
-    t = Table(rows, colWidths=[110 * mm, 50 * mm])
+    # Colour has been removed from the recap table's title/header row per
+    # client request (contracts are now achromatic except logos/photos):
+    # the header row uses a light grey background + black bold text and a
+    # bottom border instead of a solid maroon fill with white text.
+    t = Table(rows, colWidths=[110 * mm, 50 * mm], hAlign="LEFT")
     t.setStyle(
         TableStyle(
             [
                 ("GRID", (0, 0), (-1, -1), 0.5, GREY_BORDER),
-                ("BACKGROUND", (0, 0), (-1, 0), MAROON),
-                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("BACKGROUND", (0, 0), (-1, 0), GREY_DARKER),
+                ("LINEBELOW", (0, 0), (-1, 0), 1, colors.black),
                 ("BACKGROUND", (0, -1), (-1, -1), GREY_LIGHT),
                 ("FONTNAME", (0, 0), (-1, 0), "DejaVu-Bold"),
                 ("FONTNAME", (0, -1), (-1, -1), "DejaVu-Bold"),
@@ -504,29 +566,13 @@ def _page4(d, summary, styles):
             ]
         )
     )
+    # NOTE: the SIGNATURE / EMPREINTE POUCE GAUCHE box that used to sit here
+    # has been moved to the top of page 5, so that ALL signature-related
+    # boxes are consolidated on a single page (page 5), per client request.
     story = [
         Paragraph("RÉCAPITULATIF DES COMPENSATIONS", styles["section"]),
         t,
-        Spacer(1, 20),
     ]
-    sig_box = Table(
-        [["SIGNATURE", "EMPREINTE POUCE GAUCHE"]], colWidths=[80 * mm, 80 * mm], rowHeights=[24 * mm]
-    )
-    sig_box.setStyle(
-        TableStyle(
-            [
-                ("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER),
-                ("GRID", (0, 0), (-1, -1), 0.75, GREY_BORDER),
-                ("VALIGN", (0, 0), (-1, -1), "TOP"),
-                ("BACKGROUND", (0, 0), (-1, 0), GREY_LIGHT),
-                ("FONTNAME", (0, 0), (-1, -1), "DejaVu-Bold"),
-                ("FONTSIZE", (0, 0), (-1, -1), 8.5),
-                ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-                ("TOPPADDING", (0, 0), (-1, -1), 3),
-            ]
-        )
-    )
-    story.append(sig_box)
     return story
 
 
@@ -541,74 +587,105 @@ def _page5(d, summary, styles):
         "la fonction est ............................................................................"
     )
     dt = fmt_date(d.get("dateEnquete")) or ""
+
+    # SIGNATURE / EMPREINTE POUCE GAUCHE box, moved here from page 4 so that
+    # ALL signature-related boxes appear together on a single page (page 5).
+    # Height increased (24mm -> 34mm) to leave enough room for an actual
+    # thumbprint, per client request. Colour removed from the header cell
+    # (light grey instead of a solid brand colour).
+    sig_thumb_box = Table(
+        [["SIGNATURE", "EMPREINTE POUCE GAUCHE"], ["", ""]],
+        colWidths=[80 * mm, 80 * mm],
+        rowHeights=[7 * mm, 34 * mm],
+        hAlign="LEFT",
+    )
+    sig_thumb_box.setStyle(
+        TableStyle(
+            [
+                ("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER),
+                ("GRID", (0, 0), (-1, -1), 0.75, GREY_BORDER),
+                ("VALIGN", (0, 0), (-1, -1), "TOP"),
+                ("BACKGROUND", (0, 0), (-1, 0), GREY_LIGHT),
+                ("FONTNAME", (0, 0), (-1, 0), "DejaVu-Bold"),
+                ("FONTSIZE", (0, 0), (-1, 0), 8.5),
+                ("ALIGN", (0, 0), (-1, 0), "CENTER"),
+                ("TOPPADDING", (0, 0), (-1, 0), 3),
+            ]
+        )
+    )
+
     story = [
+        sig_thumb_box,
+        Spacer(1, 8),
         Paragraph(
             f"Fait en deux (2) exemplaires originaux, un étant remis à chacune des Parties.<br/>"
             f"À ........................, le {dt}",
             styles["para"],
         ),
-        Spacer(1, 8),
+        Spacer(1, 6),
     ]
     box_content = [
         [Paragraph(f"<b>{TITLE_SUFFIX[d['type']] if d['type']!='proprietaire' else 'Le Ménage affecté'}</b>", styles["small_bold"])],
         [Paragraph(consent, styles["para"])],
         [Paragraph("Signature :", styles["small"])],
     ]
-    box = Table(box_content, colWidths=[160 * mm])
+    box = Table(box_content, colWidths=[FULL_WIDTH_MM * mm], hAlign="LEFT")
     box.setStyle(
         TableStyle(
             [
                 ("BOX", (0, 0), (-1, -1), 0.75, colors.black),
-                ("TOPPADDING", (0, 0), (-1, -1), 4),
-                ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+                ("TOPPADDING", (0, 0), (-1, -1), 3),
+                ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
             ]
         )
     )
     story.append(box)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 8))
 
     def sig_lines(*labels):
         return [Paragraph(f"{lbl} : ......................................................................", styles["small"]) for lbl in labels]
 
+    _half_mm = (FULL_WIDTH_MM - 2) / 2.0
+
     amc_box = Table(
         [[Paragraph("<b>AMC</b>", styles["small_bold"])]] + [[l] for l in sig_lines("Nom", "Fonction", "Signature")],
-        colWidths=[80 * mm],
+        colWidths=[_half_mm * mm],
     )
-    amc_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 3)]))
+    amc_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))
 
     aut_box = Table(
         [[Paragraph("<b>Autorités</b>", styles["small_bold"])]]
         + [[l] for l in sig_lines("Nom", "Institution/Fonction", "Signature", "Nom", "Institution/Fonction")],
-        colWidths=[80 * mm],
+        colWidths=[_half_mm * mm],
     )
-    aut_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 3)]))
+    aut_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))
 
-    row1 = Table([[amc_box, aut_box]], colWidths=[82 * mm, 82 * mm])
+    row1 = Table([[amc_box, aut_box]], colWidths=[(_half_mm + 1) * mm, (_half_mm + 1) * mm], hAlign="LEFT")
     story.append(row1)
-    story.append(Spacer(1, 10))
+    story.append(Spacer(1, 6))
 
     temoins_lines = []
     for _ in range(4):
         temoins_lines += sig_lines("Nom", "Relation", "Signature")
-        temoins_lines.append(Spacer(1, 4))
+        temoins_lines.append(Spacer(1, 2))
     temoins_box = Table(
         [[Paragraph(f"<b>{TEMOINS_LABEL[d['type']]}</b>", styles["small_bold"])]] + [[l] for l in temoins_lines],
-        colWidths=[80 * mm],
+        colWidths=[_half_mm * mm],
     )
-    temoins_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 3)]))
+    temoins_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 1.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5)]))
 
     autorites_lines = []
     for _ in range(4):
         autorites_lines += sig_lines("Nom", "Fonction", "Signature")
-        autorites_lines.append(Spacer(1, 4))
+        autorites_lines.append(Spacer(1, 2))
     autorites_box = Table(
         [[Paragraph("<b>Autorités locales (Chef du village, Chef du district ou Autres.......)</b>", styles["small_bold"])]]
         + [[l] for l in autorites_lines],
-        colWidths=[80 * mm],
+        colWidths=[_half_mm * mm],
     )
-    autorites_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 3)]))
+    autorites_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 1.5), ("BOTTOMPADDING", (0, 0), (-1, -1), 1.5)]))
 
-    row2 = Table([[temoins_box, autorites_box]], colWidths=[82 * mm, 82 * mm])
+    row2 = Table([[temoins_box, autorites_box]], colWidths=[(_half_mm + 1) * mm, (_half_mm + 1) * mm], hAlign="LEFT")
     story.append(row2)
     return story
 
@@ -838,22 +915,27 @@ def _annexe2(d, summary, styles):
 def _header_footer(canvas, doc, d):
     canvas.saveState()
     w, h = A4
-    # Header
-    canvas.setFillColor(MAROON)
-    canvas.rect(32, h - 55, 3.5 * mm, 9 * mm, fill=1, stroke=0)
-    canvas.setFont("DejaVu-Bold", 13)
-    canvas.setFillColor(MAROON)
-    canvas.drawString(40, h - 48, "OKAPI")
-    canvas.setFont("DejaVu", 7)
-    canvas.setFillColor(DARK_GREEN)
-    canvas.drawString(40, h - 56, "Environnement Conseil")
-
-    canvas.setFont("DejaVu-Bold", 13)
-    canvas.setFillColor(DARK_GREEN)
-    canvas.drawRightString(w - 32, h - 48, "WCAG")
-    canvas.setFont("DejaVu", 7)
-    canvas.setFillColor(MAROON)
-    canvas.drawRightString(w - 32, h - 56, "Winning Consortium Alumina Guinea")
+    # Header: brand logos (replaces the former text-based OKAPI / WCAG header)
+    logo_h = 13 * mm
+    top_y = h - 22
+    try:
+        if os.path.exists(OKAPI_LOGO_PATH):
+            okapi_w = logo_h * OKAPI_LOGO_ASPECT
+            canvas.drawImage(
+                OKAPI_LOGO_PATH, 32, top_y - logo_h, width=okapi_w, height=logo_h,
+                preserveAspectRatio=True, mask="auto",
+            )
+    except Exception:
+        pass
+    try:
+        if os.path.exists(WCAG_LOGO_PATH):
+            wcag_w = logo_h * WCAG_LOGO_ASPECT
+            canvas.drawImage(
+                WCAG_LOGO_PATH, w - 32 - wcag_w, top_y - logo_h, width=wcag_w, height=logo_h,
+                preserveAspectRatio=True, mask="auto",
+            )
+    except Exception:
+        pass
 
     canvas.setStrokeColor(GREY_BORDER)
     canvas.line(32, h - 62, w - 32, h - 62)

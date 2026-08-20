@@ -11,9 +11,12 @@ that:
 import io
 import json
 import os
+import sqlite3
+import uuid
 from datetime import datetime
 
 from flask import Flask, render_template, request, jsonify, send_file, abort
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import db
 from compensation import compute_for_owner, compute_global
@@ -51,6 +54,14 @@ def _fromjson_filter(s):
         return json.loads(s) if s else {}
     except Exception:
         return {}
+
+
+@app.context_processor
+def _inject_pending_users_count():
+    try:
+        return {"pending_users_count": db.users_counts().get("pending", 0)}
+    except Exception:
+        return {"pending_users_count": 0}
 
 
 # ---------------------------------------------------------------------------
@@ -360,6 +371,152 @@ def api_status():
         "totals": db.counts(),
         "time": datetime.now().isoformat(),
     })
+
+
+# ---------------------------------------------------------------------------
+# Authentication API (mobile app self-registration + login + admin approval)
+# ---------------------------------------------------------------------------
+
+def _user_public(u: dict):
+    """Returns the user dict WITHOUT the password hash, for API responses."""
+    return {
+        "id": u.get("id"),
+        "nomPrenom": u.get("nom_prenom"),
+        "telephone": u.get("telephone"),
+        "username": u.get("username"),
+        "sexe": u.get("sexe"),
+        "statut": u.get("statut"),
+        "approvalStatus": u.get("approval_status"),
+        "createdAt": u.get("created_at"),
+        "approvedAt": u.get("approved_at"),
+    }
+
+
+@app.route("/api/register", methods=["POST", "OPTIONS"])
+def api_register():
+    if request.method == "OPTIONS":
+        return ("", 204)
+    payload = request.get_json(force=True, silent=True) or {}
+    nom_prenom = (payload.get("nomPrenom") or "").strip()
+    telephone = (payload.get("telephone") or "").strip()
+    username = (payload.get("username") or "").strip().lower()
+    password = payload.get("password") or ""
+    sexe = (payload.get("sexe") or "").strip()
+    statut = (payload.get("statut") or "").strip()
+
+    if not nom_prenom or not username or not password:
+        return jsonify({
+            "status": "error",
+            "message": "Nom/prénom, nom d'utilisateur et mot de passe sont obligatoires.",
+        }), 400
+
+    if len(password) < 4:
+        return jsonify({
+            "status": "error",
+            "message": "Le mot de passe doit contenir au moins 4 caractères.",
+        }), 400
+
+    if db.get_user_by_username(username):
+        return jsonify({
+            "status": "error",
+            "message": "Ce nom d'utilisateur est déjà utilisé.",
+        }), 409
+
+    user_id = str(uuid.uuid4())
+    password_hash = generate_password_hash(password)
+    try:
+        db.create_user(user_id, nom_prenom, telephone, username, password_hash, sexe, statut)
+    except sqlite3.IntegrityError:
+        return jsonify({
+            "status": "error",
+            "message": "Ce nom d'utilisateur est déjà utilisé.",
+        }), 409
+
+    return jsonify({
+        "status": "ok",
+        "message": "Compte créé. En attente de validation par un administrateur.",
+        "user": _user_public(db.get_user_by_id(user_id)),
+    })
+
+
+@app.route("/api/login", methods=["POST", "OPTIONS"])
+def api_login():
+    if request.method == "OPTIONS":
+        return ("", 204)
+    payload = request.get_json(force=True, silent=True) or {}
+    username = (payload.get("username") or "").strip().lower()
+    password = payload.get("password") or ""
+
+    user = db.get_user_by_username(username)
+    if not user or not check_password_hash(user["password_hash"], password):
+        return jsonify({
+            "status": "error",
+            "message": "Nom d'utilisateur ou mot de passe incorrect.",
+        }), 401
+
+    if user["approval_status"] == "pending":
+        return jsonify({
+            "status": "pending",
+            "message": "Votre compte est en attente de validation par un administrateur.",
+        }), 403
+
+    if user["approval_status"] == "rejected":
+        return jsonify({
+            "status": "rejected",
+            "message": "Votre demande de compte a été refusée. Contactez un administrateur.",
+        }), 403
+
+    return jsonify({
+        "status": "ok",
+        "message": "Connexion réussie.",
+        "user": _user_public(user),
+    })
+
+
+@app.route("/api/users/<user_id>/status", methods=["GET", "OPTIONS"])
+def api_user_status(user_id):
+    """Lets the mobile app re-check whether a still-pending account has since
+    been approved/rejected, without requiring the password again."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+    user = db.get_user_by_id(user_id)
+    if not user:
+        return jsonify({"status": "error", "message": "Utilisateur introuvable."}), 404
+    return jsonify({"status": "ok", "user": _user_public(user)})
+
+
+# ---------------------------------------------------------------------------
+# Admin: user management (approve / reject registrations)
+# ---------------------------------------------------------------------------
+
+@app.route("/users")
+def users_list():
+    users = db.all_users()
+    counts = db.users_counts()
+    return render_template("users.html", users=users, counts=counts)
+
+
+@app.route("/users/<user_id>/approve", methods=["POST"])
+def user_approve(user_id):
+    db.set_user_approval(user_id, "approved", approved_by="admin")
+    return ("", 204) if request.args.get("ajax") else _redirect_users()
+
+
+@app.route("/users/<user_id>/reject", methods=["POST"])
+def user_reject(user_id):
+    db.set_user_approval(user_id, "rejected", approved_by="admin")
+    return ("", 204) if request.args.get("ajax") else _redirect_users()
+
+
+@app.route("/users/<user_id>/delete", methods=["POST"])
+def user_delete(user_id):
+    db.delete_user(user_id)
+    return ("", 204) if request.args.get("ajax") else _redirect_users()
+
+
+def _redirect_users():
+    from flask import redirect, url_for
+    return redirect(url_for("users_list"))
 
 
 if __name__ == "__main__":

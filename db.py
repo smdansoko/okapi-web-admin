@@ -76,12 +76,102 @@ def init_db():
             synced_at TEXT DEFAULT (datetime('now'))
         );
 
+        CREATE TABLE IF NOT EXISTS users (
+            id TEXT PRIMARY KEY,
+            nom_prenom TEXT NOT NULL,
+            telephone TEXT,
+            username TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            sexe TEXT,
+            statut TEXT,
+            approval_status TEXT NOT NULL DEFAULT 'pending',
+            created_at TEXT DEFAULT (datetime('now')),
+            approved_at TEXT,
+            approved_by TEXT
+        );
+
         CREATE INDEX IF NOT EXISTS idx_champs_batch ON champs(num_batch);
         CREATE INDEX IF NOT EXISTS idx_structures_batch ON structures(num_batch);
+        CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+        CREATE INDEX IF NOT EXISTS idx_users_status ON users(approval_status);
         """
     )
     conn.commit()
     conn.close()
+
+
+# ---------------------------------------------------------------------------
+# Users (mobile app authentication + admin approval workflow)
+# ---------------------------------------------------------------------------
+
+def create_user(user_id: str, nom_prenom: str, telephone: str, username: str,
+                 password_hash: str, sexe: str, statut: str):
+    """Inserts a new pending registration. Raises sqlite3.IntegrityError if the
+    username is already taken."""
+    with _lock:
+        conn = get_conn()
+        conn.execute(
+            """INSERT INTO users
+               (id, nom_prenom, telephone, username, password_hash, sexe, statut, approval_status)
+               VALUES (?,?,?,?,?,?,?, 'pending')""",
+            (user_id, nom_prenom, telephone, username, password_hash, sexe, statut),
+        )
+        conn.commit()
+        conn.close()
+
+
+def get_user_by_username(username: str):
+    conn = get_conn()
+    row = conn.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def get_user_by_id(user_id: str):
+    conn = get_conn()
+    row = conn.execute("SELECT * FROM users WHERE id=?", (user_id,)).fetchone()
+    conn.close()
+    return dict(row) if row else None
+
+
+def all_users():
+    conn = get_conn()
+    rows = conn.execute("SELECT * FROM users ORDER BY created_at DESC").fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def set_user_approval(user_id: str, status: str, approved_by: str = ""):
+    """status must be 'approved' or 'rejected'."""
+    with _lock:
+        conn = get_conn()
+        conn.execute(
+            """UPDATE users SET approval_status=?, approved_at=datetime('now'), approved_by=?
+               WHERE id=?""",
+            (status, approved_by, user_id),
+        )
+        conn.commit()
+        conn.close()
+
+
+def delete_user(user_id: str):
+    with _lock:
+        conn = get_conn()
+        conn.execute("DELETE FROM users WHERE id=?", (user_id,))
+        conn.commit()
+        conn.close()
+
+
+def users_counts():
+    conn = get_conn()
+    rows = conn.execute(
+        "SELECT approval_status, COUNT(*) c FROM users GROUP BY approval_status"
+    ).fetchall()
+    conn.close()
+    out = {"pending": 0, "approved": 0, "rejected": 0}
+    for r in rows:
+        out[r["approval_status"]] = r["c"]
+    return out
 
 
 def upsert_menage(m: dict, device_id: str = ""):

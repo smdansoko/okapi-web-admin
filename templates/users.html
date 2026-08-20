@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Utilisateurs - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="cards-row">
+  <div class="stat-card">
+    <div class="label">En attente de validation</div>
+    <div class="value">{{ counts.pending }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="label">Comptes approuvés</div>
+    <div class="value">{{ counts.approved }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Comptes refusés</div>
+    <div class="value">{{ counts.rejected }}</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Comptes de l'application mobile</h2>
+  <p style="color:#666; font-size: 13px; margin-top:-6px;">
+    Les nouveaux comptes créés depuis l'application mobile Okapi Survey apparaissent ici en statut
+    <strong>« En attente »</strong>. Vérifiez l'identité de la personne puis validez ou refusez sa demande.
+    Le mot de passe n'est jamais affiché (il est stocké de façon chiffrée).
+  </p>
+
+  {% if users %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Nom et prénom</th>
+        <th>Nom d'utilisateur</th>
+        <th>Téléphone</th>
+        <th>Sexe</th>
+        <th>Statut (rôle)</th>
+        <th>Créé le</th>
+        <th>État du compte</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.nom_prenom }}</td>
+        <td><code class="mono">{{ u.username }}</code></td>
+        <td>{{ u.telephone or '—' }}</td>
+        <td>{{ u.sexe or '—' }}</td>
+        <td>{{ u.statut or '—' }}</td>
+        <td>{{ u.created_at }}</td>
+        <td>
+          {% if u.approval_status == 'pending' %}
+            <span class="badge status-pending">En attente</span>
+          {% elif u.approval_status == 'approved' %}
+            <span class="badge status-approved">Approuvé</span>
+          {% else %}
+            <span class="badge status-rejected">Refusé</span>
+          {% endif %}
+        </td>
+        <td class="actions-cell">
+          {% if u.approval_status != 'approved' %}
+          <form method="post" action="{{ url_for('user_approve', user_id=u.id) }}" style="display:inline;">
+            <button class="btn small" type="submit">Approuver</button>
+          </form>
+          {% endif %}
+          {% if u.approval_status != 'rejected' %}
+          <form method="post" action="{{ url_for('user_reject', user_id=u.id) }}" style="display:inline;">
+            <button class="btn small maroon" type="submit">Refuser</button>
+          </form>
+          {% endif %}
+          <form method="post" action="{{ url_for('user_delete', user_id=u.id) }}" style="display:inline;"
+                onsubmit="return confirm('Supprimer définitivement ce compte ?');">
+            <button class="btn small btn-outline" type="submit">Supprimer</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucun compte enregistré pour le moment.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

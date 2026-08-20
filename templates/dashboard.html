@@ -4,29 +4,42 @@
 
 <div class="cards-row">
   <div class="stat-card">
+    <div class="icon">🏠</div>
     <div class="label">Ménages synchronisés</div>
     <div class="value">{{ counts.menages }}</div>
   </div>
-  <div class="stat-card">
+  <div class="stat-card blue">
+    <div class="icon">👥</div>
     <div class="label">Individus recensés</div>
     <div class="value">{{ total_individus }}</div>
   </div>
-  <div class="stat-card">
+  <div class="stat-card gold">
+    <div class="icon">🌾</div>
     <div class="label">Enquêtes Champs</div>
     <div class="value">{{ counts.champs }}</div>
   </div>
   <div class="stat-card">
+    <div class="icon">🏗️</div>
     <div class="label">Enquêtes Structures</div>
     <div class="value">{{ counts.structures }}</div>
   </div>
   <div class="stat-card green">
+    <div class="icon">📐</div>
     <div class="label">Superficie totale (m²)</div>
     <div class="value">{{ "{:,.0f}".format(total_superficie).replace(",", " ") }}</div>
   </div>
   <div class="stat-card green">
+    <div class="icon">💰</div>
     <div class="label">Montant total à indemniser (GNF)</div>
     <div class="value">{{ "{:,.0f}".format(total_montant).replace(",", " ") }}</div>
   </div>
+  {% if pending_users_count %}
+  <div class="stat-card gold">
+    <div class="icon">🔔</div>
+    <div class="label">Comptes en attente de validation</div>
+    <div class="value">{{ pending_users_count }}</div>
+  </div>
+  {% endif %}
 </div>
 
 <div class="panel">

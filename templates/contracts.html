@@ -45,7 +45,7 @@
         </td>
         <td>{{ o.village }}</td>
         <td>
-          <a class="btn small maroon" href="{{ url_for('export_contract', code_individu=o.code) }}">
+          <a class="btn small maroon js-export-pdf" href="{{ url_for('export_contract', code_individu=o.code) }}">
             Générer contrat PDF
           </a>
         </td>
@@ -58,4 +58,64 @@
   {% endif %}
 </div>
 
+<div class="panel" style="font-size:13px; color:#666;">
+  <strong>💡 Astuce :</strong> pour choisir le dossier d'enregistrement à chaque export de contrat, utilisez un
+  navigateur compatible (Chrome, Edge). Une fenêtre « Enregistrer sous » s'ouvrira automatiquement vous permettant
+  de sélectionner le dossier de destination. Sur les navigateurs non compatibles, le fichier sera téléchargé dans
+  le dossier de téléchargement par défaut de votre navigateur.
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Uses the File System Access API (showSaveFilePicker) to let the user pick
+// the destination folder for each contract PDF export, when supported by the
+// browser (Chrome/Edge desktop). Falls back to a normal download otherwise.
+document.addEventListener('click', async function (e) {
+  const link = e.target.closest('.js-export-pdf');
+  if (!link) return;
+
+  if (typeof window.showSaveFilePicker !== 'function') {
+    // Not supported (Firefox/Safari or older browsers): let the browser
+    // handle the normal download via its own "Ask where to save" setting.
+    return;
+  }
+
+  e.preventDefault();
+  const url = link.href;
+  const original = link.textContent;
+  link.style.pointerEvents = 'none';
+  link.textContent = 'Génération...';
+  try {
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Erreur serveur (' + response.status + ')');
+    const disposition = response.headers.get('Content-Disposition') || '';
+    let filename = 'contrat.pdf';
+    const match = disposition.match(/filename="?([^"]+)"?/);
+    if (match) filename = match[1];
+
+    const blob = await response.blob();
+
+    const handle = await window.showSaveFilePicker({
+      suggestedName: filename,
+      types: [{ description: 'Document PDF', accept: { 'application/pdf': ['.pdf'] } }],
+    });
+    const writable = await handle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+  } catch (err) {
+    if (err && err.name === 'AbortError') {
+      // User cancelled the save dialog — do nothing.
+    } else {
+      console.error(err);
+      // Fallback: trigger a normal download if the picker/fetch failed.
+      window.location.href = url;
+    }
+  } finally {
+    link.style.pointerEvents = '';
+    link.textContent = original;
+  }
+});
+</script>
 {% endblock %}

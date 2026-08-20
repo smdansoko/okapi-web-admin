@@ -19,6 +19,10 @@
     <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}">Tableau de bord</a>
     <a href="{{ url_for('contracts_list') }}" class="{{ 'active' if request.endpoint == 'contracts_list' else '' }}">Contrats</a>
     <a href="{{ url_for('compensation_page') }}" class="{{ 'active' if request.endpoint == 'compensation_page' else '' }}">Indemnisation</a>
+    <a href="{{ url_for('users_list') }}" class="{{ 'active' if request.endpoint == 'users_list' else '' }}">
+      Utilisateurs
+      {% if pending_users_count is defined and pending_users_count %}<span class="nav-badge">{{ pending_users_count }}</span>{% endif %}
+    </a>
   </nav>
   <main class="content">
     {% block content %}{% endblock %}
@@ -26,5 +30,6 @@
   <footer class="app-footer">
     OKAPI Environnement Conseil SARL &mdash; Application d'administration Okapi Survey &copy; {{ now.year if now else '' }}
   </footer>
+  {% block scripts %}{% endblock %}
 </body>
 </html>
