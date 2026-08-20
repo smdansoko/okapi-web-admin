@@ -18,8 +18,12 @@ class ContractsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = context.watch<AppDataProvider>();
 
-    // Group Lignage / Communautaire champs by (codeMenage, codeProprietaire)
-    // so we generate a single contract per owner rather than one per parcelle.
+    // Group champs by (codeMenage, codeProprietaire) so we generate a single
+    // contract per owner rather than one per parcelle. The owner used is
+    // always the individu selected in the Champs survey's "1.7 Sélectionnez
+    // le propriétaire de la parcelle agricole" field (codeProprietaire /
+    // proprietaireNom), for all 3 contract types, including Propriétaire.
+    final proprietaireOwners = <String, _OwnerRef>{};
     final lignageOwners = <String, _OwnerRef>{};
     final communautaireOwners = <String, _OwnerRef>{};
     for (final c in data.champs) {
@@ -35,12 +39,26 @@ class ContractsScreen extends StatelessWidget {
         village: c.village,
         dateEnquete: c.dateEnquete,
       );
-      if (c.typeDePropriete == 'Lignage') {
+      if (c.typeDePropriete == 'Propriétaire') {
+        proprietaireOwners[key] = ref;
+      } else if (c.typeDePropriete == 'Lignage') {
         lignageOwners[key] = ref;
       } else if (c.typeDePropriete == 'Communautaire') {
         communautaireOwners[key] = ref;
       }
     }
+
+    // Households that already have at least one "Propriétaire" Champs
+    // survey: their contract uses the individu selected in that survey.
+    final menagesWithProprietaireChamp = proprietaireOwners.values
+        .map((o) => o.codeMenage)
+        .toSet();
+    // Fallback: households without any "Propriétaire" Champs survey yet
+    // fall back to the chef de ménage, so a contract can still be produced
+    // before the Champs survey has been completed for that household.
+    final fallbackMenages = data.menages
+        .where((m) => !menagesWithProprietaireChamp.contains(m.codeMenage))
+        .toList();
 
     return DefaultTabController(
       length: 3,
@@ -60,17 +78,28 @@ class ContractsScreen extends StatelessWidget {
             _ContractTab(
               emptyLabel:
                   'Aucun ménage disponible pour générer un accord Propriétaire.',
-              items: data.menages
-                  .map(
-                    (m) => _ContractEntry(
-                      title: m.nomChefMenage.isEmpty
-                          ? m.codeMenage
-                          : m.nomChefMenage,
-                      subtitle: m.codeMenage,
-                      onGenerate: () => _generateMenageContract(context, m),
+              items: [
+                ...proprietaireOwners.values.map(
+                  (o) => _ContractEntry(
+                    title: o.nom,
+                    subtitle: o.codeMenage,
+                    onGenerate: () => _generateOwnerContract(
+                      context,
+                      ContractType.proprietaire,
+                      o,
                     ),
-                  )
-                  .toList(),
+                  ),
+                ),
+                ...fallbackMenages.map(
+                  (m) => _ContractEntry(
+                    title: m.nomChefMenage.isEmpty
+                        ? m.codeMenage
+                        : m.nomChefMenage,
+                    subtitle: m.codeMenage,
+                    onGenerate: () => _generateMenageContract(context, m),
+                  ),
+                ),
+              ],
             ),
             _ContractTab(
               emptyLabel: 'Aucune enquête de type Lignage disponible.',
@@ -110,6 +139,12 @@ class ContractsScreen extends StatelessWidget {
     );
   }
 
+  /// Fallback contract generation for households that do not yet have a
+  /// "Propriétaire" Champs survey: uses the chef de ménage as beneficiary.
+  /// As soon as a Champs survey exists for the household, the contract is
+  /// generated via [_generateOwnerContract] using the individu selected in
+  /// the survey's "1.7 Sélectionnez le propriétaire de la parcelle
+  /// agricole" field instead (see [proprietaireOwners] in build()).
   Future<void> _generateMenageContract(
     BuildContext context,
     Menage menage,

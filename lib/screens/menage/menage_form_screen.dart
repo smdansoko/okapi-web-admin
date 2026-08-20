@@ -104,6 +104,29 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
     setState(() => _codeMenageCtrl.text = code);
   }
 
+  /// Generates the next sequential "code individu" for a newly added
+  /// member: `<codeMenage>-<N>`, where N increments with each member added
+  /// (order of addition), reusing the ménage's code as an unchanged prefix.
+  /// Example: codeMenage = KAT3-260820-1 → 1st member KAT3-260820-1-1,
+  /// 2nd member KAT3-260820-1-2, 3rd member KAT3-260820-1-3, etc.
+  /// The max existing suffix (rather than a plain count) is used so that
+  /// deleting and re-adding members never produces a duplicate id.
+  String _nextIndividuId() {
+    final prefix = _codeMenageCtrl.text.isNotEmpty
+        ? _codeMenageCtrl.text
+        : (_menage.codeMenage.isNotEmpty ? _menage.codeMenage : _menage.id);
+    var maxSuffix = 0;
+    final pattern = RegExp('^${RegExp.escape(prefix)}-(\\d+)\$');
+    for (final ind in _menage.individus) {
+      final m = pattern.firstMatch(ind.id);
+      if (m != null) {
+        final n = int.tryParse(m.group(1)!) ?? 0;
+        if (n > maxSuffix) maxSuffix = n;
+      }
+    }
+    return '$prefix-${maxSuffix + 1}';
+  }
+
   Future<void> _addOrEditIndividu({Individu? existing, int? index}) async {
     final result = await _showIndividuDialog(existing: existing);
     if (result != null) {
@@ -314,7 +337,7 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                       return;
                     }
                     final result = Individu(
-                      id: existing?.id ?? _uuid.v4(),
+                      id: existing?.id ?? _nextIndividuId(),
                       numOrdreIndividu:
                           existing?.numOrdreIndividu ??
                           (_menage.individus.length + 1),
