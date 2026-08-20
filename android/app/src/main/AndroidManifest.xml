@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required for the "Synchroniser" feature: sending survey data to the
+         OKAPI Web Admin server over HTTP(S). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="Okapi Survey"
         android:name="${applicationName}"
