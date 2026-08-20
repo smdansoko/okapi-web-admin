@@ -4,7 +4,7 @@ import 'theme/app_theme.dart';
 import 'services/reference_data_service.dart';
 import 'services/storage_service.dart';
 import 'services/app_data_provider.dart';
-import 'screens/root_shell.dart';
+import 'screens/auth/auth_gate.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
