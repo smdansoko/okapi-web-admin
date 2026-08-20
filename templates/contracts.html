@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Contrats - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <h2>Export des contrats (PAP)</h2>
+
+  <form class="filters" method="get">
+    <label for="batch">Filtrer par N° de lot :</label>
+    <select name="batch" id="batch" onchange="this.form.submit()">
+      <option value="">-- Tous les lots --</option>
+      {% for b in batches %}
+      <option value="{{ b }}" {{ 'selected' if b == selected_batch else '' }}>{{ b }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
+  {% if owners %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>N° de lot</th>
+        <th>Nom et prénom</th>
+        <th>Code individu</th>
+        <th>Type de contrat</th>
+        <th>Village</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for o in owners %}
+      <tr>
+        <td><code class="mono">{{ o.numBatch or o.codeMenage }}</code></td>
+        <td>{{ o.nom }}</td>
+        <td><code class="mono">{{ o.code }}</code></td>
+        <td>
+          {% set tt = o.type_contrat|lower %}
+          {% if 'ligna' in tt %}
+            <span class="badge lignage">Lignage</span>
+          {% elif 'communaut' in tt %}
+            <span class="badge communautaire">Communautaire</span>
+          {% else %}
+            <span class="badge proprietaire">Propriétaire</span>
+          {% endif %}
+        </td>
+        <td>{{ o.village }}</td>
+        <td>
+          <a class="btn small maroon" href="{{ url_for('export_contract', code_individu=o.code) }}">
+            Générer contrat PDF
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucun PAP trouvé pour ce filtre. Synchronisez des données depuis l'application mobile.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

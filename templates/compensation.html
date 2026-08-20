@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Indemnisation - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <h2>Export du tableau d'indemnisation (.xlsx)</h2>
+  <p>Génère le tableau au format identique à <code class="mono">OKAPI_WCAG_Tableau d'indemnisation_WCAG2613.xlsm</code>,
+     calculé automatiquement à partir des enquêtes Champs et Structures synchronisées.</p>
+
+  <form class="filters" method="get" action="{{ url_for('compensation_export') }}">
+    <label for="batch">N° de lot :</label>
+    <select name="batch" id="batch">
+      <option value="">-- Tous les lots (export global) --</option>
+      {% for b in batches %}
+      <option value="{{ b }}">{{ b }}</option>
+      {% endfor %}
+    </select>
+    <label for="village">Libellé villages (optionnel) :</label>
+    <input type="text" name="village" id="village" placeholder="ex: Sangaredi">
+    <button class="btn maroon" type="submit">Télécharger le tableau Excel</button>
+  </form>
+</div>
+
+{% endblock %}

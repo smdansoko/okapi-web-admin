@@ -1,0 +1,221 @@
+:root {
+  --maroon: #6B1F1F;
+  --dark-green: #1F4A2E;
+  --grey-light: #F4F4F2;
+  --grey-border: #DADAD5;
+  --text-dark: #24291F;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Century Gothic", Arial, sans-serif;
+  background: var(--grey-light);
+  color: var(--text-dark);
+}
+
+.topbar {
+  background: linear-gradient(90deg, var(--maroon) 0%, #8a2c2c 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 10px 24px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.topbar img.logo {
+  height: 44px;
+  margin-right: 16px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 3px;
+}
+
+.topbar .title-block h1 {
+  font-size: 18px;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.topbar .title-block small {
+  opacity: 0.85;
+}
+
+nav.mainnav {
+  background: var(--dark-green);
+  display: flex;
+  gap: 4px;
+  padding: 0 20px;
+}
+
+nav.mainnav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.85;
+  border-bottom: 3px solid transparent;
+  transition: 0.15s;
+}
+
+nav.mainnav a:hover,
+nav.mainnav a.active {
+  opacity: 1;
+  border-bottom-color: #E8B84B;
+  background: rgba(255,255,255,0.06);
+}
+
+main.content {
+  padding: 24px 28px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 18px 20px;
+  border: 1px solid var(--grey-border);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.stat-card .label {
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #7a7a72;
+  margin-bottom: 6px;
+}
+
+.stat-card .value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--maroon);
+}
+
+.stat-card.green .value { color: var(--dark-green); }
+
+.panel {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid var(--grey-border);
+  padding: 20px 22px;
+  margin-bottom: 24px;
+}
+
+.panel h2 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: var(--maroon);
+  border-bottom: 2px solid var(--grey-light);
+  padding-bottom: 8px;
+}
+
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+table.data-table th, table.data-table td {
+  border: 1px solid var(--grey-border);
+  padding: 8px 10px;
+  text-align: left;
+}
+
+table.data-table th {
+  background: var(--grey-light);
+  font-weight: 700;
+  color: var(--dark-green);
+}
+
+table.data-table tr:nth-child(even) { background: #FAFAF8; }
+
+.btn {
+  display: inline-block;
+  background: var(--dark-green);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover { background: #163a24; }
+
+.btn.maroon { background: var(--maroon); }
+.btn.maroon:hover { background: #521717; }
+
+.btn.small { padding: 5px 10px; font-size: 12px; }
+
+.filters {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filters select, .filters input {
+  padding: 7px 10px;
+  border: 1px solid var(--grey-border);
+  border-radius: 6px;
+  font-size: 13.5px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 12px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.badge.proprietaire { background: var(--dark-green); }
+.badge.lignage { background: #a06a1f; }
+.badge.communautaire { background: var(--maroon); }
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #888;
+}
+
+footer.app-footer {
+  text-align: center;
+  padding: 18px;
+  color: #8a8a80;
+  font-size: 12px;
+}
+
+.sync-status-ok {
+  display: inline-block;
+  background: #1F4A2E;
+  color: #fff;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+code.mono {
+  background: var(--grey-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Consolas", monospace;
+  font-size: 12.5px;
+}

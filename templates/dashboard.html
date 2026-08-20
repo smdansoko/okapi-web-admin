@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="cards-row">
+  <div class="stat-card">
+    <div class="label">Ménages synchronisés</div>
+    <div class="value">{{ counts.menages }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Individus recensés</div>
+    <div class="value">{{ total_individus }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Enquêtes Champs</div>
+    <div class="value">{{ counts.champs }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="label">Enquêtes Structures</div>
+    <div class="value">{{ counts.structures }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="label">Superficie totale (m²)</div>
+    <div class="value">{{ "{:,.0f}".format(total_superficie).replace(",", " ") }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="label">Montant total à indemniser (GNF)</div>
+    <div class="value">{{ "{:,.0f}".format(total_montant).replace(",", " ") }}</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Répartition par lot (numéro de batch)</h2>
+  {% if batch_rows %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>N° de lot</th>
+        <th>PAP concernés</th>
+        <th>Montant estimé (GNF)</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in batch_rows %}
+      <tr>
+        <td><code class="mono">{{ row.num_batch }}</code></td>
+        <td>{{ row.owners_count }}</td>
+        <td>{{ "{:,.0f}".format(row.total_montant).replace(",", " ") }}</td>
+        <td>
+          <a class="btn small" href="{{ url_for('contracts_list', batch=row.num_batch) }}">Contrats</a>
+          <a class="btn small maroon" href="{{ url_for('compensation_export', batch=row.num_batch) }}">Export Excel</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment. Utilisez la synchronisation depuis l'application mobile Okapi Survey.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Dernières synchronisations</h2>
+  {% if recent_syncs %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Appareil</th>
+        <th>ID appareil</th>
+        <th>Données reçues</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in recent_syncs %}
+      <tr>
+        <td>{{ s.synced_at }}</td>
+        <td>{{ s.device_name or "—" }}</td>
+        <td><code class="mono">{{ s.device_id or "—" }}</code></td>
+        <td>
+          {% set c = s.counts_json | fromjson %}
+          Ménages: {{ c.get('menages', 0) }} · Champs: {{ c.get('champs', 0) }} · Structures: {{ c.get('structures', 0) }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    Aucune synchronisation reçue pour le moment.<br>
+    Endpoint de synchronisation : <code class="mono">POST /api/sync</code>
+  </div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Synchronisation avec l'application mobile</h2>
+  <p>
+    L'application mobile <strong>Okapi Survey</strong> peut envoyer ses données (ménages, enquêtes champs,
+    enquêtes structures) vers ce serveur via une requête <code class="mono">POST</code> à l'adresse :
+  </p>
+  <p><code class="mono">{{ request.url_root }}api/sync</code></p>
+  <p>Statut du serveur : <code class="mono">GET {{ request.url_root }}api/status</code></p>
+</div>
+
+{% endblock %}

@@ -1,0 +1,431 @@
+{
+  "Boké": {
+    "Boffa": [
+      "Boffa Centre",
+      "Colia",
+      "Douprou",
+      "Koba-Tatema",
+      "Lisso",
+      "Mankountan",
+      "Tamita",
+      "Tougnifili"
+    ],
+    "Boké": [
+      "Bintimodiya",
+      "Boké Centre",
+      "Dabiss",
+      "Kamsar",
+      "Kanfarandé",
+      "Kolaboui",
+      "Malapouyah",
+      "Sangaredi",
+      "Sansalé",
+      "Tanènè"
+    ],
+    "Fria": [
+      "Baguinet",
+      "Banguigny",
+      "Fria Centre",
+      "Tormelin"
+    ],
+    "Gaoual": [
+      "Foulamory",
+      "Gaoual Centre",
+      "Kakony",
+      "Koumbia",
+      "Kounsitel",
+      "Malanta",
+      "Touba",
+      "Wendou M'Bour"
+    ],
+    "Koundara": [
+      "Guingan",
+      "Kamaby",
+      "Koundara Centre",
+      "Sambailo",
+      "Sareboido",
+      "Termesse",
+      "Youkounkoun"
+    ]
+  },
+  "Kindia": {
+    "Coyah": [
+      "Coyah Centre",
+      "Kouriah",
+      "Manéah",
+      "Wonkifong"
+    ],
+    "Dubréka": [
+      "Badi",
+      "Dubréka Centre",
+      "Falissade",
+      "Khorira",
+      "Ouassou",
+      "Tanènè",
+      "Tondon"
+    ],
+    "Forécariah": [
+      "Alassoya",
+      "Benty",
+      "Farmoriah",
+      "Forécariah Centre",
+      "Kaback",
+      "Kakossa",
+      "Kallia",
+      "Maferenya",
+      "Moussaya",
+      "Sikhourou"
+    ],
+    "Kindia": [
+      "Bangouyah",
+      "Damankanyah",
+      "Friguiagbé",
+      "Kindia Centre",
+      "Kolente",
+      "Linsan",
+      "Madina Oula",
+      "Mambiya",
+      "Molota",
+      "Samayah",
+      "Sougueta"
+    ],
+    "Télimélé": [
+      "Bourouwal",
+      "Daramagnaky",
+      "Gougoudjé",
+      "Koba",
+      "Kollet",
+      "Konsotamy",
+      "Missira",
+      "Santou",
+      "Sarékaly",
+      "Sinta",
+      "Sogolon",
+      "Tarihoye",
+      "Télimélé Centre",
+      "Thionthian"
+    ]
+  },
+  "Mamou": {
+    "Dalaba": [
+      "Bodié",
+      "Dalaba Centre",
+      "Ditinn",
+      "Kaalan",
+      "Kankalabé",
+      "Kébali",
+      "Koba",
+      "Mafara",
+      "Mitty",
+      "Mombéyah"
+    ],
+    "Mamou": [
+      "Bouliwel",
+      "Dounet",
+      "Gongoret",
+      "Kegneko",
+      "Konkoure",
+      "Mamou Centre",
+      "Nyagara",
+      "Ouré-Kaba",
+      "Porédaka",
+      "Saramoussaya",
+      "Soyah",
+      "Téguéréya",
+      "Timbo",
+      "Tolo"
+    ],
+    "Pita": [
+      "Bantignel",
+      "Bourouwal-Tappé",
+      "Donghol-Touma",
+      "Gongore",
+      "Ley-Miro",
+      "Maci",
+      "Ninguélandé",
+      "Pita Centre",
+      "Sangaréah",
+      "Sintaly",
+      "Timbi Madina",
+      "Timbi-Touny"
+    ]
+  },
+  "Labé": {
+    "Koubia": [
+      "Fafaya",
+      "Gadha-Woundou",
+      "Koubia Centre",
+      "Matakaou",
+      "Missira",
+      "Pilimini"
+    ],
+    "Labé": [
+      "Dalein",
+      "Daralabe",
+      "Diari",
+      "Dionfo",
+      "Garambé",
+      "Hafia",
+      "Kaalan",
+      "Kouramangui",
+      "Labé Centre",
+      "Noussy",
+      "Popodara",
+      "Sannou",
+      "Taranbaly",
+      "Tountouroun"
+    ],
+    "Lélouma": [
+      "Balaya",
+      "Djountou",
+      "Herico",
+      "Korbe",
+      "Lafou",
+      "Lélouma Centre",
+      "Linsansaran",
+      "Manda",
+      "Parawol",
+      "Sagalé",
+      "Tyanguel-Bori"
+    ],
+    "Mali": [
+      "Balaki",
+      "Donghol Sigon",
+      "Dougountouny",
+      "Fougou",
+      "Gayah",
+      "Hidayatou",
+      "Lebekere",
+      "Madina Wora",
+      "Mali Centre",
+      "Salambande"
+    ],
+    "Tougué": [
+      "Téliré",
+      "Touba",
+      "Yembereng",
+      "Fatako",
+      "Fello Koundoua",
+      "Kansangui",
+      "Kolangui",
+      "Kollet",
+      "Konah",
+      "Kouratongo",
+      "Koïn",
+      "Tangaly",
+      "Tougué Centre"
+    ]
+  },
+  "Faranah": {
+    "Dabola": [
+      "Arfamoussaya",
+      "Banko",
+      "Bissikrima",
+      "Dabola Centre",
+      "Dogomet",
+      "Kankama",
+      "Kindoye",
+      "Konindou",
+      "N'Dema"
+    ],
+    "Dinguiraye": [
+      "Banora",
+      "Dialakoro",
+      "Diatiféré",
+      "Dinguiraye Centre",
+      "Gagnakali",
+      "Kalinko",
+      "Lansanya",
+      "Sélouma"
+    ],
+    "Faranah": [
+      "Banian",
+      "Beindou",
+      "Faranah Centre",
+      "Gnaléah",
+      "Hérémakonon",
+      "Kobikoro",
+      "Maréla",
+      "Passayah",
+      "Sandeniah",
+      "Songoyah",
+      "Tindo",
+      "Tiro"
+    ],
+    "Kissidougou": [
+      "Albadaria",
+      "Banama",
+      "Bardou",
+      "Beindou",
+      "Fermesadou",
+      "Firawa",
+      "Gbangbadou",
+      "Kissidougou Centre",
+      "Kondiadou",
+      "Manfran",
+      "Sangardo",
+      "Yendé-Millimou",
+      "Yombiro"
+    ]
+  },
+  "Kankan": {
+    "Kankan": [
+      "Balandougou",
+      "Bate-Nafadji",
+      "Boula",
+      "Gbérédou-Baranama",
+      "Kankan Centre",
+      "Karifamoriyah",
+      "Koumban",
+      "Mamouroudou",
+      "Missamana",
+      "Moribayah",
+      "Sabadou-Baranama",
+      "Tinti-Oulen",
+      "Tokounou"
+    ],
+    "Kérouané": [
+      "Banankoro",
+      "Damaro",
+      "Kérouane Centre",
+      "Komodou",
+      "Kounsankoro",
+      "Linko",
+      "Sibiribaro",
+      "Soromaya"
+    ],
+    "Kouroussa": [
+      "Babila",
+      "Balato",
+      "Banfélé",
+      "Baro",
+      "Cisséla",
+      "Douako",
+      "Doura",
+      "Kiniéro",
+      "Komola-Koura",
+      "Koumana",
+      "Kouroussa Centre",
+      "Sanguiana"
+    ],
+    "Mandiana": [
+      "Balandougouba",
+      "Dialakoro",
+      "Faralako",
+      "Kantoumanina",
+      "Kiniéran",
+      "Kondianakoro",
+      "Koundian",
+      "Mandiana Centre",
+      "Morodou",
+      "Niantania",
+      "Saladou",
+      "Sansando"
+    ],
+    "Siguiri": [
+      "Bankon",
+      "Doko",
+      "Franwalia",
+      "Kiniébakoura",
+      "Kintinian",
+      "Maléa",
+      "Naboun",
+      "Niagassola",
+      "Niandankoro",
+      "Norassoba",
+      "Nounkounkan",
+      "Siguiri Centre",
+      "Tomba Kanssa",
+      "Siguirini"
+    ]
+  },
+  "Nzérékoré": {
+    "Beyla": [
+      "Beyla Centre",
+      "Boola",
+      "Diarraguerela",
+      "Diassadou",
+      "Fouala",
+      "Gbackédou",
+      "Gbéssoba",
+      "Karala",
+      "Koumandou",
+      "Mousadou",
+      "Nionsomoridou",
+      "Samana",
+      "Sinko",
+      "Sokourala"
+    ],
+    "Guéckédou": [
+      "Bolodou",
+      "Fangamadou",
+      "Guéckédou Centre",
+      "Guendembou",
+      "Kassadou",
+      "Koundou",
+      "Nongoa",
+      "Ouendé-Kénéma",
+      "Tékoulo",
+      "Terméssadou Djibo"
+    ],
+    "Lola": [
+      "Bossou",
+      "Foumbadou",
+      "Gama Berema",
+      "Guéassou",
+      "Kokota",
+      "Lainé",
+      "Lola Centre",
+      "N'Zoo",
+      "Tounkarata"
+    ],
+    "Macenta": [
+      "Balizia",
+      "Binikala",
+      "Bofossou",
+      "Daro",
+      "Fassankoni",
+      "Kouankan",
+      "Koyama",
+      "Macenta Centre",
+      "N'Zébéla",
+      "Ourémai",
+      "Panziazou",
+      "Semgbédou",
+      "Sérédou",
+      "Vassérédou",
+      "Watanka"
+    ],
+    "Nzérékoré": [
+      "Bounouma",
+      "Gouécké",
+      "Kobéla",
+      "Koropara",
+      "Koulé",
+      "Nzérékoré Centre",
+      "Palé",
+      "Samoé",
+      "Soulouta",
+      "Womey",
+      "Yalenzou"
+    ],
+    "Yomou": [
+      "Banié",
+      "Bheeta",
+      "Bignamou",
+      "Bowé",
+      "Djécké",
+      "Péla",
+      "Yomou Centre"
+    ]
+  },
+  "Conakry": {
+    "Conakry": [
+      "Dixinn",
+      "Kaloum",
+      "Matam",
+      "Matoto",
+      "Ratoma"
+    ]
+  }
+}

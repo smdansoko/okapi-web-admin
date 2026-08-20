@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}OKAPI Survey - Admin{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo_small.png') }}">
+</head>
+<body>
+  <div class="topbar">
+    <img src="{{ url_for('static', filename='img/logo_small.png') }}" alt="OKAPI logo" class="logo">
+    <div class="title-block">
+      <h1>OKAPI Environnement Conseil</h1>
+      <small>Plateforme d'administration &mdash; Okapi Survey (WCAG)</small>
+    </div>
+  </div>
+  <nav class="mainnav">
+    <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' else '' }}">Tableau de bord</a>
+    <a href="{{ url_for('contracts_list') }}" class="{{ 'active' if request.endpoint == 'contracts_list' else '' }}">Contrats</a>
+    <a href="{{ url_for('compensation_page') }}" class="{{ 'active' if request.endpoint == 'compensation_page' else '' }}">Indemnisation</a>
+  </nav>
+  <main class="content">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="app-footer">
+    OKAPI Environnement Conseil SARL &mdash; Application d'administration Okapi Survey &copy; {{ now.year if now else '' }}
+  </footer>
+</body>
+</html>
