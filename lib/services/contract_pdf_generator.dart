@@ -244,12 +244,37 @@ class ContractPdfGenerator {
     _italic = pw.Font.ttf(
       await rootBundle.load('assets/fonts/DejaVuSans-Oblique.ttf'),
     );
+    try {
+      _okapiLogo = pw.MemoryImage(
+        (await rootBundle.load(
+          'assets/logo/okapi_header_logo.png',
+        )).buffer.asUint8List(),
+      );
+    } catch (_) {
+      _okapiLogo = null;
+    }
+    try {
+      _wcagLogo = pw.MemoryImage(
+        (await rootBundle.load(
+          'assets/logo/wcag_header_logo.png',
+        )).buffer.asUint8List(),
+      );
+    } catch (_) {
+      _wcagLogo = null;
+    }
   }
 
-  static const PdfColor maroon = PdfColor.fromInt(0xFF6B1F1F);
-  static const PdfColor darkGreen = PdfColor.fromInt(0xFF1F4A2E);
-  static const PdfColor greyLight = PdfColor.fromInt(0xFFEDEDED);
+  // NOTE: Per client request, contracts no longer use branded colors (maroon
+  // / dark green) anywhere except the two header logo images and the
+  // applicant's photos. maroon/darkGreen are kept only as aliases (now
+  // black) so the rest of this file needs no further edits.
+  static const PdfColor maroon = PdfColors.black;
+  static const PdfColor darkGreen = PdfColors.black;
+  static const PdfColor greyLight = PdfColor.fromInt(0xFFD9D9D9);
   static const PdfColor greyBorder = PdfColor.fromInt(0xFFBBBBBB);
+
+  static pw.MemoryImage? _okapiLogo;
+  static pw.MemoryImage? _wcagLogo;
 
   static Future<Uint8List> generate(ContractData d) async {
     await _ensureFonts();
@@ -310,50 +335,42 @@ class ContractPdfGenerator {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         crossAxisAlignment: pw.CrossAxisAlignment.center,
         children: [
-          pw.Row(
-            children: [
-              pw.Container(
-                width: 10,
-                height: 26,
-                decoration: const pw.BoxDecoration(color: maroon),
-              ),
-              pw.SizedBox(width: 6),
-              pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    'OKAPI',
-                    style: pw.TextStyle(
-                      fontSize: 13,
-                      fontWeight: pw.FontWeight.bold,
-                      color: maroon,
+          _okapiLogo != null
+              ? pw.Image(_okapiLogo!, height: 34)
+              : pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'OKAPI',
+                      style: pw.TextStyle(
+                        fontSize: 13,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  pw.Text(
-                    'Environnement Conseil',
-                    style: pw.TextStyle(fontSize: 7, color: darkGreen),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.end,
-            children: [
-              pw.Text(
-                'WCAG',
-                style: pw.TextStyle(
-                  fontSize: 13,
-                  fontWeight: pw.FontWeight.bold,
-                  color: darkGreen,
+                    pw.Text(
+                      'Environnement Conseil',
+                      style: pw.TextStyle(fontSize: 7),
+                    ),
+                  ],
                 ),
-              ),
-              pw.Text(
-                'Winning Consortium Alumina Guinea',
-                style: pw.TextStyle(fontSize: 7, color: maroon),
-              ),
-            ],
-          ),
+          _wcagLogo != null
+              ? pw.Image(_wcagLogo!, height: 34)
+              : pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.end,
+                  children: [
+                    pw.Text(
+                      'WCAG',
+                      style: pw.TextStyle(
+                        fontSize: 13,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.Text(
+                      'Winning Consortium Alumina Guinea',
+                      style: pw.TextStyle(fontSize: 7),
+                    ),
+                  ],
+                ),
         ],
       ),
     );
@@ -769,7 +786,7 @@ class ContractPdfGenerator {
         },
         children: [
           pw.TableRow(
-            decoration: const pw.BoxDecoration(color: maroon),
+            decoration: const pw.BoxDecoration(color: greyLight),
             children: [
               pw.Padding(
                 padding: const pw.EdgeInsets.symmetric(
@@ -781,7 +798,6 @@ class ContractPdfGenerator {
                   style: pw.TextStyle(
                     fontSize: 9.5,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.white,
                   ),
                 ),
               ),
@@ -796,7 +812,6 @@ class ContractPdfGenerator {
                   style: pw.TextStyle(
                     fontSize: 9.5,
                     fontWeight: pw.FontWeight.bold,
-                    color: PdfColors.white,
                   ),
                 ),
               ),
@@ -820,7 +835,7 @@ class ContractPdfGenerator {
         children: [
           pw.Expanded(
             child: pw.Container(
-              height: 70,
+              height: 100,
               decoration: pw.BoxDecoration(
                 border: pw.Border.all(color: greyBorder),
               ),
@@ -846,7 +861,7 @@ class ContractPdfGenerator {
           pw.SizedBox(width: 10),
           pw.Expanded(
             child: pw.Container(
-              height: 70,
+              height: 100,
               decoration: pw.BoxDecoration(
                 border: pw.Border.all(color: greyBorder),
               ),
