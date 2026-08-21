@@ -28,6 +28,13 @@ class Individu {
   String? photoCniRectoBase64;
   String? photoCniVersoBase64;
 
+  /// "Code PAP" (3e code d'identification, en complément du code ménage et
+  /// du code individu) : incrémenté en fonction du nombre d'enregistrements
+  /// de la PAP dans l'enquête champs. Null tant que la valeur n'a pas été
+  /// attribuée (voir CodePapService) ; les contrats retombent alors sur un
+  /// dérivé temporaire "{codeIndividu}-1" en attendant l'attribution.
+  String? codePap;
+
   Individu({
     required this.id,
     required this.numOrdreIndividu,
@@ -50,6 +57,7 @@ class Individu {
     this.photoProfilBase64,
     this.photoCniRectoBase64,
     this.photoCniVersoBase64,
+    this.codePap,
   });
 
   /// True when [typeDePiece] denotes an actual identity document (i.e. not
@@ -80,6 +88,7 @@ class Individu {
     'photoProfilBase64': photoProfilBase64,
     'photoCniRectoBase64': photoCniRectoBase64,
     'photoCniVersoBase64': photoCniVersoBase64,
+    'codePap': codePap,
   };
 
   factory Individu.fromMap(Map map) => Individu(
@@ -104,6 +113,7 @@ class Individu {
     photoProfilBase64: map['photoProfilBase64'] as String?,
     photoCniRectoBase64: map['photoCniRectoBase64'] as String?,
     photoCniVersoBase64: map['photoCniVersoBase64'] as String?,
+    codePap: map['codePap'] as String?,
   );
 
   /// Label used in dropdown pickers: "Prénom NOM (numéro pièce) - relation"
