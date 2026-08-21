@@ -95,6 +95,7 @@ class ContractData {
   final String village;
   final String codeMenage;
   final String codeIndividu;
+  final String codePap;
   final String nomPrenom;
   final String sexe;
   final String dateNaissance; // formatted dd/mm/yyyy or empty
@@ -123,6 +124,7 @@ class ContractData {
     required this.village,
     required this.codeMenage,
     required this.codeIndividu,
+    this.codePap = '',
     required this.nomPrenom,
     required this.sexe,
     required this.dateNaissance,
@@ -160,6 +162,7 @@ class ContractData {
       village: menage.village,
       codeMenage: menage.codeMenage,
       codeIndividu: chef?.id ?? menage.codeMenage,
+      codePap: chef?.codePap ?? '',
       nomPrenom: chef?.nomPrenom ?? menage.nomChefMenage,
       sexe: chef?.sexe ?? '',
       dateNaissance: Formatters.date(Formatters.isoToDate(chef?.dateNaissance)),
@@ -202,6 +205,7 @@ class ContractData {
       village: village,
       codeMenage: codeMenage,
       codeIndividu: proprietaire.id,
+      codePap: proprietaire.codePap ?? '',
       nomPrenom: proprietaire.nomPrenom,
       sexe: proprietaire.sexe,
       dateNaissance: Formatters.date(
@@ -545,7 +549,7 @@ class ContractPdfGenerator {
 
     final widgets = <pw.Widget>[
       _title(
-        'ACCORD DE COMPENSATION CONCLU ENTRE AMC ET ${d.type.titleSuffix}',
+        'ACCORD DE COMPENSATION CONCLU ENTRE WCAG ET ${d.type.titleSuffix}',
       ),
       pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -560,10 +564,9 @@ class ContractPdfGenerator {
                 _fieldRow('Région', d.region),
                 _fieldRow('Préfecture', d.prefecture),
                 _fieldRow('Sous préfecture', d.sousPrefecture),
-                _fieldRow('District', d.district),
                 _fieldRow('Localité', d.village),
-                _fieldRow('Code du ménage', d.codeMenage),
                 _fieldRow('Code de l\'individu', d.codeIndividu),
+                _fieldRow('Code PAP', d.codePap),
                 _fieldRow('Prénom et NOM', d.nomPrenom),
                 _fieldRow('Sexe', d.sexe),
                 _fieldRow('Date de naissance', d.dateNaissance),
@@ -628,38 +631,35 @@ class ContractPdfGenerator {
     final chefName = d.nomPrenom.isEmpty
         ? '...........................'
         : d.nomPrenom;
+    final bool isCommunautaire = d.type == ContractType.communautaire;
     final String repIntro;
-    switch (d.type) {
-      case ContractType.proprietaire:
-        repIntro =
-            'Le MÉNAGE AFFECTÉ identifié ci-dessus, valablement représenté à l\'effet des présentes par son Chef, '
-            'Monsieur $chefName, agissant d\'un commun accord avec et pour le compte de l\'ensemble des personnes physiques '
-            'composant ledit Ménage affecté, ci-après désigné « le Ménage affecté » ;';
-        break;
-      case ContractType.lignage:
-        repIntro =
-            'Le LIGNAGE AFFECTÉ identifié ci-dessus, valablement représenté à l\'effet des présentes par son Chef, '
-            'Monsieur $chefName, agissant d\'un commun accord avec et pour le compte de l\'ensemble des personnes physiques '
-            'composant ledit Lignage affecté, ci-après désigné « le Lignage affecté » ;';
-        break;
-      case ContractType.communautaire:
-        repIntro =
-            'La COMMUNAUTÉ AFFECTÉE identifiée ci-dessus, valablement représentée à l\'effet des présentes par son Chef, '
-            'Monsieur $chefName, agissant d\'un commun accord avec et pour le compte de l\'ensemble des personnes '
-            'composant ladite Communauté affectée, ci-après désignée « la Communauté affectée » ;';
-        break;
+    if (isCommunautaire) {
+      repIntro =
+          'La COMMUNAUTÉ AFFECTÉE identifiée ci-dessus, valablement représentée à l\'effet des présentes par son Chef, '
+          'Monsieur $chefName, agissant d\'un commun accord avec et pour le compte de l\'ensemble des personnes '
+          'physiques composant ladite Communauté affectée, lesquelles lui ont reconnu et conféré l\'ensemble des '
+          'pouvoirs nécessaires, en ce compris le pouvoir de représentation, pour conclure le présent accord.';
+    } else {
+      final partyWord = d.type == ContractType.proprietaire
+          ? const ['MÉNAGE AFFECTÉ', 'Ménage']
+          : const ['LIGNAGE AFFECTÉ', 'Lignage'];
+      repIntro =
+          'Le ${partyWord[0]} identifié ci-dessus, valablement représenté à l\'effet des présentes par son Chef, '
+          'Monsieur $chefName, agissant d\'un commun accord avec et pour le compte de l\'ensemble des personnes '
+          'physiques composant ledit ${partyWord[1]} affecté, lesquelles lui ont reconnu et conféré l\'ensemble des '
+          'pouvoirs nécessaires, en ce compris le pouvoir de représentation, pour conclure le présent accord.';
     }
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        _paragraph('ENTRE LES SOUSSIGNÉS :'),
         _paragraph(
-          'LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen immatriculée au Registre du '
-          'Commerce et du Crédit Mobilier, ayant son siège social en République de Guinée, valablement représentée par '
-          'son Directeur Général, Monsieur WU QIONG, agissant tant en son nom personnel qu\'au nom et pour le compte de '
-          'sa filiale Alumina Minérale Compagnie (AMC), ci-après désignée « AMC » ou « la Société » ;',
+          'LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen enregistrée au Registre de '
+          'commerce sous le numéro RCCM/GN-KAL/2018.B.086411/2018 dont le siège social se situe à Camayenne, Corniche '
+          'Nord, BP : 435, C/Dixinnn, Conakry, République de Guinée, représentée par son Directeur Général M. WU '
+          'QIONG, dûment habilité aux fins des présentes,',
         ),
-        _paragraph('ET :'),
+        _paragraph('Ci-après dénommée «WCAG».'),
+        _paragraph('Et'),
         _paragraph(repIntro),
       ],
     );
@@ -668,42 +668,78 @@ class ContractPdfGenerator {
   // ---------------- Page 2: preamble continued + Article 1 ----------------
 
   static List<pw.Widget> _page2PreambleAndArticle1(ContractData d) {
+    final bool isCommunautaire = d.type == ContractType.communautaire;
+    // PARTY_LABEL: "Ménage affecté" / "Lignage affecté" / "Communauté affectée"
     final party = d.type.partyLabel;
+    final partyLower = party[0].toLowerCase() + party.substring(1);
+    final String chefOf;
+    final String chefDesigne;
+    switch (d.type) {
+      case ContractType.proprietaire:
+        chefOf = 'Chef du Ménage affecté';
+        chefDesigne = 'Chef désigné du Ménage affecté';
+        break;
+      case ContractType.lignage:
+        chefOf = 'Chef du Lignage affecté';
+        chefDesigne = 'Chef désigné du Lignage affecté';
+        break;
+      case ContractType.communautaire:
+        chefOf = 'Chef de la Communauté affectée';
+        chefDesigne = 'Chef désigné de la Communauté affectée';
+        break;
+    }
+    final art = isCommunautaire ? 'la' : 'le';
+
     return [
-      _paragraph('IL EST PRÉALABLEMENT EXPOSÉ CE QUI SUIT :'),
       _paragraph(
-        '- AMC construit et exploite une raffinerie d\'alumine ainsi que les infrastructures connexes (« le Projet ») '
-        'dans la zone couvrant notamment la localité de ${d.village} ;',
+        'Ci-après dénommé${isCommunautaire ? 'e' : ''} « $party ».',
       ),
       _paragraph(
-        '- Dans ce cadre, un recensement des ménages, biens et actifs affectés par le Projet a été mené à partir du '
-        '21/11/2025, incluant celui du $party identifié ci-dessus ;',
+        'WCAG et ${isCommunautaire ? 'la' : 'le'} $partyLower étant également désignés ci-après collectivement '
+        '« les Parties » et individuellement « la Partie ».',
+      ),
+      pw.SizedBox(height: 6),
+      _paragraph('APRÈS AVOIR PRÉALABLEMENT RAPPELÉ QUE :', fontSize: 10.5),
+      _paragraph(
+        '- En vue de la construction et de l\'exploitation de la raffinerie d\'alumine par WCAG, un recensement des '
+        'ayants droit et un inventaire de l\'ensemble de leurs biens affectés ont été entrepris depuis le '
+        '21/11/2025, dans l\'emprise concernée du Projet ;',
       ),
       _paragraph(
-        '- De ces études, il ressort que le $party détient des droits dans la zone visée par le Projet, dont le détail '
-        'figure en Annexe 1 du présent Accord ;',
+        '- De ces études, il ressort que $art $partyLower détient des droits dans la zone visée par le Projet. Ces '
+        'droits, dûment énumérés dans une fiche récapitulative signée par le $chefDesigne, sont détaillés en '
+        'Annexe 1 ;',
       ),
       _paragraph(
-        '- Conformément au Plan d\'Action de Réinstallation et de Compensation (PARC) applicable au Projet, ces droits '
-        'donnent lieu à une compensation au titre de l\'occupation permanente des terres et des actifs concernés ;',
+        '- Conformément à ses principes et à ses engagements vis-à-vis de l\'État guinéen, WCAG a élaboré un Plan '
+        'd\'action de Réinstallation et de Compensation (PARC) afin d\'assurer la compensation de tous les ayants '
+        'droits affectés par le Projet. Le PARC prévoit la compensation pour une occupation permanente.',
       ),
       _paragraph(
         '- En application du PARC, une proposition de compensation personnalisée a été développée par WCAG, et '
-        'communiquée, présentée et expliquée au $party et aux personnes le composant ;',
+        'communiquée, présentée et expliquée ${isCommunautaire ? 'à la' : 'au'} $partyLower et aux personnes le '
+        'composant ;',
       ),
       _paragraph(
         '- Après avoir pris le temps nécessaire à la réflexion et à la consultation de l\'ensemble des personnes le '
-        'constituant, le Chef du $party consent librement et en toute connaissance de cause aux termes du présent '
-        'Accord.',
+        'constituant, le $chefOf consent librement et en toute connaissance de cause à l\'offre de compensation '
+        'proposée par WCAG telle que décrite en Annexe 2 ;',
+      ),
+      _paragraph(
+        'Dans ce contexte, les Parties ont conclu le présent accord de compensation (ci-après dénommé l\'« '
+        'Accord »).',
       ),
       pw.SizedBox(height: 6),
       _paragraph('IL A ÉTÉ CONVENU ET ARRÊTÉ CE QUI SUIT :', fontSize: 10.5),
       _articleTitle('Article 1 – Principe d\'indemnisation'),
       _paragraph(
-        'Les Parties conviennent des termes et conditions de l\'indemnisation, pour la perte des terres et des biens '
-        'du $party figurant en Annexe 1 du présent Accord. Le $party considère ces termes et conditions comme étant '
-        'pleinement suffisants et satisfaisants, et de nature à compenser intégralement les conséquences de son '
-        'déplacement physique et/ou économique du fait du Projet.',
+        'Les Parties conviennent des termes et conditions de l\'indemnisation, pour la perte des terres et des '
+        'biens ${isCommunautaire ? 'de la' : 'du'} $partyLower figurant en Annexe 1. '
+        '${isCommunautaire ? 'La' : 'Le'} $partyLower considère ces termes et conditions comme étant pleinement '
+        'suffisants, satisfaisants et de nature à compenser intégralement tout préjudice causé par son '
+        'déplacement physique et/ou économique ainsi que les éventuelles conséquences sur ses conditions de vie, '
+        'y compris tous les dommages et pertes subis par ${isCommunautaire ? 'elle' : 'lui'} du fait de ce '
+        'déplacement.',
       ),
     ];
   }
@@ -711,34 +747,78 @@ class ContractPdfGenerator {
   // ---------------- Page 3: Articles 2, 3, 4 ----------------
 
   static List<pw.Widget> _page3ArticlesRest(ContractData d) {
+    final bool isCommunautaire = d.type == ContractType.communautaire;
     final party = d.type.partyLabel;
+    final partyLower = party[0].toLowerCase() + party.substring(1);
+    final deParty = '${isCommunautaire ? 'de la' : 'du'} $partyLower';
+    final artLeLa = isCommunautaire ? 'la' : 'le';
+    final membresDe = isCommunautaire
+        ? 'de la Communauté affectée'
+        : 'du $partyLower';
+
     return [
       _articleTitle('Article 2 – Principe de non-contestation'),
       _paragraph(
-        'Le $party déclare expressément renoncer à réclamer à WCAG, ainsi qu\'à ses sous-traitants intervenant dans le '
-        'cadre du Projet, toute indemnisation additionnelle liée à la perte des parcelles listées en Annexe 1 du '
-        'présent Accord, ainsi que des actifs (cultures, arbres, structures) qui y sont implantés.',
+        '${isCommunautaire ? 'La' : 'Le'} $partyLower déclare expressément renoncer à réclamer à WCAG, ainsi qu\'à '
+        'ses sous-traitants intervenant dans le cadre de la mise en œuvre du Projet, une quelconque indemnisation '
+        'supplémentaire, de quelque nature que ce soit, à raison des faits cités en préambule et autres que les '
+        'indemnisations prévues dans le cadre du présent Accord.',
+      ),
+      _paragraph(
+        '${isCommunautaire ? 'La' : 'Le'} $partyLower s\'engage ainsi dans les conditions prévues dans l\'Annexe 2 '
+        'à renoncer :',
+      ),
+      _paragraph(
+        '- À tous droits de quelque nature que ce soit, formels, informels ou coutumiers, sur les parcelles listées '
+        'en Annexe 1 pour la durée prévue à cet accord ;',
+      ),
+      _paragraph(
+        '- À tous droits sur les actifs de quelque nature que ce soit qui y sont implantés ou édifiés, (ci-après '
+        'les « Actifs ») pour la durée prévue à cet accord.',
+      ),
+      _paragraph(
+        'Les Parties s\'engagent à conclure, à cet effet, une attestation de reconnaissance de compensation au '
+        'plus tard à la date à laquelle l\'indemnisation aura été effectivement mise à la disposition $deParty. '
+        'Cette attestation prendra la forme d\'un acte de rétrocession.',
       ),
       _articleTitle('Article 3 – Dispositions diverses'),
       _paragraph(
-        'Le préambule et les annexes du présent Accord en font partie intégrante. Le présent Accord est régi par le '
-        'droit guinéen. Tout différend relatif à sa validité, son interprétation ou son exécution sera réglé à '
-        'l\'amiable et, à défaut, conformément à la réglementation guinéenne en vigueur.',
-      ),
-      _articleTitle('Article 4 – Intégrité du consentement du $party'),
-      _paragraph(
-        'Le représentant des autorités locales présent lors de la signature certifie :',
+        'Les Parties reconnaissent que le préambule ainsi que les annexes font partie intégrante du présent '
+        'Accord.',
       ),
       _paragraph(
-        '- Que l\'Accord a fait l\'objet d\'une traduction orale en soussou, langue parlée par le $party ;',
+        'L\'Accord est régi et interprété conformément aux dispositions du droit guinéen.',
       ),
       _paragraph(
-        '- Qu\'il a informé tous les membres présents, adultes et capables, du $party de l\'ensemble de leurs droits et '
-        'obligations au titre du présent Accord ;',
+        'Tous différends qui surviendraient entre $artLeLa $partyLower ou l\'un quelconque de ses membres et les '
+        'autres Parties découlant de l\'Accord ou en relation avec celui-ci seront réglés conformément aux '
+        'dispositions légales en vigueur en République de Guinée.',
+      ),
+      _articleTitle('Article 4 – Intégrité du consentement $deParty'),
+      _paragraph(
+        'Les Parties reconnaissent qu\'un représentant des autorités locales a assisté à la présentation du '
+        'présent Accord. En apposant sa signature au bas du présent Accord, ledit représentant confirme :',
       ),
       _paragraph(
-        '- Que le $party a disposé du temps de réflexion nécessaire avant de donner son consentement final aux termes '
-        'du présent Accord.',
+        '- Que l\'Accord a fait l\'objet d\'une traduction orale en soussou, langue parlée par la Communauté '
+        'affectée ;',
+      ),
+      _paragraph(
+        '- Qu\'il a informé tous les membres présents, adultes et capables $membresDe de l\'ensemble de leurs '
+        'droits et obligations au titre de l\'Accord et de ses annexes ; et',
+      ),
+      _paragraph(
+        '- Qu\'il a répondu à toutes leurs interrogations et leur a communiqué l\'ensemble des éléments de réponse '
+        'propres à leur permettre de se déterminer eux-mêmes.',
+      ),
+      _paragraph(
+        'Le représentant des autorités locales s\'engage en outre expressément à assurer un suivi de l\'exécution '
+        'du présent Accord, selon les termes et dans les conditions qui y sont définis.',
+      ),
+      _paragraph(
+        'Les membres $membresDe, qui ont disposé du temps de réflexion nécessaire, déclarent ainsi avoir '
+        'pleinement compris et accepté de leur plein gré, l\'ensemble de leurs droits et obligations au titre de '
+        'l\'Accord.',
       ),
     ];
   }
@@ -895,28 +975,30 @@ class ContractPdfGenerator {
     final chefName = d.nomPrenom.isEmpty
         ? '...........................'
         : d.nomPrenom;
-    final String consentText;
+    final bool isCommunautaire = d.type == ContractType.communautaire;
+    final bool isLignage = d.type == ContractType.lignage;
+    // party.split()[0]: "Ménage" / "Lignage" / "Communauté"
+    final partyFirstWord = d.type.partyLabel.split(' ').first;
+    final consentText =
+        'Je, soussigné, ${isCommunautaire ? '' : 'Monsieur '}$chefName, en ma qualité de ${d.type.chefLabel}, '
+        'certifie, en plein accord avec les membres du${isCommunautaire ? 'e' : ''} $partyFirstWord, donner mon '
+        'consentement à l\'ensemble des termes et conditions du présent Accord qui m\'ont été traduits oralement '
+        'du français en sousou, et ce, en présence d\'un représentant des autorités locales dont la fonction est '
+        '............................................................................';
+
+    // Consent-box header: corrected per-type (see contract_pdf.py _page5())
+    // rather than replicating the reference documents' "Le Ménage affecté"
+    // copy-paste artifact regardless of type.
+    final String consentHeader;
     switch (d.type) {
       case ContractType.proprietaire:
-        consentText =
-            'Je, soussigné, Monsieur $chefName, en ma qualité de ${d.type.chefLabel}, certifie, en plein accord avec '
-            'les membres dudit Ménage, donner mon consentement à l\'ensemble des termes et conditions du présent Accord '
-            'qui m\'ont été traduits oralement du français en sousou, et ce, en présence d\'un représentant des autorités '
-            'locales dont la fonction est ............................................................................';
+        consentHeader = 'Le Ménage affecté';
         break;
       case ContractType.lignage:
-        consentText =
-            'Je, soussigné, Monsieur $chefName, en ma qualité de ${d.type.chefLabel}, certifie, en plein accord avec '
-            'les membres dudit Lignage, donner mon consentement à l\'ensemble des termes et conditions du présent Accord '
-            'qui m\'ont été traduits oralement du français en sousou, et ce, en présence d\'un représentant des autorités '
-            'locales dont la fonction est ............................................................................';
+        consentHeader = 'Le Lignage affecté';
         break;
       case ContractType.communautaire:
-        consentText =
-            'Je, soussigné, $chefName, en ma qualité de ${d.type.chefLabel}, certifie, en plein accord avec les membres '
-            'de ladite Communauté, donner mon consentement à l\'ensemble des termes et conditions du présent Accord qui '
-            'm\'ont été traduits oralement du français en sousou, et ce, en présence d\'un représentant des autorités '
-            'locales dont la fonction est ............................................................................';
+        consentHeader = 'La Communauté affectée';
         break;
     }
 
@@ -943,9 +1025,7 @@ class ContractPdfGenerator {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              d.type == ContractType.proprietaire
-                  ? 'Le Ménage affecté'
-                  : d.type.titleSuffix,
+              consentHeader,
               style: pw.TextStyle(
                 fontSize: 9.5,
                 fontWeight: pw.FontWeight.bold,
@@ -963,58 +1043,119 @@ class ContractPdfGenerator {
         ),
       ),
       pw.SizedBox(height: 10),
+      ..._page5SignatureGrids(d, signatureLine, isLignage),
+    ];
+  }
+
+  /// Builds the WCAG/Autorités signature boxes and, depending on the
+  /// contract type, either the Ménage/Collectif layout (row1 = WCAG |
+  /// Autorités; row2 = Témoins | Autorités locales) or the Lignage layout
+  /// (row1 = WCAG | single "Autorités locales" box; full-width Témoins
+  /// section with a 2x3 grid of signature slots and no second "Autorités
+  /// locales" box) — mirrors contract_pdf.py's _page5().
+  static List<pw.Widget> _page5SignatureGrids(
+    ContractData d,
+    pw.Widget Function(String) signatureLine,
+    bool isLignage,
+  ) {
+    pw.Widget signatureBox(String title, List<String> labels) {
+      return pw.Container(
+        padding: const pw.EdgeInsets.all(6),
+        decoration: pw.BoxDecoration(border: pw.Border.all(color: greyBorder)),
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              title,
+              style: pw.TextStyle(
+                fontSize: 9.5,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            ),
+            for (final l in labels) signatureLine(l),
+          ],
+        ),
+      );
+    }
+
+    final wcagBox = signatureBox('WCAG', const ['Nom', 'Fonction', 'Signature']);
+
+    if (isLignage) {
+      // Lignage: row1 = WCAG box | single-slot "Autorités locales" box (NOT
+      // the 2-slot "Autorités" box used by Ménage/Collectif).
+      final autLocBox = signatureBox(
+        'Autorités locales',
+        const ['Nom', 'Fonction', 'Signature'],
+      );
+      pw.Widget temoinCell() => pw.Padding(
+        padding: const pw.EdgeInsets.all(4),
+        child: pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            signatureLine('Nom'),
+            signatureLine('Fonction'),
+            signatureLine('Signature'),
+          ],
+        ),
+      );
+      final gridRows = <pw.TableRow>[];
+      for (int i = 0; i < 3; i++) {
+        gridRows.add(
+          pw.TableRow(children: [temoinCell(), temoinCell()]),
+        );
+      }
+      return [
+        pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Expanded(child: wcagBox),
+            pw.SizedBox(width: 10),
+            pw.Expanded(child: autLocBox),
+          ],
+        ),
+        pw.SizedBox(height: 6),
+        // Full-width Témoins section with a 2-column x 3-row grid of slots
+        // (6 total), matching the Lignage reference's distinct layout.
+        pw.Text(
+          d.type.temoinsGroupLabel,
+          style: pw.TextStyle(fontSize: 8.5, fontWeight: pw.FontWeight.bold),
+        ),
+        pw.SizedBox(height: 3),
+        pw.Table(
+          border: pw.TableBorder.all(color: greyBorder, width: 0.75),
+          children: gridRows,
+        ),
+      ];
+    }
+
+    // Ménage / Collectif: row1 = WCAG box | 2-slot "Autorités" box; row2 =
+    // Témoins (4 slots) | Autorités locales (4 slots).
+    final autoritesBox = pw.Container(
+      padding: const pw.EdgeInsets.all(6),
+      decoration: pw.BoxDecoration(border: pw.Border.all(color: greyBorder)),
+      child: pw.Column(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: [
+          pw.Text(
+            'Autorités',
+            style: pw.TextStyle(fontSize: 9.5, fontWeight: pw.FontWeight.bold),
+          ),
+          signatureLine('Nom'),
+          signatureLine('Institution/Fonction'),
+          signatureLine('Signature'),
+          signatureLine('Nom'),
+          signatureLine('Institution/Fonction'),
+        ],
+      ),
+    );
+
+    return [
       pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Expanded(
-            child: pw.Container(
-              padding: const pw.EdgeInsets.all(6),
-              decoration: pw.BoxDecoration(
-                border: pw.Border.all(color: greyBorder),
-              ),
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    'AMC',
-                    style: pw.TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  signatureLine('Nom'),
-                  signatureLine('Fonction'),
-                  signatureLine('Signature'),
-                ],
-              ),
-            ),
-          ),
+          pw.Expanded(child: wcagBox),
           pw.SizedBox(width: 10),
-          pw.Expanded(
-            child: pw.Container(
-              padding: const pw.EdgeInsets.all(6),
-              decoration: pw.BoxDecoration(
-                border: pw.Border.all(color: greyBorder),
-              ),
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    'Autorités',
-                    style: pw.TextStyle(
-                      fontSize: 9.5,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  signatureLine('Nom'),
-                  signatureLine('Institution/Fonction'),
-                  signatureLine('Signature'),
-                  signatureLine('Nom'),
-                  signatureLine('Institution/Fonction'),
-                ],
-              ),
-            ),
-          ),
+          pw.Expanded(child: autoritesBox),
         ],
       ),
       pw.SizedBox(height: 10),
