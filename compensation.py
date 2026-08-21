@@ -166,6 +166,11 @@ def _accumulate_culture_perenne(summary, espece, arbre):
                 "jeunesP": jeunes_p,
                 "matures": matures,
                 "adulteDeclinant": adulte_decl,
+                "prixPlante": prix_plante,
+                "prixJeuneNp": prix_jeune_np,
+                "prixJeuneP": prix_jeune_p,
+                "prixAdulte": prix_adulte,
+                "prixAdulteDeclinant": prix_adulte_decl,
                 "montant": montant,
             }
         )
@@ -187,6 +192,8 @@ def _accumulate_espece_sauvage(summary, espece, arbre):
                 "espece": espece,
                 "jeunesNp": jeunes_np,
                 "jeunesP": jeunes_p,
+                "prixNp": prix_np,
+                "prixP": prix_p,
                 "montant": montant,
             }
         )
@@ -212,8 +219,10 @@ def _accumulate_bois_doeuvre(summary, espece, arbre):
             "espece": espece,
             "circonference": circonference,
             "hauteur": hauteur,
+            "volumeUnitaire": volume_unitaire,
             "nombrePieds": nombre_pieds,
             "volumeTotal": volume_total,
+            "prixUnitaire": valeur_m3,
             "montant": montant,
         }
     )

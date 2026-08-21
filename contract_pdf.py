@@ -173,6 +173,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "village": menage.get("village", ""),
             "codeMenage": menage.get("codeMenage", ""),
             "codeIndividu": chef.get("id", menage.get("codeMenage", "")),
+            "codePap": chef.get("codePap", ""),
             "nomPrenom": chef.get("nomPrenom", ""),
             "sexe": chef.get("sexe", ""),
             "dateNaissance": fmt_date(chef.get("dateNaissance")),
@@ -197,6 +198,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "village": champ.get("village", ""),
             "codeMenage": champ.get("codeMenage", ""),
             "codeIndividu": proprietaire.get("id", ""),
+            "codePap": proprietaire.get("codePap", ""),
             "nomPrenom": proprietaire.get("nomPrenom", ""),
             "sexe": proprietaire.get("sexe", ""),
             "dateNaissance": fmt_date(proprietaire.get("dateNaissance")),
@@ -340,20 +342,22 @@ def _annex_table(header, rows, total_row, col_widths):
 def _page1(d, styles):
     story = []
     story.append(Paragraph(
-        f"ACCORD DE COMPENSATION CONCLU ENTRE AMC ET {TITLE_SUFFIX[d['type']]}",
+        f"ACCORD DE COMPENSATION CONCLU ENTRE WCAG ET {TITLE_SUFFIX[d['type']]}",
         styles["title"],
     ))
     story.append(Spacer(1, 4))
 
+    # Field order matches the official reference contracts exactly (no
+    # "District", no "Code du ménage" — replaced by "Code de l'individu"
+    # followed by the new "Code PAP" identifier).
     fields = [
         ("Numéro de lot", d["numeroLot"]),
         ("Région", d["region"]),
         ("Préfecture", d["prefecture"]),
         ("Sous préfecture", d["sousPrefecture"]),
-        ("District", d["district"]),
         ("Localité", d["village"]),
-        ("Code du ménage", d["codeMenage"]),
         ("Code de l'individu", d["codeIndividu"]),
+        ("Code PAP", d.get("codePap", "")),
         ("Prénom et NOM", d["nomPrenom"]),
         ("Sexe", d["sexe"]),
         ("Date de naissance", d["dateNaissance"]),
@@ -415,81 +419,116 @@ def _page1(d, styles):
         story.append(Spacer(1, 10))
 
     chef_name = d["nomPrenom"] or "..........................."
-    party_word = {
-        "proprietaire": ("MÉNAGE AFFECTÉ", "Ménage affecté", "Ménage"),
-        "lignage": ("LIGNAGE AFFECTÉ", "Lignage affecté", "Lignage"),
-        "communautaire": ("COMMUNAUTÉ AFFECTÉE", "Communauté affectée", "Communauté"),
-    }[d["type"]]
+    is_communautaire = d["type"] == "communautaire"
 
-    story.append(Paragraph("ENTRE LES SOUSSIGNÉS :", styles["para"]))
     story.append(Paragraph(
-        "LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen immatriculée au Registre du "
-        "Commerce et du Crédit Mobilier, ayant son siège social en République de Guinée, valablement représentée par "
-        "son Directeur Général, Monsieur WU QIONG, agissant tant en son nom personnel qu'au nom et pour le compte de "
-        "sa filiale Alumina Minérale Compagnie (AMC), ci-après désignée « AMC » ou « la Société » ;",
+        "LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen enregistrée au Registre de "
+        "commerce sous le numéro RCCM/GN-KAL/2018.B.086411/2018 dont le siège social se situe à Camayenne, Corniche "
+        "Nord, BP : 435, C/Dixinnn, Conakry, République de Guinée, représentée par son Directeur Général M. WU QIONG, "
+        "dûment habilité aux fins des présentes,",
         styles["para"],
     ))
-    story.append(Paragraph("ET :", styles["para"]))
-    if d["type"] == "communautaire":
+    story.append(Paragraph("Ci-après dénommée «WCAG».", styles["para"]))
+    story.append(Paragraph("Et", styles["para"]))
+    if is_communautaire:
         story.append(Paragraph(
-            f"La {party_word[0]} identifiée ci-dessus, valablement représentée à l'effet des présentes par son Chef, "
-            f"Monsieur {chef_name}, agissant d'un commun accord avec et pour le compte de l'ensemble des personnes "
-            f"composant ladite {party_word[2]} affectée, ci-après désignée « la {party_word[2]} affectée » ;",
+            f"La COMMUNAUTÉ AFFECTÉE identifiée ci-dessus, valablement représentée à l'effet des présentes par son "
+            f"Chef, Monsieur {chef_name}, agissant d'un commun accord avec et pour le compte de l'ensemble des "
+            "personnes physiques composant ladite Communauté affectée, lesquelles lui ont reconnu et conféré "
+            "l'ensemble des pouvoirs nécessaires, en ce compris le pouvoir de représentation, pour conclure le "
+            "présent accord.",
             styles["para"],
         ))
     else:
+        party_word = {
+            "proprietaire": ("MÉNAGE AFFECTÉ", "Ménage"),
+            "lignage": ("LIGNAGE AFFECTÉ", "Lignage"),
+        }[d["type"]]
         story.append(Paragraph(
             f"Le {party_word[0]} identifié ci-dessus, valablement représenté à l'effet des présentes par son Chef, "
             f"Monsieur {chef_name}, agissant d'un commun accord avec et pour le compte de l'ensemble des personnes "
-            f"physiques composant ledit {party_word[2]} affecté, ci-après désigné « le {party_word[2]} affecté » ;",
+            f"physiques composant ledit {party_word[1]} affecté, lesquelles lui ont reconnu et conféré l'ensemble "
+            "des pouvoirs nécessaires, en ce compris le pouvoir de représentation, pour conclure le présent accord.",
             styles["para"],
         ))
     return story
 
 
 def _page2(d, styles):
-    party = PARTY_LABEL[d["type"]]
+    t = d["type"]
+    is_communautaire = t == "communautaire"
+    party = PARTY_LABEL[t]  # "Ménage affecté" / "Lignage affecté" / "Communauté affectée"
+    party_lower = party[0].lower() + party[1:]
+    chef_of = {
+        "proprietaire": "Chef du Ménage affecté",
+        "lignage": "Chef du Lignage affecté",
+        "communautaire": "Chef de la Communauté affectée",
+    }[t]
+    chef_designe = {
+        "proprietaire": "Chef désigné du Ménage affecté",
+        "lignage": "Chef désigné du Lignage affecté",
+        "communautaire": "Chef désigné de la Communauté affectée",
+    }[t]
+    art = "le" if not is_communautaire else "la"
+
+    # "AMC" only ever appears in the Collectif reference contract; per client
+    # request every such occurrence in that specific type is replaced by
+    # "WCAG" here (the other two types already use WCAG throughout).
     story = [
-        Paragraph("IL EST PRÉALABLEMENT EXPOSÉ CE QUI SUIT :", styles["para"]),
+        Paragraph(f"Ci-après dénommé{'e' if is_communautaire else ''} « {party} ».", styles["para"]),
         Paragraph(
-            f"- AMC construit et exploite une raffinerie d'alumine ainsi que les infrastructures connexes (« le Projet ») "
-            f"dans la zone couvrant notamment la localité de {d['village']} ;",
+            f"WCAG et {'la' if is_communautaire else 'le'} {party_lower} étant également désignés ci-après "
+            "collectivement « les Parties » et individuellement « la Partie ».",
+            styles["para"],
+        ),
+        Spacer(1, 6),
+        Paragraph("APRÈS AVOIR PRÉALABLEMENT RAPPELÉ QUE :", styles["small_bold"]),
+        Paragraph(
+            "- En vue de la construction et de l'exploitation de la raffinerie d'alumine par WCAG, un recensement des "
+            "ayants droit et un inventaire de l'ensemble de leurs biens affectés ont été entrepris depuis le "
+            "21/11/2025, dans l'emprise concernée du Projet ;",
             styles["para"],
         ),
         Paragraph(
-            f"- Dans ce cadre, un recensement des ménages, biens et actifs affectés par le Projet a été mené à partir du "
-            f"21/11/2025, incluant celui du {party} identifié ci-dessus ;",
+            f"- De ces études, il ressort que {art} {party_lower} détient des droits dans la zone visée par le Projet. "
+            f"Ces droits, dûment énumérés dans une fiche récapitulative signée par le {chef_designe}, sont "
+            "détaillés en Annexe 1 ;",
             styles["para"],
         ),
         Paragraph(
-            f"- De ces études, il ressort que le {party} détient des droits dans la zone visée par le Projet, dont le détail "
-            f"figure en Annexe 1 du présent Accord ;",
-            styles["para"],
-        ),
-        Paragraph(
-            "- Conformément au Plan d'Action de Réinstallation et de Compensation (PARC) applicable au Projet, ces droits "
-            "donnent lieu à une compensation au titre de l'occupation permanente des terres et des actifs concernés ;",
+            "- Conformément à ses principes et à ses engagements vis-à-vis de l'État guinéen, WCAG a élaboré un Plan "
+            "d'action de Réinstallation et de Compensation (PARC) afin d'assurer la compensation de tous les ayants "
+            "droits affectés par le Projet. Le PARC prévoit la compensation pour une occupation permanente.",
             styles["para"],
         ),
         Paragraph(
             f"- En application du PARC, une proposition de compensation personnalisée a été développée par WCAG, et "
-            f"communiquée, présentée et expliquée au {party} et aux personnes le composant ;",
+            f"communiquée, présentée et expliquée {'à la' if is_communautaire else 'au'} {party_lower} et aux "
+            "personnes le composant ;",
             styles["para"],
         ),
         Paragraph(
-            f"- Après avoir pris le temps nécessaire à la réflexion et à la consultation de l'ensemble des personnes le "
-            f"constituant, le Chef du {party} consent librement et en toute connaissance de cause aux termes du présent "
-            "Accord.",
+            f"- Après avoir pris le temps nécessaire à la réflexion et à la consultation de l'ensemble des personnes "
+            f"le constituant, le {chef_of} consent librement et en toute connaissance de cause à l'offre de "
+            "compensation proposée par WCAG telle que décrite en Annexe 2 ;",
+            styles["para"],
+        ),
+        Paragraph(
+            "Dans ce contexte, les Parties ont conclu le présent accord de compensation (ci-après dénommé l'« "
+            "Accord »).",
             styles["para"],
         ),
         Spacer(1, 6),
         Paragraph("IL A ÉTÉ CONVENU ET ARRÊTÉ CE QUI SUIT :", styles["small_bold"]),
         Paragraph("Article 1 – Principe d'indemnisation", styles["article"]),
         Paragraph(
-            f"Les Parties conviennent des termes et conditions de l'indemnisation, pour la perte des terres et des biens "
-            f"du {party} figurant en Annexe 1 du présent Accord. Le {party} considère ces termes et conditions comme étant "
-            "pleinement suffisants et satisfaisants, et de nature à compenser intégralement les conséquences de son "
-            "déplacement physique et/ou économique du fait du Projet.",
+            f"Les Parties conviennent des termes et conditions de l'indemnisation, pour la perte des terres et des "
+            f"biens {'de la' if is_communautaire else 'du'} {party_lower} figurant en Annexe 1. "
+            f"{'La' if is_communautaire else 'Le'} {party_lower} considère ces termes et conditions comme étant "
+            "pleinement suffisants, satisfaisants et de nature à compenser intégralement tout préjudice causé par "
+            "son déplacement physique et/ou économique ainsi que les éventuelles conséquences sur ses conditions de "
+            f"vie, y compris tous les dommages et pertes subis par {'elle' if is_communautaire else 'lui'} du fait "
+            "de ce déplacement.",
             styles["para"],
         ),
     ]
@@ -497,36 +536,87 @@ def _page2(d, styles):
 
 
 def _page3(d, styles):
-    party = PARTY_LABEL[d["type"]]
+    t = d["type"]
+    is_communautaire = t == "communautaire"
+    party = PARTY_LABEL[t]
+    party_lower = party[0].lower() + party[1:]
+    de_party = f"{'de la' if is_communautaire else 'du'} {party_lower}"
+    art_le_la = "la" if is_communautaire else "le"
+    membres_de = "de la Communauté affectée" if is_communautaire else f"du {party_lower}"
+
     return [
         Paragraph("Article 2 – Principe de non-contestation", styles["article"]),
         Paragraph(
-            f"Le {party} déclare expressément renoncer à réclamer à WCAG, ainsi qu'à ses sous-traitants intervenant dans le "
-            "cadre du Projet, toute indemnisation additionnelle liée à la perte des parcelles listées en Annexe 1 du "
-            "présent Accord, ainsi que des actifs (cultures, arbres, structures) qui y sont implantés.",
+            f"{'La' if is_communautaire else 'Le'} {party_lower} déclare expressément renoncer à réclamer à WCAG, "
+            "ainsi qu'à ses sous-traitants intervenant dans le cadre de la mise en œuvre du Projet, une quelconque "
+            "indemnisation supplémentaire, de quelque nature que ce soit, à raison des faits cités en préambule et "
+            "autres que les indemnisations prévues dans le cadre du présent Accord.",
+            styles["para"],
+        ),
+        Paragraph(
+            f"{'La' if is_communautaire else 'Le'} {party_lower} s'engage ainsi dans les conditions prévues dans "
+            "l'Annexe 2 à renoncer :",
+            styles["para"],
+        ),
+        Paragraph(
+            "- À tous droits de quelque nature que ce soit, formels, informels ou coutumiers, sur les parcelles "
+            "listées en Annexe 1 pour la durée prévue à cet accord ;",
+            styles["para"],
+        ),
+        Paragraph(
+            "- À tous droits sur les actifs de quelque nature que ce soit qui y sont implantés ou édifiés, "
+            "(ci-après les « Actifs ») pour la durée prévue à cet accord.",
+            styles["para"],
+        ),
+        Paragraph(
+            f"Les Parties s'engagent à conclure, à cet effet, une attestation de reconnaissance de compensation au "
+            f"plus tard à la date à laquelle l'indemnisation aura été effectivement mise à la disposition {de_party}. "
+            "Cette attestation prendra la forme d'un acte de rétrocession.",
             styles["para"],
         ),
         Paragraph("Article 3 – Dispositions diverses", styles["article"]),
         Paragraph(
-            "Le préambule et les annexes du présent Accord en font partie intégrante. Le présent Accord est régi par le "
-            "droit guinéen. Tout différend relatif à sa validité, son interprétation ou son exécution sera réglé à "
-            "l'amiable et, à défaut, conformément à la réglementation guinéenne en vigueur.",
+            "Les Parties reconnaissent que le préambule ainsi que les annexes font partie intégrante du présent "
+            "Accord.",
             styles["para"],
         ),
-        Paragraph(f"Article 4 – Intégrité du consentement du {party}", styles["article"]),
-        Paragraph("Le représentant des autorités locales présent lors de la signature certifie :", styles["para"]),
+        Paragraph("L'Accord est régi et interprété conformément aux dispositions du droit guinéen.", styles["para"]),
         Paragraph(
-            f"- Que l'Accord a fait l'objet d'une traduction orale en soussou, langue parlée par le {party} ;",
+            f"Tous différends qui surviendraient entre {art_le_la} {party_lower} ou l'un quelconque de ses membres "
+            "et les autres Parties découlant de l'Accord ou en relation avec celui-ci seront réglés conformément "
+            "aux dispositions légales en vigueur en République de Guinée.",
+            styles["para"],
+        ),
+        Paragraph(f"Article 4 – Intégrité du consentement {de_party}", styles["article"]),
+        Paragraph(
+            "Les Parties reconnaissent qu'un représentant des autorités locales a assisté à la présentation du "
+            "présent Accord. En apposant sa signature au bas du présent Accord, ledit représentant confirme :",
             styles["para"],
         ),
         Paragraph(
-            f"- Qu'il a informé tous les membres présents, adultes et capables, du {party} de l'ensemble de leurs droits et "
-            "obligations au titre du présent Accord ;",
+            "- Que l'Accord a fait l'objet d'une traduction orale en soussou, langue parlée par la Communauté "
+            "affectée ;",
             styles["para"],
         ),
         Paragraph(
-            f"- Que le {party} a disposé du temps de réflexion nécessaire avant de donner son consentement final aux termes "
-            "du présent Accord.",
+            f"- Qu'il a informé tous les membres présents, adultes et capables {membres_de} de l'ensemble de leurs "
+            "droits et obligations au titre de l'Accord et de ses annexes ; et",
+            styles["para"],
+        ),
+        Paragraph(
+            "- Qu'il a répondu à toutes leurs interrogations et leur a communiqué l'ensemble des éléments de "
+            "réponse propres à leur permettre de se déterminer eux-mêmes.",
+            styles["para"],
+        ),
+        Paragraph(
+            "Le représentant des autorités locales s'engage en outre expressément à assurer un suivi de "
+            "l'exécution du présent Accord, selon les termes et dans les conditions qui y sont définis.",
+            styles["para"],
+        ),
+        Paragraph(
+            f"Les membres {membres_de}, qui ont disposé du temps de réflexion nécessaire, déclarent ainsi avoir "
+            "pleinement compris et accepté de leur plein gré, l'ensemble de leurs droits et obligations au titre "
+            "de l'Accord.",
             styles["para"],
         ),
     ]
@@ -566,33 +656,9 @@ def _page4(d, summary, styles):
             ]
         )
     )
-    # NOTE: the SIGNATURE / EMPREINTE POUCE GAUCHE box that used to sit here
-    # has been moved to the top of page 5, so that ALL signature-related
-    # boxes are consolidated on a single page (page 5), per client request.
-    story = [
-        Paragraph("RÉCAPITULATIF DES COMPENSATIONS", styles["section"]),
-        t,
-    ]
-    return story
-
-
-def _page5(d, summary, styles):
-    chef_name = d["nomPrenom"] or "..........................."
-    party = PARTY_LABEL[d["type"]]
-    consent = (
-        f"Je, soussigné, {'Monsieur ' if d['type'] != 'communautaire' else ''}{chef_name}, en ma qualité de "
-        f"{CHEF_LABEL[d['type']]}, certifie, en plein accord avec les membres du{'e' if d['type']=='communautaire' else ''} "
-        f"{party.split()[0]}, donner mon consentement à l'ensemble des termes et conditions du présent Accord qui m'ont "
-        "été traduits oralement du français en sousou, et ce, en présence d'un représentant des autorités locales dont "
-        "la fonction est ............................................................................"
-    )
-    dt = fmt_date(d.get("dateEnquete")) or ""
-
-    # SIGNATURE / EMPREINTE POUCE GAUCHE box, moved here from page 4 so that
-    # ALL signature-related boxes appear together on a single page (page 5).
-    # Height increased (24mm -> 34mm) to leave enough room for an actual
-    # thumbprint, per client request. Colour removed from the header cell
-    # (light grey instead of a solid brand colour).
+    # SIGNATURE / EMPREINTE POUCE GAUCHE box: belongs on the SAME page as the
+    # récapitulatif table in all 3 reference contracts (Ménage page 4,
+    # Lignage page 4, Collectif page 4) — moved back here from page 5.
     sig_thumb_box = Table(
         [["SIGNATURE", "EMPREINTE POUCE GAUCHE"], ["", ""]],
         colWidths=[80 * mm, 80 * mm],
@@ -613,10 +679,40 @@ def _page5(d, summary, styles):
             ]
         )
     )
+    story = [
+        Paragraph("RÉCAPITULATIF DES COMPENSATIONS", styles["section"]),
+        t,
+        Spacer(1, 10),
+        sig_thumb_box,
+    ]
+    return story
+
+
+def _page5(d, summary, styles):
+    chef_name = d["nomPrenom"] or "..........................."
+    party = PARTY_LABEL[d["type"]]
+    consent = (
+        f"Je, soussigné, {'Monsieur ' if d['type'] != 'communautaire' else ''}{chef_name}, en ma qualité de "
+        f"{CHEF_LABEL[d['type']]}, certifie, en plein accord avec les membres du{'e' if d['type']=='communautaire' else ''} "
+        f"{party.split()[0]}, donner mon consentement à l'ensemble des termes et conditions du présent Accord qui m'ont "
+        "été traduits oralement du français en sousou, et ce, en présence d'un représentant des autorités locales dont "
+        "la fonction est ............................................................................"
+    )
+    dt = fmt_date(d.get("dateEnquete")) or ""
+    is_lignage = d["type"] == "lignage"
+
+    # Consent-box header: all 3 reference documents literally read "Le
+    # Ménage affecté"/"Le Ménage Affecté" here regardless of type (a
+    # template copy-paste artifact present even in the Lignage/Collectif
+    # source docs) — corrected here per-type instead of replicating the
+    # artifact, for professionalism.
+    consent_header = {
+        "proprietaire": "Le Ménage affecté",
+        "lignage": "Le Lignage affecté",
+        "communautaire": "La Communauté affectée",
+    }[d["type"]]
 
     story = [
-        sig_thumb_box,
-        Spacer(1, 8),
         Paragraph(
             f"Fait en deux (2) exemplaires originaux, un étant remis à chacune des Parties.<br/>"
             f"À ........................, le {dt}",
@@ -625,7 +721,7 @@ def _page5(d, summary, styles):
         Spacer(1, 6),
     ]
     box_content = [
-        [Paragraph(f"<b>{TITLE_SUFFIX[d['type']] if d['type']!='proprietaire' else 'Le Ménage affecté'}</b>", styles["small_bold"])],
+        [Paragraph(f"<b>{consent_header}</b>", styles["small_bold"])],
         [Paragraph(consent, styles["para"])],
         [Paragraph("Signature :", styles["small"])],
     ]
@@ -647,12 +743,55 @@ def _page5(d, summary, styles):
 
     _half_mm = (FULL_WIDTH_MM - 2) / 2.0
 
-    amc_box = Table(
-        [[Paragraph("<b>AMC</b>", styles["small_bold"])]] + [[l] for l in sig_lines("Nom", "Fonction", "Signature")],
+    wcag_box = Table(
+        [[Paragraph("<b>WCAG</b>", styles["small_bold"])]] + [[l] for l in sig_lines("Nom", "Fonction", "Signature")],
         colWidths=[_half_mm * mm],
     )
-    amc_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))
+    wcag_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))
 
+    if is_lignage:
+        # Lignage: row 1 = WCAG box | single-slot "Autorités locales" box
+        # (NOT the 2-slot "Autorités" box used by Ménage/Collectif).
+        autloc_box = Table(
+            [[Paragraph("<b>Autorités locales</b>", styles["small_bold"])]]
+            + [[l] for l in sig_lines("Nom", "Fonction", "Signature")],
+            colWidths=[_half_mm * mm],
+        )
+        autloc_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))
+        row1 = Table([[wcag_box, autloc_box]], colWidths=[(_half_mm + 1) * mm, (_half_mm + 1) * mm], hAlign="LEFT")
+        story.append(row1)
+        story.append(Spacer(1, 6))
+
+        # Full-width Témoins section with a 2-column x 3-row grid of slots
+        # (6 total), matching the Lignage reference's distinct layout — no
+        # separate "Autorités locales" box here since it already appeared
+        # in row 1 above.
+        story.append(Paragraph(f"<b>{TEMOINS_LABEL['lignage']}</b>", styles["small_bold"]))
+        story.append(Spacer(1, 3))
+
+        def temoin_cell():
+            return Table(
+                [[l] for l in sig_lines("Nom", "Fonction", "Signature")],
+                colWidths=[_half_mm * mm],
+            )
+
+        grid_rows = []
+        for _ in range(3):
+            c1 = temoin_cell()
+            c2 = temoin_cell()
+            grid_rows.append([c1, c2])
+        grid = Table(grid_rows, colWidths=[(_half_mm + 1) * mm, (_half_mm + 1) * mm], hAlign="LEFT")
+        grid.setStyle(TableStyle([
+            ("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER),
+            ("GRID", (0, 0), (-1, -1), 0.75, GREY_BORDER),
+            ("TOPPADDING", (0, 0), (-1, -1), 3),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 3),
+        ]))
+        story.append(grid)
+        return story
+
+    # Ménage / Collectif: row 1 = WCAG box | 2-slot "Autorités" box; row 2 =
+    # Témoins (4 slots) | Autorités locales (4 slots).
     aut_box = Table(
         [[Paragraph("<b>Autorités</b>", styles["small_bold"])]]
         + [[l] for l in sig_lines("Nom", "Institution/Fonction", "Signature", "Nom", "Institution/Fonction")],
@@ -660,7 +799,7 @@ def _page5(d, summary, styles):
     )
     aut_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))
 
-    row1 = Table([[amc_box, aut_box]], colWidths=[(_half_mm + 1) * mm, (_half_mm + 1) * mm], hAlign="LEFT")
+    row1 = Table([[wcag_box, aut_box]], colWidths=[(_half_mm + 1) * mm, (_half_mm + 1) * mm], hAlign="LEFT")
     story.append(row1)
     story.append(Spacer(1, 6))
 
