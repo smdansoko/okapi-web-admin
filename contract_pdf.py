@@ -174,8 +174,11 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "village": menage.get("village", ""),
             "codeMenage": menage.get("codeMenage", ""),
             "codeIndividu": chef.get("id", menage.get("codeMenage", "")),
-            "codePap": chef.get("codePap", ""),
-            "codeEnquete": chef.get("id", menage.get("codeMenage", "")),
+            # "Code PAP" is normally attributed manually; when it hasn't been
+            # set yet, fall back to displaying the auto-generated survey
+            # code (same value the "Code de l'individu" already carries for
+            # a menage-based contract) instead of a bare "-" placeholder.
+            "codePap": chef.get("codePap") or chef.get("id", menage.get("codeMenage", "")),
             "nomPrenom": chef.get("nomPrenom", ""),
             "sexe": chef.get("sexe", ""),
             "dateNaissance": fmt_date(chef.get("dateNaissance")),
@@ -200,8 +203,13 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "village": champ.get("village", ""),
             "codeMenage": champ.get("codeMenage", ""),
             "codeIndividu": proprietaire.get("id", ""),
-            "codePap": proprietaire.get("codePap", ""),
-            "codeEnquete": code_enquete_for_champ(champ) if champ.get("id") else proprietaire.get("id", ""),
+            # "Code PAP" is normally attributed manually; when it hasn't been
+            # set yet, fall back to displaying the auto-generated "code de
+            # l'enquête" (concat(codeProprietaire, '-', numEnqueteChamp))
+            # instead of a bare "-" placeholder.
+            "codePap": proprietaire.get("codePap") or (
+                code_enquete_for_champ(champ) if champ.get("id") else proprietaire.get("id", "")
+            ),
             "nomPrenom": proprietaire.get("nomPrenom", ""),
             "sexe": proprietaire.get("sexe", ""),
             "dateNaissance": fmt_date(proprietaire.get("dateNaissance")),
@@ -430,7 +438,6 @@ def _page1(d, styles):
         ("Localité", d["village"]),
         ("Code de l'individu", d["codeIndividu"]),
         ("Code PAP", d.get("codePap", "")),
-        ("Code de l'enquête", d.get("codeEnquete", "")),
         ("Prénom et NOM", d["nomPrenom"]),
         ("Sexe", d["sexe"]),
         ("Date de naissance", d["dateNaissance"]),

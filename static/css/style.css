@@ -183,6 +183,19 @@ table.data-table.compact-table td {
   text-overflow: ellipsis;
 }
 
+/* Shrink action buttons/badges inside compact rows so they don't force the
+   row back to full height (used e.g. by the Contrats table's Aperçu/Action
+   columns). */
+table.data-table.compact-table .btn.small {
+  padding: 2px 8px;
+  font-size: 10.5px;
+}
+
+table.data-table.compact-table .badge {
+  padding: 1px 6px;
+  font-size: 10px;
+}
+
 .btn {
   display: inline-block;
   background: var(--dark-green);
