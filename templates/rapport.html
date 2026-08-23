@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Rapport - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <h2>Rapport de synthèse — enquête OKAPI Survey</h2>
+  <p style="color:#666; font-size:13px;">Généré le {{ now.strftime('%d/%m/%Y à %H:%M') }}</p>
+
+  <div class="cards-row">
+    <div class="stat-card">
+      <div class="icon">🏠</div>
+      <div class="label">Ménages enquêtés</div>
+      <div class="value">{{ menages_count }}</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="icon">👥</div>
+      <div class="label">Individus recensés</div>
+      <div class="value">{{ total_individus }}</div>
+    </div>
+    <div class="stat-card gold">
+      <div class="icon">🌾</div>
+      <div class="label">Enquêtes champs</div>
+      <div class="value">{{ champs_count }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="icon">🏗️</div>
+      <div class="label">Enquêtes structures</div>
+      <div class="value">{{ structures_count }}</div>
+    </div>
+    <div class="stat-card green">
+      <div class="icon">📐</div>
+      <div class="label">Superficie totale (m²)</div>
+      <div class="value">{{ "{:,.0f}".format(total_superficie).replace(",", " ") }}</div>
+    </div>
+    <div class="stat-card green">
+      <div class="icon">💰</div>
+      <div class="label">Montant total à indemniser (GNF)</div>
+      <div class="value">{{ "{:,.0f}".format(total_montant).replace(",", " ") }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Détail du montant par catégorie de compensation</h2>
+  <table class="data-table">
+    <thead><tr><th>Catégorie</th><th>Montant (GNF)</th><th>% du total</th></tr></thead>
+    <tbody>
+      {% for label, montant in montant_par_categorie %}
+      <tr>
+        <td>{{ label }}</td>
+        <td>{{ "{:,.0f}".format(montant).replace(",", " ") }}</td>
+        <td>{{ "%.1f"|format((montant / total_montant * 100) if total_montant else 0) }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Répartition par lot</h2>
+  {% if batch_report_rows %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>N° de lot</th>
+        <th>PAP distincts</th>
+        <th>Contrats à générer</th>
+        <th>Villages concernés</th>
+        <th>Montant estimé (GNF)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in batch_report_rows %}
+      <tr>
+        <td><code class="mono">{{ row.num_batch }}</code></td>
+        <td>{{ row.owners_count }}</td>
+        <td>{{ row.contracts_count }}</td>
+        <td>{{ row.villages }}</td>
+        <td>{{ "{:,.0f}".format(row.total_montant).replace(",", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Dernières synchronisations</h2>
+  {% if recent_syncs %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Date</th><th>Appareil</th><th>Données reçues</th></tr>
+    </thead>
+    <tbody>
+      {% for s in recent_syncs %}
+      <tr>
+        <td>{{ s.synced_at }}</td>
+        <td>{{ s.device_name or "—" }}</td>
+        <td>
+          {% set c = s.counts_json | fromjson %}
+          Ménages: {{ c.get('menages', 0) }} · Champs: {{ c.get('champs', 0) }} · Structures: {{ c.get('structures', 0) }}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune synchronisation reçue pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel" style="font-size:13px; color:#666;">
+  <strong>💡 Astuce :</strong> utilisez la fonction d'impression de votre navigateur (Ctrl+P / Cmd+P) pour
+  exporter ce rapport en PDF.
+</div>
+
+{% endblock %}

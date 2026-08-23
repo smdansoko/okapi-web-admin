@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% block title %}Statistiques détaillées - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="dash-tabs">
+  <a href="{{ url_for('dashboard') }}" class="dash-tab">Vue d'ensemble</a>
+  <a href="{{ url_for('dashboard_stats') }}" class="dash-tab active">Statistiques détaillées</a>
+</div>
+
+<div class="cards-row">
+  <div class="stat-card">
+    <div class="icon">🏠</div>
+    <div class="label">Ménages</div>
+    <div class="value">{{ counts.menages }}</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="icon">👥</div>
+    <div class="label">Individus</div>
+    <div class="value">{{ total_individus }}</div>
+  </div>
+  <div class="stat-card gold">
+    <div class="icon">🌾</div>
+    <div class="label">Parcelles enquêtées</div>
+    <div class="value">{{ total_parcelles }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="icon">🌳</div>
+    <div class="label">Arbres/plantes recensés</div>
+    <div class="value">{{ total_arbres }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="icon">💰</div>
+    <div class="label">Montant total (GNF)</div>
+    <div class="value">{{ "{:,.0f}".format(total_montant).replace(",", " ") }}</div>
+  </div>
+</div>
+
+<div class="stats-grid">
+
+  <div class="panel">
+    <h2>Répartition par type de contrat</h2>
+    <table class="data-table">
+      <thead><tr><th>Type</th><th>Nombre d'enquêtes champs</th></tr></thead>
+      <tbody>
+        {% for k, v in type_contrat_counts.items() %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Montant par catégorie de compensation</h2>
+    <table class="data-table">
+      <thead><tr><th>Catégorie</th><th>Montant (GNF)</th></tr></thead>
+      <tbody>
+        {% for label, montant in montant_par_categorie %}
+        <tr><td>{{ label }}</td><td>{{ "{:,.0f}".format(montant).replace(",", " ") }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Répartition par région</h2>
+    <table class="data-table">
+      <thead><tr><th>Région</th><th>Ménages</th></tr></thead>
+      <tbody>
+        {% for k, v in par_region %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Répartition par préfecture</h2>
+    <table class="data-table">
+      <thead><tr><th>Préfecture</th><th>Ménages</th></tr></thead>
+      <tbody>
+        {% for k, v in par_prefecture %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Top villages (par nombre de ménages)</h2>
+    <table class="data-table">
+      <thead><tr><th>Village</th><th>Ménages</th></tr></thead>
+      <tbody>
+        {% for k, v in par_village %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Démographie — sexe</h2>
+    <table class="data-table">
+      <thead><tr><th>Sexe</th><th>Individus</th></tr></thead>
+      <tbody>
+        {% for k, v in sexe_counts.items() %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Démographie — tranches d'âge</h2>
+    <table class="data-table">
+      <thead><tr><th>Tranche d'âge</th><th>Individus</th></tr></thead>
+      <tbody>
+        {% for k, v in age_buckets.items() %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Types de terrain les plus fréquents</h2>
+    <table class="data-table">
+      <thead><tr><th>Type de terrain</th><th>Occurrences</th></tr></thead>
+      <tbody>
+        {% for k, v in type_terrain_counts %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Cultures annuelles les plus fréquentes</h2>
+    <table class="data-table">
+      <thead><tr><th>Culture</th><th>Occurrences</th></tr></thead>
+      <tbody>
+        {% for k, v in culture_annuelle_counts %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Cultures pérennes les plus fréquentes</h2>
+    <table class="data-table">
+      <thead><tr><th>Espèce</th><th>Occurrences</th></tr></thead>
+      <tbody>
+        {% for k, v in culture_perenne_counts %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Espèces sauvages les plus fréquentes</h2>
+    <table class="data-table">
+      <thead><tr><th>Espèce</th><th>Occurrences</th></tr></thead>
+      <tbody>
+        {% for k, v in espece_sauvage_counts %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Bois d'œuvre les plus fréquents</h2>
+    <table class="data-table">
+      <thead><tr><th>Espèce</th><th>Occurrences</th></tr></thead>
+      <tbody>
+        {% for k, v in bois_doeuvre_counts %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Types de structures les plus fréquents</h2>
+    <table class="data-table">
+      <thead><tr><th>Type de structure</th><th>Occurrences</th></tr></thead>
+      <tbody>
+        {% for k, v in type_structure_counts %}
+        <tr><td>{{ k }}</td><td>{{ v }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Contrats par lot (non fusionnés)</h2>
+    <table class="data-table">
+      <thead><tr><th>N° de lot</th><th>PAP distincts</th><th>Contrats à générer</th></tr></thead>
+      <tbody>
+        {% for row in contracts_per_batch %}
+        <tr>
+          <td><code class="mono">{{ row.num_batch }}</code></td>
+          <td>{{ row.owners_count }}</td>
+          <td>{{ row.contracts_count }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>PAP ayant plusieurs enquêtes champs (contrats séparés)</h2>
+    {% if multi_record_owners %}
+    <table class="data-table">
+      <thead><tr><th>Code individu</th><th>Nom</th><th>Nombre d'enquêtes / contrats</th></tr></thead>
+      <tbody>
+        {% for o in multi_record_owners %}
+        <tr>
+          <td><code class="mono">{{ o.code }}</code></td>
+          <td>{{ o.nom }}</td>
+          <td><span class="badge lignage">{{ o.count }} contrats</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">Aucun PAP n'a actuellement plusieurs enquêtes champs distinctes.</div>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <h2>Activité de synchronisation (14 derniers jours avec activité)</h2>
+    {% if sync_timeline %}
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Nombre de synchronisations</th></tr></thead>
+      <tbody>
+        {% for day, count in sync_timeline %}
+        <tr><td>{{ day }}</td><td>{{ count }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">Aucune synchronisation enregistrée.</div>
+    {% endif %}
+  </div>
+
+</div>
+
+{% endblock %}

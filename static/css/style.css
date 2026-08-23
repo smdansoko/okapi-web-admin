@@ -264,6 +264,38 @@ footer.app-footer {
   font-weight: 700;
 }
 
+.dash-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--grey-border);
+}
+
+.dash-tab {
+  padding: 10px 18px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #7a7a72;
+  text-decoration: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.dash-tab:hover { color: var(--maroon); }
+
+.dash-tab.active {
+  color: var(--maroon);
+  border-bottom-color: var(--maroon);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 20px;
+}
+
+.stats-grid .panel { margin-bottom: 0; }
+
 code.mono {
   background: var(--grey-light);
   padding: 2px 6px;

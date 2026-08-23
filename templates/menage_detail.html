@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Ménage {{ menage.codeMenage }} - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<p><a href="{{ url_for('menages_list') }}">&larr; Retour à la liste des ménages</a></p>
+
+<div class="panel">
+  <h2>Ménage <code class="mono">{{ menage.codeMenage }}</code></h2>
+  <table class="data-table">
+    <tbody>
+      <tr><th style="width:220px;">Village</th><td>{{ menage.village }}</td></tr>
+      <tr><th>District</th><td>{{ menage.district }}</td></tr>
+      <tr><th>Sous-préfecture</th><td>{{ menage.sousPrefecture }}</td></tr>
+      <tr><th>Préfecture</th><td>{{ menage.prefecture }}</td></tr>
+      <tr><th>Région</th><td>{{ menage.region }}</td></tr>
+      <tr><th>Date d'enquête</th><td>{{ (menage.dateEnquete or '')[:10] }}</td></tr>
+      <tr><th>Statut du ménage</th><td>{{ menage.statutMenage }}</td></tr>
+      <tr><th>Résidence principale</th><td>{{ menage.residencePrincipale }}</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Membres du ménage ({{ individus|length }})</h2>
+  {% if individus %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Nom et prénom</th>
+        <th>Sexe</th>
+        <th>Âge</th>
+        <th>Relation au CDM</th>
+        <th>Enquêtes champs</th>
+        <th>Enquêtes structures</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in individus %}
+      <tr>
+        <td>{{ i.nomPrenom }}</td>
+        <td>{{ i.sexe }}</td>
+        <td>{{ i.age if i.age is not none else '—' }}</td>
+        <td>{{ i.relationCdm }}</td>
+        <td>
+          {% if i.nb_enquetes_champ %}
+            <span class="badge lignage">{{ i.nb_enquetes_champ }}</span>
+          {% else %}0{% endif %}
+        </td>
+        <td>
+          {% if i.nb_enquetes_structure %}
+            <span class="badge proprietaire">{{ i.nb_enquetes_structure }}</span>
+          {% else %}0{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucun membre enregistré pour ce ménage.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

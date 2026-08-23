@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Facturation - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <h2>Tableau de facturation</h2>
+
+  <form class="filters" method="get">
+    <label for="batch">Filtrer par N° de lot :</label>
+    <select name="batch" id="batch" onchange="this.form.submit()">
+      <option value="">-- Tous les lots --</option>
+      {% for b in batches %}
+      <option value="{{ b }}" {{ 'selected' if b == selected_batch else '' }}>{{ b }}</option>
+      {% endfor %}
+    </select>
+    <a class="btn small maroon" href="{{ url_for('facturation_export', batch=selected_batch) }}">Exporter en Excel</a>
+  </form>
+
+  <p style="font-size:13px; color:#666; margin-bottom:14px;">
+    <strong>{{ contracts_count }}</strong> contrat(s) &mdash;
+    Montant total : <strong>{{ "{:,.0f}".format(grand_total).replace(",", " ") }} GNF</strong>
+  </p>
+
+  {% if rows %}
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>N° de lot</th>
+        <th>Nom et prénom</th>
+        <th>Code individu</th>
+        <th>N° enquête</th>
+        <th>Type</th>
+        <th>Village</th>
+        <th>Parcelles</th>
+        <th>Cultures annuelles</th>
+        <th>Cultures pérennes</th>
+        <th>Espèces sauvages</th>
+        <th>Bois d'œuvre</th>
+        <th>Structures</th>
+        <th>Total (GNF)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><code class="mono">{{ r.numBatch or r.codeMenage }}</code></td>
+        <td>{{ r.nom }}</td>
+        <td><code class="mono">{{ r.code }}</code></td>
+        <td>{% if r.num_enquete %}#{{ r.num_enquete }}{% else %}&mdash;{% endif %}</td>
+        <td>
+          {% set tt = r.type_contrat|lower %}
+          {% if 'ligna' in tt %}<span class="badge lignage">Lignage</span>
+          {% elif 'communaut' in tt %}<span class="badge communautaire">Communautaire</span>
+          {% else %}<span class="badge proprietaire">Propriétaire</span>{% endif %}
+        </td>
+        <td>{{ r.village }}</td>
+        <td>{{ "{:,.0f}".format(r.montant_parcelles).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant_cultures_annuelles).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant_cultures_perennes).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant_especes_sauvages).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant_bois_doeuvre).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant_structures).replace(",", " ") }}</td>
+        <td><strong>{{ "{:,.0f}".format(r.montant_total).replace(",", " ") }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="12" style="text-align:right; font-weight:700;">TOTAL GÉNÉRAL</td>
+        <td style="font-weight:800;">{{ "{:,.0f}".format(grand_total).replace(",", " ") }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  </div>
+  {% else %}
+  <div class="empty-state">Aucune donnée pour ce filtre.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

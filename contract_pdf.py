@@ -214,11 +214,40 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
 
 
 def _decode_photo(b64data, max_w=90, max_h=110):
+    """Decode a base64 photo and embed it in the PDF, applying EXIF
+    orientation correction first.
+
+    Photos captured on mobile phones frequently carry an EXIF "Orientation"
+    tag (e.g. 6 = rotate 90 CW needed, 8 = rotate 90 CCW needed) instead of
+    physically rotating the pixel data. Flutter's on-screen ``Image.memory``
+    widget uses Skia's JPEG decoder, which automatically honours this tag -
+    so the photo looks correctly oriented on the phone screen. ReportLab's
+    ``Image`` (like Dart's ``pw.MemoryImage``) does NOT apply this
+    correction, so without this fix the same photo appears sideways or
+    upside-down in the generated PDF. We use Pillow's
+    ``ImageOps.exif_transpose`` to bake the correct rotation into the pixel
+    data before handing it to ReportLab.
+    """
     if not b64data:
         return None
     try:
         raw = base64.b64decode(b64data)
-        img = RLImage(io.BytesIO(raw), width=max_w, height=max_h)
+        try:
+            from PIL import Image as PILImage, ImageOps
+
+            pil_img = PILImage.open(io.BytesIO(raw))
+            pil_img = ImageOps.exif_transpose(pil_img)
+            if pil_img.mode not in ("RGB", "L"):
+                pil_img = pil_img.convert("RGB")
+            buf = io.BytesIO()
+            pil_img.save(buf, format="JPEG", quality=90)
+            buf.seek(0)
+            img = RLImage(buf, width=max_w, height=max_h)
+        except Exception:
+            # Fallback: if Pillow fails for any reason, fall back to the
+            # raw bytes so a photo still shows up (possibly mis-oriented)
+            # rather than showing nothing at all.
+            img = RLImage(io.BytesIO(raw), width=max_w, height=max_h)
         return img
     except Exception:
         return None

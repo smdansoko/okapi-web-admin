@@ -19,7 +19,12 @@ from flask import Flask, render_template, request, jsonify, send_file, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import db
-from compensation import compute_for_owner, compute_global
+from compensation import (
+    compute_for_owner,
+    compute_for_champ_record,
+    compute_global,
+    CompensationSummary,
+)
 from contract_pdf import build_contract_data, generate_contract_pdf
 from excel_export import build_compensation_table
 
@@ -86,6 +91,21 @@ def _individu_lookup(menages, code_menage, code_individu):
     return None
 
 
+def _compute_age(date_naissance_iso):
+    """Computes age in whole years from an ISO date string, or None."""
+    if not date_naissance_iso:
+        return None
+    try:
+        dob = datetime.fromisoformat(date_naissance_iso.replace("Z", ""))
+        today = datetime.now()
+        age = today.year - dob.year - (
+            (today.month, today.day) < (dob.month, dob.day)
+        )
+        return age if age >= 0 else None
+    except Exception:
+        return None
+
+
 def _distinct_batches(champs, structures):
     batches = set()
     for c in champs:
@@ -97,9 +117,27 @@ def _distinct_batches(champs, structures):
     return sorted(batches)
 
 
-def _owners_for_batch(menages, champs, structures, num_batch=""):
-    """Returns a list of owner dicts: code, nom, type_contrat, village, numBatch."""
-    owners = {}
+def _contract_rows_for_batch(menages, champs, structures, num_batch=""):
+    """Returns a list of contract-row dicts, ONE ROW PER CHAMPS RECORD.
+
+    IMPORTANT (per user requirement): when the same PAP (propriétaire) has
+    several distinct "enquêtes champs" records, each record must produce
+    its OWN separate contract - they must NOT be merged into a single
+    combined contract. So unlike a plain "distinct owners" list, this
+    function may return several rows sharing the same owner `code`, one
+    per champs record (`champ_id` distinguishes them), meaning:
+        number of champs-based rows for a PAP == number of contracts for
+        that PAP.
+
+    Each row dict has: code, champ_id ("" if not champ-based), nom,
+    type_contrat, village, numBatch, codeMenage, source, num_enquete
+    (the numEnqueteChamp value, or None), and include_structures (True
+    only for the FIRST row belonging to a given owner code, so that a
+    PAP's structures/habitation are billed on exactly ONE of their
+    contracts, never duplicated across multiple contracts nor omitted).
+    """
+    rows = []
+    codes_with_champ_rows = set()
     for c in champs:
         if num_batch and c.get("numBatch", "") != num_batch:
             continue
@@ -107,56 +145,106 @@ def _owners_for_batch(menages, champs, structures, num_batch=""):
         if not code:
             continue
         ind = _individu_lookup(menages, c.get("codeMenage", ""), code) or {}
-        owners.setdefault(code, {
+        rows.append({
             "code": code,
+            "champ_id": c.get("id", ""),
             "nom": ind.get("nomPrenom") or c.get("proprietaireNom", ""),
             "type_contrat": c.get("typeDePropriete", ""),
             "village": c.get("village", ""),
             "numBatch": c.get("numBatch", ""),
             "codeMenage": c.get("codeMenage", ""),
             "source": "champ",
+            "num_enquete": c.get("numEnqueteChamp", 1),
         })
+        codes_with_champ_rows.add(code)
+
+    existing_codes_no_champ = set()
     for s in structures:
         if num_batch and s.get("numBatch", "") != num_batch:
             continue
         code = s.get("proprietaireStructure", "")
         if not code:
             continue
+        if code in codes_with_champ_rows:
+            # This owner already has at least one champs-based contract row
+            # - their structures/habitation will be billed on that record
+            # (see include_structures below), so no separate row is added
+            # here to avoid a duplicate/second contract for the same PAP.
+            continue
+        if code in existing_codes_no_champ:
+            continue
         ind = _individu_lookup(menages, s.get("codeMenage", ""), code) or {}
-        owners.setdefault(code, {
+        rows.append({
             "code": code,
+            "champ_id": "",
             "nom": ind.get("nomPrenom") or s.get("proprietaireNom", ""),
             "type_contrat": "Propriétaire",
             "village": s.get("village", ""),
             "numBatch": s.get("numBatch", ""),
             "codeMenage": s.get("codeMenage", ""),
             "source": "structure",
+            "num_enquete": None,
         })
+        existing_codes_no_champ.add(code)
+
     if not num_batch:
+        known_codes = codes_with_champ_rows | existing_codes_no_champ
         for m in menages:
             chef = _chef_of(m)
-            if chef and chef.get("id") not in owners:
-                owners[chef.get("id")] = {
+            if chef and chef.get("id") not in known_codes:
+                rows.append({
                     "code": chef.get("id"),
+                    "champ_id": "",
                     "nom": chef.get("nomPrenom", ""),
                     "type_contrat": "Propriétaire",
                     "village": m.get("village", ""),
                     "numBatch": m.get("codeMenage", ""),
                     "codeMenage": m.get("codeMenage", ""),
                     "source": "menage",
-                }
-    return list(owners.values())
+                    "num_enquete": None,
+                })
+                known_codes.add(chef.get("id"))
+
+    # Mark, per owner code, which row is the FIRST one encountered so that
+    # exactly one contract per PAP carries their structures/habitation.
+    seen_for_structures = set()
+    for r in rows:
+        r["include_structures"] = r["code"] not in seen_for_structures
+        seen_for_structures.add(r["code"])
+
+    return rows
+
+
+def _distinct_owner_count(rows):
+    return len({r["code"] for r in rows})
+
+
+def _summary_for_row(champs, structures, row):
+    """Computes the compensation summary for a single contract row,
+    respecting the non-merge rule: a champs-based row only accounts for
+    ITS OWN champs record (never other records belonging to the same
+    owner), and structures are only added on the row flagged
+    include_structures=True."""
+    if row.get("champ_id"):
+        champ = next((c for c in champs if c.get("id") == row["champ_id"]), None)
+        if champ is None:
+            return CompensationSummary()
+        return compute_for_champ_record(
+            champ, structures, row["code"],
+            include_structures=row.get("include_structures", False),
+        )
+    structs = structures if row.get("include_structures", True) else []
+    return compute_for_owner([], structs, row["code"])
 
 
 # ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------
 
-def _total_montant_for_owners(champs, structures, owners):
+def _total_montant_for_rows(champs, structures, rows):
     total = 0.0
-    for o in owners:
-        s = compute_for_owner(champs, structures, o["code"])
-        total += s.total
+    for r in rows:
+        total += _summary_for_row(champs, structures, r).total
     return round(total)
 
 
@@ -181,11 +269,12 @@ def dashboard():
     # Batch breakdown for a quick table
     batch_rows = []
     for b in batches:
-        owners = _owners_for_batch(menages, champs, structures, b)
-        total_montant = _total_montant_for_owners(champs, structures, owners)
+        rows = _contract_rows_for_batch(menages, champs, structures, b)
+        total_montant = _total_montant_for_rows(champs, structures, rows)
         batch_rows.append({
             "num_batch": b,
-            "owners_count": len(owners),
+            "owners_count": _distinct_owner_count(rows),
+            "contracts_count": len(rows),
             "total_montant": total_montant,
         })
 
@@ -202,6 +291,179 @@ def dashboard():
     )
 
 
+@app.route("/statistiques")
+def dashboard_stats():
+    """Second dashboard screen: as many additional statistics as possible
+    (breakdowns by contract type, région/préfecture/village, structure
+    types, culture/espèce totals, sync activity over time, etc.)."""
+    menages = db.all_menages()
+    champs = db.all_champs()
+    structures = db.all_structures()
+    c = db.counts()
+
+    # --- Répartition par type de contrat (Propriétaire / Lignage / Communautaire) ---
+    type_contrat_counts = {"Propriétaire": 0, "Lignage": 0, "Communautaire": 0, "Autre": 0}
+    for ch in champs:
+        tt = (ch.get("typeDePropriete") or "").lower()
+        if "ligna" in tt:
+            type_contrat_counts["Lignage"] += 1
+        elif "communaut" in tt:
+            type_contrat_counts["Communautaire"] += 1
+        elif "propri" in tt:
+            type_contrat_counts["Propriétaire"] += 1
+        else:
+            type_contrat_counts["Autre"] += 1
+
+    # --- Répartition géographique ---
+    def _geo_counts(items, field):
+        counts = {}
+        for it in items:
+            key = it.get(field) or "Non spécifié"
+            counts[key] = counts.get(key, 0) + 1
+        return sorted(counts.items(), key=lambda kv: -kv[1])
+
+    par_region = _geo_counts(menages, "region")
+    par_prefecture = _geo_counts(menages, "prefecture")
+    par_village = _geo_counts(menages, "village")[:15]  # top 15
+
+    # --- Sexe / démographie des individus ---
+    sexe_counts = {"Masculin": 0, "Féminin": 0, "Non spécifié": 0}
+    age_buckets = {"0-17": 0, "18-35": 0, "36-60": 0, "61+": 0, "Non spécifié": 0}
+    total_individus = 0
+    for m in menages:
+        for ind in m.get("individus", []):
+            total_individus += 1
+            sexe = (ind.get("sexe") or "").strip()
+            if sexe.lower().startswith("m"):
+                sexe_counts["Masculin"] += 1
+            elif sexe.lower().startswith("f"):
+                sexe_counts["Féminin"] += 1
+            else:
+                sexe_counts["Non spécifié"] += 1
+            age = _compute_age(ind.get("dateNaissance"))
+            if age is not None:
+                if age < 18:
+                    age_buckets["0-17"] += 1
+                elif age < 36:
+                    age_buckets["18-35"] += 1
+                elif age <= 60:
+                    age_buckets["36-60"] += 1
+                else:
+                    age_buckets["61+"] += 1
+            else:
+                age_buckets["Non spécifié"] += 1
+
+    # --- Types de terrain / cultures / structures (top items by frequency) ---
+    def _top(counter_dict, n=10):
+        return sorted(counter_dict.items(), key=lambda kv: -kv[1])[:n]
+
+    type_terrain_counts = {}
+    culture_annuelle_counts = {}
+    culture_perenne_counts = {}
+    espece_sauvage_counts = {}
+    bois_doeuvre_counts = {}
+    total_parcelles = 0
+    total_arbres = 0
+    for ch in champs:
+        for p in ch.get("parcelles", []):
+            total_parcelles += 1
+            tdt = p.get("typeDeTerrain") or "Non spécifié"
+            type_terrain_counts[tdt] = type_terrain_counts.get(tdt, 0) + 1
+            for champ_agr in p.get("champs", []):
+                cu = champ_agr.get("culture") or "Non spécifié"
+                culture_annuelle_counts[cu] = culture_annuelle_counts.get(cu, 0) + 1
+            for arbre in p.get("arbres", []):
+                total_arbres += 1
+                t = arbre.get("typeArbre")
+                esp = arbre.get("especeArbre") or "Non spécifié"
+                if t == "cultures_perennes":
+                    culture_perenne_counts[esp] = culture_perenne_counts.get(esp, 0) + 1
+                elif t == "especes_sauvages":
+                    espece_sauvage_counts[esp] = espece_sauvage_counts.get(esp, 0) + 1
+                elif t == "bois_doeuvre":
+                    bois_doeuvre_counts[esp] = bois_doeuvre_counts.get(esp, 0) + 1
+
+    type_structure_counts = {}
+    for s in structures:
+        for st in s.get("structures", []):
+            t = st.get("typeDeStructure") or "Non spécifié"
+            type_structure_counts[t] = type_structure_counts.get(t, 0) + 1
+
+    # --- Montant total détaillé par catégorie (across all PAP, no merging
+    #     needed here since this is a GLOBAL sum, not per-contract) ---
+    global_summary = compute_global(champs, structures)
+    montant_par_categorie = [
+        ("Parcelles (terrain)", round(global_summary.parcelles)),
+        ("Cultures annuelles", round(global_summary.champs_cultures_annuelles)),
+        ("Cultures pérennes", round(global_summary.cultures_perennes)),
+        ("Espèces sauvages", round(global_summary.especes_sauvages)),
+        ("Bois d'œuvre", round(global_summary.bois_doeuvre)),
+        ("Ressources naturelles", round(global_summary.ressources)),
+        ("Structures / habitations", round(global_summary.structures)),
+    ]
+
+    # --- Activité de synchronisation dans le temps (par jour, 14 derniers) ---
+    sync_by_day = {}
+    for row in db.recent_syncs(200):
+        day = (row.get("synced_at") or "")[:10]
+        if not day:
+            continue
+        sync_by_day[day] = sync_by_day.get(day, 0) + 1
+    sync_timeline = sorted(sync_by_day.items())[-14:]
+
+    # --- Répartition par lot (nombre de contrats, PAS de PAP fusionnés) ---
+    batches = _distinct_batches(champs, structures)
+    contracts_per_batch = []
+    for b in batches:
+        rows = _contract_rows_for_batch(menages, champs, structures, b)
+        contracts_per_batch.append({
+            "num_batch": b,
+            "owners_count": _distinct_owner_count(rows),
+            "contracts_count": len(rows),
+        })
+
+    # --- PAP avec plusieurs enquêtes champs (contrats non fusionnés) ---
+    per_owner_champ_count = {}
+    for ch in champs:
+        code = ch.get("codeProprietaire", "")
+        if code:
+            per_owner_champ_count[code] = per_owner_champ_count.get(code, 0) + 1
+    multi_record_owners = [
+        {"code": code, "nom": next(
+            (ch.get("proprietaireNom", "") for ch in champs if ch.get("codeProprietaire") == code),
+            "",
+        ), "count": cnt}
+        for code, cnt in per_owner_champ_count.items() if cnt > 1
+    ]
+    multi_record_owners.sort(key=lambda o: -o["count"])
+
+    return render_template(
+        "dashboard_stats.html",
+        counts=c,
+        total_individus=total_individus,
+        total_parcelles=total_parcelles,
+        total_arbres=total_arbres,
+        type_contrat_counts=type_contrat_counts,
+        par_region=par_region,
+        par_prefecture=par_prefecture,
+        par_village=par_village,
+        sexe_counts=sexe_counts,
+        age_buckets=age_buckets,
+        type_terrain_counts=_top(type_terrain_counts),
+        culture_annuelle_counts=_top(culture_annuelle_counts),
+        culture_perenne_counts=_top(culture_perenne_counts),
+        espece_sauvage_counts=_top(espece_sauvage_counts),
+        bois_doeuvre_counts=_top(bois_doeuvre_counts),
+        type_structure_counts=_top(type_structure_counts, 15),
+        montant_par_categorie=montant_par_categorie,
+        total_montant=round(global_summary.total),
+        sync_timeline=sync_timeline,
+        contracts_per_batch=contracts_per_batch,
+        multi_record_owners=multi_record_owners,
+        now=datetime.now(),
+    )
+
+
 # ---------------------------------------------------------------------------
 # Contracts listing + PDF export
 # ---------------------------------------------------------------------------
@@ -214,27 +476,50 @@ def contracts_list():
     batch_filter = request.args.get("batch", "")
     batches = _distinct_batches(champs, structures)
 
-    owners = _owners_for_batch(menages, champs, structures, batch_filter)
-    # Sort by numBatch then nom
-    owners.sort(key=lambda o: (o.get("numBatch", ""), o.get("nom", "")))
+    rows = _contract_rows_for_batch(menages, champs, structures, batch_filter)
+    # Sort by numBatch then nom then num_enquete (so multi-record PAP appear
+    # grouped together, in survey order)
+    rows.sort(
+        key=lambda o: (
+            o.get("numBatch", ""),
+            o.get("nom", ""),
+            o.get("num_enquete") or 0,
+        )
+    )
+
+    distinct_owners = _distinct_owner_count(rows)
 
     return render_template(
         "contracts.html",
-        owners=owners,
+        owners=rows,
         batches=batches,
         selected_batch=batch_filter,
+        distinct_owners=distinct_owners,
+        contracts_count=len(rows),
     )
 
 
 @app.route("/contracts/export/<code_individu>")
 def export_contract(code_individu):
+    """Exports a contract PDF.
+
+    IMPORTANT: contracts are generated PER CHAMPS RECORD, not per owner.
+    When a PAP (propriétaire) has several distinct "enquêtes champs"
+    records, pass ``champ_id`` in the query string to select exactly which
+    record's contract to generate; each record produces its own separate,
+    non-merged contract. If ``champ_id`` is omitted, the first matching
+    champs record for that owner is used (kept for backward compatibility
+    with old links / structure-only or ménage-only owners).
+    """
     menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
 
     contract_type = request.args.get("type", "")
+    champ_id = request.args.get("champ_id", "")
 
-    # Try to find as a chef de menage first
+    # Try to find as a chef de menage first (ménage-based contract, no
+    # champs record involved at all)
     menage_match = None
     for m in menages:
         chef = _chef_of(m)
@@ -242,15 +527,22 @@ def export_contract(code_individu):
             menage_match = m
             break
 
-    if menage_match is not None:
-        d = build_contract_data(menage=menage_match)
-    else:
-        # Find via champ owner
-        champ_match = None
-        for c in champs:
-            if c.get("codeProprietaire") == code_individu:
-                champ_match = c
-                break
+    champ_match = None
+    if menage_match is None:
+        # Find via champ owner - if champ_id was given, match that EXACT
+        # record (required for the non-merged, per-record contract
+        # behaviour); otherwise fall back to the first matching record.
+        if champ_id:
+            champ_match = next(
+                (c for c in champs if c.get("id") == champ_id
+                 and c.get("codeProprietaire") == code_individu),
+                None,
+            )
+        if champ_match is None:
+            for c in champs:
+                if c.get("codeProprietaire") == code_individu:
+                    champ_match = c
+                    break
         if champ_match is None:
             for s in structures:
                 if s.get("proprietaireStructure") == code_individu:
@@ -266,8 +558,15 @@ def export_contract(code_individu):
                         "dateEnquete": s.get("dateEnquete", ""),
                     }
                     break
-        if champ_match is None:
-            abort(404, description="Owner not found")
+
+    if menage_match is None and champ_match is None:
+        abort(404, description="Owner not found")
+
+    if menage_match is not None:
+        d = build_contract_data(menage=menage_match)
+        summary = compute_for_owner(champs, structures, code_individu)
+        out_suffix = code_individu
+    else:
         individu = _individu_lookup(menages, champ_match.get("codeMenage", ""), code_individu) or {
             "id": code_individu,
             "nomPrenom": "",
@@ -282,10 +581,37 @@ def export_contract(code_individu):
                 contract_type = "proprietaire"
         d = build_contract_data(champ=champ_match, individu=individu, contract_type=contract_type)
 
-    summary = compute_for_owner(champs, structures, code_individu)
+        # Non-merge rule: this contract accounts ONLY for champ_match's own
+        # champs record. Structures are only included if this is the
+        # first/only champs record for this owner (avoids double-billing a
+        # PAP's habitation across multiple separate contracts) - detected
+        # by checking whether this is the earliest-created champs record
+        # for that owner among all of that owner's records.
+        owner_champs = [c for c in champs if c.get("codeProprietaire") == code_individu]
+        is_first_record = True
+        if len(owner_champs) > 1 and champ_match.get("id"):
+            owner_champs_sorted = sorted(
+                owner_champs,
+                key=lambda c: (c.get("numEnqueteChamp", 1), c.get("createdAt", "")),
+            )
+            is_first_record = owner_champs_sorted[0].get("id") == champ_match.get("id")
+
+        if champ_match.get("id"):
+            summary = compute_for_champ_record(
+                champ_match, structures, code_individu,
+                include_structures=is_first_record,
+            )
+            out_suffix = f"{code_individu}_{champ_match.get('numEnqueteChamp', 1)}"
+        else:
+            # Structure-only or ménage-fallback owner (no actual champs
+            # record) - keep the previous merged/global behaviour since
+            # there is only ever one contract for this PAP in that case.
+            summary = compute_for_owner(champs, structures, code_individu)
+            out_suffix = code_individu
+
     pdf_bytes = generate_contract_pdf(d, summary)
 
-    filename = f"Contrat_{d.get('numeroLot', code_individu)}_{code_individu}.pdf"
+    filename = f"Contrat_{d.get('numeroLot', code_individu)}_{out_suffix}.pdf"
     return send_file(
         io.BytesIO(pdf_bytes),
         mimetype="application/pdf",
@@ -328,6 +654,264 @@ def compensation_export():
 
 
 # ---------------------------------------------------------------------------
+# Ménages (household list, including members)
+# ---------------------------------------------------------------------------
+
+@app.route("/menages")
+def menages_list():
+    menages = db.all_menages()
+    search = (request.args.get("q", "") or "").strip().lower()
+    village_filter = request.args.get("village", "")
+
+    villages = sorted({m.get("village", "") for m in menages if m.get("village")})
+
+    rows = []
+    for m in menages:
+        chef = _chef_of(m) or {}
+        if village_filter and m.get("village", "") != village_filter:
+            continue
+        if search:
+            haystack = " ".join([
+                m.get("codeMenage", ""),
+                chef.get("nomPrenom", ""),
+                m.get("village", ""),
+                m.get("district", ""),
+            ]).lower()
+            if search not in haystack:
+                continue
+        rows.append({
+            "id": m.get("id"),
+            "codeMenage": m.get("codeMenage", ""),
+            "chef_nom": chef.get("nomPrenom", ""),
+            "nb_individus": len(m.get("individus", [])),
+            "village": m.get("village", ""),
+            "district": m.get("district", ""),
+            "sousPrefecture": m.get("sousPrefecture", ""),
+            "prefecture": m.get("prefecture", ""),
+            "region": m.get("region", ""),
+            "dateEnquete": (m.get("dateEnquete") or "")[:10],
+        })
+
+    rows.sort(key=lambda r: (r["village"], r["chef_nom"]))
+
+    return render_template(
+        "menages.html",
+        rows=rows,
+        villages=villages,
+        search=search,
+        selected_village=village_filter,
+        total_menages=len(menages),
+    )
+
+
+@app.route("/menages/<menage_id>")
+def menage_detail(menage_id):
+    menage = db.menage_by_id(menage_id)
+    if not menage:
+        abort(404, description="Ménage introuvable")
+
+    champs = db.all_champs()
+    structures = db.all_structures()
+
+    individus = []
+    for ind in menage.get("individus", []):
+        age = _compute_age(ind.get("dateNaissance"))
+        nb_enquetes_champ = sum(
+            1 for c in champs if c.get("codeProprietaire") == ind.get("id")
+        )
+        nb_enquetes_structure = sum(
+            1 for s in structures if s.get("proprietaireStructure") == ind.get("id")
+        )
+        individus.append({
+            **ind,
+            "age": age,
+            "nb_enquetes_champ": nb_enquetes_champ,
+            "nb_enquetes_structure": nb_enquetes_structure,
+        })
+
+    return render_template(
+        "menage_detail.html",
+        menage=menage,
+        individus=individus,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Rapport (synthèse imprimable de l'état d'avancement de l'enquête)
+# ---------------------------------------------------------------------------
+
+@app.route("/rapport")
+def rapport_page():
+    menages = db.all_menages()
+    champs = db.all_champs()
+    structures = db.all_structures()
+
+    total_individus = sum(len(m.get("individus", [])) for m in menages)
+    total_superficie = 0.0
+    for ch in champs:
+        for p in ch.get("parcelles", []):
+            total_superficie += p.get("superficieParcelle", 0) or 0
+
+    global_summary = compute_global(champs, structures)
+    batches = _distinct_batches(champs, structures)
+
+    batch_report_rows = []
+    for b in batches:
+        rows = _contract_rows_for_batch(menages, champs, structures, b)
+        total_montant = _total_montant_for_rows(champs, structures, rows)
+        villages = sorted({r["village"] for r in rows if r.get("village")})
+        batch_report_rows.append({
+            "num_batch": b,
+            "owners_count": _distinct_owner_count(rows),
+            "contracts_count": len(rows),
+            "total_montant": total_montant,
+            "villages": ", ".join(villages) if villages else "—",
+        })
+
+    recent_syncs = db.recent_syncs(15)
+
+    return render_template(
+        "rapport.html",
+        menages_count=len(menages),
+        total_individus=total_individus,
+        champs_count=len(champs),
+        structures_count=len(structures),
+        total_superficie=round(total_superficie, 2),
+        total_montant=round(global_summary.total),
+        montant_par_categorie=[
+            ("Parcelles (terrain)", round(global_summary.parcelles)),
+            ("Cultures annuelles", round(global_summary.champs_cultures_annuelles)),
+            ("Cultures pérennes", round(global_summary.cultures_perennes)),
+            ("Espèces sauvages", round(global_summary.especes_sauvages)),
+            ("Bois d'œuvre", round(global_summary.bois_doeuvre)),
+            ("Ressources naturelles", round(global_summary.ressources)),
+            ("Structures / habitations", round(global_summary.structures)),
+        ],
+        batch_report_rows=batch_report_rows,
+        recent_syncs=recent_syncs,
+        now=datetime.now(),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Facturation (tableau de facturation par lot / par PAP)
+# ---------------------------------------------------------------------------
+
+@app.route("/facturation")
+def facturation_page():
+    menages = db.all_menages()
+    champs = db.all_champs()
+    structures = db.all_structures()
+    batch_filter = request.args.get("batch", "")
+    batches = _distinct_batches(champs, structures)
+
+    rows = _contract_rows_for_batch(menages, champs, structures, batch_filter)
+    rows.sort(key=lambda o: (o.get("numBatch", ""), o.get("nom", "")))
+
+    facture_rows = []
+    grand_total = 0.0
+    for r in rows:
+        summary = _summary_for_row(champs, structures, r)
+        montant = summary.total
+        grand_total += montant
+        facture_rows.append({
+            **r,
+            "montant_parcelles": round(summary.parcelles),
+            "montant_cultures_annuelles": round(summary.champs_cultures_annuelles),
+            "montant_cultures_perennes": round(summary.cultures_perennes),
+            "montant_especes_sauvages": round(summary.especes_sauvages),
+            "montant_bois_doeuvre": round(summary.bois_doeuvre),
+            "montant_structures": round(summary.structures),
+            "montant_total": round(montant),
+        })
+
+    return render_template(
+        "facturation.html",
+        rows=facture_rows,
+        batches=batches,
+        selected_batch=batch_filter,
+        grand_total=round(grand_total),
+        contracts_count=len(facture_rows),
+    )
+
+
+@app.route("/facturation/export")
+def facturation_export():
+    """Exports the billing table as .xlsx (same figures as /facturation,
+    one row per contract - i.e. per champs record, not merged per PAP)."""
+    import openpyxl
+    from openpyxl.styles import Font, PatternFill, Alignment
+
+    menages = db.all_menages()
+    champs = db.all_champs()
+    structures = db.all_structures()
+    batch_filter = request.args.get("batch", "")
+
+    rows = _contract_rows_for_batch(menages, champs, structures, batch_filter)
+    rows.sort(key=lambda o: (o.get("numBatch", ""), o.get("nom", "")))
+
+    wb = openpyxl.Workbook()
+    ws = wb.active
+    ws.title = "Facturation"
+
+    headers = [
+        "N° de lot", "Nom et prénom", "Code individu", "N° enquête",
+        "Type de contrat", "Village",
+        "Parcelles (GNF)", "Cultures annuelles (GNF)", "Cultures pérennes (GNF)",
+        "Espèces sauvages (GNF)", "Bois d'œuvre (GNF)", "Structures (GNF)",
+        "Montant total (GNF)",
+    ]
+    ws.append(headers)
+    header_fill = PatternFill(start_color="6B1F1F", end_color="6B1F1F", fill_type="solid")
+    for cell in ws[1]:
+        cell.font = Font(bold=True, color="FFFFFF")
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center")
+
+    grand_total = 0.0
+    for r in rows:
+        summary = _summary_for_row(champs, structures, r)
+        grand_total += summary.total
+        ws.append([
+            r.get("numBatch") or r.get("codeMenage", ""),
+            r.get("nom", ""),
+            r.get("code", ""),
+            r.get("num_enquete") or "",
+            r.get("type_contrat", ""),
+            r.get("village", ""),
+            round(summary.parcelles),
+            round(summary.champs_cultures_annuelles),
+            round(summary.cultures_perennes),
+            round(summary.especes_sauvages),
+            round(summary.bois_doeuvre),
+            round(summary.structures),
+            round(summary.total),
+        ])
+
+    ws.append([])
+    total_row = ["", "", "", "", "", "TOTAL GÉNÉRAL", "", "", "", "", "", "", round(grand_total)]
+    ws.append(total_row)
+    for cell in ws[ws.max_row]:
+        cell.font = Font(bold=True)
+
+    for col_idx, width in enumerate(
+        [14, 24, 16, 10, 16, 16, 16, 18, 18, 18, 16, 16, 16], start=1
+    ):
+        ws.column_dimensions[ws.cell(row=1, column=col_idx).column_letter].width = width
+
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    filename = f"Facturation_{batch_filter or 'GLOBAL'}.xlsx"
+    return send_file(
+        buf,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Sync API (receives data from the OKAPI Survey mobile app)
 # ---------------------------------------------------------------------------
 
@@ -360,6 +944,25 @@ def api_sync():
         "received": counts,
         "server_totals": db.counts(),
         "synced_at": datetime.now().isoformat(),
+    })
+
+
+@app.route("/api/pull", methods=["GET", "OPTIONS"])
+def api_pull():
+    """Cross-tablet sync (pull side): lets a tablet fetch ALL menages,
+    champs and structures currently stored on the server - including ones
+    pushed there by OTHER tablets - so that pressing "Actualiser" on one
+    tablet immediately makes households registered on another tablet
+    available in its own local Champs/Structures survey forms."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+    return jsonify({
+        "status": "ok",
+        "menages": db.all_menages(),
+        "champs": db.all_champs(),
+        "structures": db.all_structures(),
+        "totals": db.counts(),
+        "pulled_at": datetime.now().isoformat(),
     })
 
 

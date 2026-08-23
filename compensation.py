@@ -309,6 +309,32 @@ def compute_for_owner(champs_enquetes, structure_enquetes, code_proprietaire):
     return summary
 
 
+def compute_for_champ_record(champ_enquete, structure_enquetes, code_proprietaire,
+                              include_structures=False):
+    """Computes a compensation summary for a SINGLE champs-survey record.
+
+    Unlike ``compute_for_owner`` (which merges *every* champs record
+    belonging to the same PAP/owner into one combined summary), this
+    function only accumulates the items found in ``champ_enquete`` itself.
+
+    This supports the requirement that when the same PAP (propriétaire) has
+    several distinct field-survey records ("enquêtes champs"), each record
+    must produce its OWN separate contract rather than being fused into a
+    single merged contract (number of contracts == number of records).
+
+    ``include_structures`` should be True only for the first champs record
+    of a given owner (so structures are billed exactly once across all of
+    that owner's contracts, never duplicated nor omitted).
+    """
+    summary = CompensationSummary()
+    _accumulate_champs_enquete(summary, champ_enquete)
+    if include_structures:
+        for enquete in structure_enquetes:
+            if enquete.get("proprietaireStructure") == code_proprietaire:
+                _accumulate_structure_enquete(summary, enquete)
+    return summary
+
+
 def compute_global(champs_enquetes, structure_enquetes):
     summary = CompensationSummary()
     for enquete in champs_enquetes:

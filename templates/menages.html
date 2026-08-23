@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Ménages - OKAPI Survey Admin{% endblock %}
+{% block content %}
+<div class="panel">
+  <h2>Liste des ménages ({{ total_menages }})</h2>
+  <form class="filters" method="get">
+    <input type="text" name="q" placeholder="Rechercher (nom, code, village...)" value="{{ search }}">
+    <select name="village" onchange="this.form.submit()">
+      <option value="">-- Tous les villages --</option>
+      {% for v in villages %}
+      <option value="{{ v }}" {{ 'selected' if v == selected_village else '' }}>{{ v }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn small" type="submit">Filtrer</button>
+  </form>
+
+  {% if rows %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Code ménage</th>
+        <th>Chef de ménage</th>
+        <th>Membres</th>
+        <th>Village</th>
+        <th>District</th>
+        <th>Région</th>
+        <th>Date enquête</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td><code class="mono">{{ r.codeMenage }}</code></td>
+        <td>{{ r.chef_nom }}</td>
+        <td>{{ r.nb_individus }}</td>
+        <td>{{ r.village }}</td>
+        <td>{{ r.district }}</td>
+        <td>{{ r.region }}</td>
+        <td>{{ r.dateEnquete }}</td>
+        <td><a class="btn small" href="{{ url_for('menage_detail', menage_id=r.id) }}">Voir membres</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucun ménage trouvé.</div>
+  {% endif %}
+</div>
+{% endblock %}

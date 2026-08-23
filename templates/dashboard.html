@@ -2,6 +2,11 @@
 {% block title %}Tableau de bord - OKAPI Survey Admin{% endblock %}
 {% block content %}
 
+<div class="dash-tabs">
+  <a href="{{ url_for('dashboard') }}" class="dash-tab active">Vue d'ensemble</a>
+  <a href="{{ url_for('dashboard_stats') }}" class="dash-tab">Statistiques détaillées</a>
+</div>
+
 <div class="cards-row">
   <div class="stat-card">
     <div class="icon">🏠</div>
@@ -50,6 +55,7 @@
       <tr>
         <th>N° de lot</th>
         <th>PAP concernés</th>
+        <th>Contrats à générer</th>
         <th>Montant estimé (GNF)</th>
         <th>Actions</th>
       </tr>
@@ -59,6 +65,7 @@
       <tr>
         <td><code class="mono">{{ row.num_batch }}</code></td>
         <td>{{ row.owners_count }}</td>
+        <td>{{ row.contracts_count }}</td>
         <td>{{ "{:,.0f}".format(row.total_montant).replace(",", " ") }}</td>
         <td>
           <a class="btn small" href="{{ url_for('contracts_list', batch=row.num_batch) }}">Contrats</a>
@@ -115,6 +122,12 @@
   </p>
   <p><code class="mono">{{ request.url_root }}api/sync</code></p>
   <p>Statut du serveur : <code class="mono">GET {{ request.url_root }}api/status</code></p>
+  <p>
+    Synchronisation croisée (une tablette récupère les ménages enregistrés sur une autre tablette) :
+    <code class="mono">GET {{ request.url_root }}api/pull</code>
+    &mdash; utilisez le bouton <strong>« Actualiser »</strong> dans l'application mobile
+    (écran Ménages / Tableau de bord) pour déclencher cette synchronisation.
+  </p>
 </div>
 
 {% endblock %}

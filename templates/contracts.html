@@ -16,12 +16,22 @@
   </form>
 
   {% if owners %}
+  <p style="font-size:13px; color:#666; margin-bottom:14px;">
+    <strong>{{ distinct_owners }}</strong> PAP distincts &mdash;
+    <strong>{{ contracts_count }}</strong> contrat(s) à générer
+    {% if contracts_count != distinct_owners %}
+      <span class="badge lignage" style="margin-left:6px;">
+        {{ contracts_count - distinct_owners }} contrat(s) supplémentaire(s) pour PAP ayant plusieurs enquêtes champs (non fusionnés)
+      </span>
+    {% endif %}
+  </p>
   <table class="data-table">
     <thead>
       <tr>
         <th>N° de lot</th>
         <th>Nom et prénom</th>
         <th>Code individu</th>
+        <th>N° enquête</th>
         <th>Type de contrat</th>
         <th>Village</th>
         <th>Action</th>
@@ -34,6 +44,13 @@
         <td>{{ o.nom }}</td>
         <td><code class="mono">{{ o.code }}</code></td>
         <td>
+          {% if o.num_enquete %}
+            <span class="badge proprietaire">#{{ o.num_enquete }}</span>
+          {% else %}
+            &mdash;
+          {% endif %}
+        </td>
+        <td>
           {% set tt = o.type_contrat|lower %}
           {% if 'ligna' in tt %}
             <span class="badge lignage">Lignage</span>
@@ -45,8 +62,9 @@
         </td>
         <td>{{ o.village }}</td>
         <td>
-          <a class="btn small maroon js-export-pdf" href="{{ url_for('export_contract', code_individu=o.code) }}">
-            Générer contrat PDF
+          <a class="btn small maroon js-export-pdf"
+             href="{{ url_for('export_contract', code_individu=o.code, champ_id=o.champ_id) }}">
+            Générer contrat PDF{% if o.num_enquete %} (enquête #{{ o.num_enquete }}){% endif %}
           </a>
         </td>
       </tr>
