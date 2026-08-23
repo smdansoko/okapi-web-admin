@@ -78,4 +78,48 @@
   {% endif %}
 </div>
 
+<div class="panel">
+  <h2>Superficies inventoriées par lot</h2>
+  <p class="hint">Tableau calqué sur le modèle de facture OKAPI/WCAG (Invoice) — superficie des terres (ha) et des structures (m²), sans montants GNF.</p>
+  <a class="btn small maroon" href="{{ url_for('facturation_export_superficie') }}">Exporter en Excel (modèle Invoice)</a>
+
+  {% if lot_superficie_rows %}
+  <table class="data-table" style="margin-top:14px;">
+    <thead>
+      <tr>
+        <th>N°</th>
+        <th>Lots</th>
+        <th>Superficies des terres inventoriées à 100&nbsp;% par OKAPI (ha)</th>
+        <th>Superficies des structures inventoriées par OKAPI (m²)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in lot_superficie_rows %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><code class="mono">{{ r.num_batch }}</code></td>
+        <td>{{ "{:,.2f}".format(r.superficie_terres_ha).replace(",", " ") }}</td>
+        <td>
+          {% if r.superficie_structures_m2 %}
+            {{ "{:,.2f}".format(r.superficie_structures_m2).replace(",", " ") }}
+          {% else %}
+            &mdash;
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" style="text-align:right; font-weight:700;">Total</td>
+        <td style="font-weight:800;">{{ "{:,.2f}".format(lot_superficie_totals.superficie_terres_ha).replace(",", " ") }}</td>
+        <td style="font-weight:800;">{{ "{:,.2f}".format(lot_superficie_totals.superficie_structures_m2).replace(",", " ") }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
 {% endblock %}

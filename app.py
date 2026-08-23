@@ -38,6 +38,7 @@ from contract_rows import (
 from rapport_data import build_full_report_data
 from rapport_pdf import generate_rapport_pdf
 from rapport_docx import generate_rapport_docx
+from facturation_data import build_lot_superficie_rows, build_invoice_workbook
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
@@ -805,6 +806,11 @@ def facturation_page():
             "montant_total": round(montant),
         })
 
+    # Additional per-lot RAW SURFACE AREA table (ha for terres, m² for
+    # structures) matching the uploaded reference invoice template — shown
+    # ALONGSIDE the existing per-PAP GNF breakdown above, not replacing it.
+    lot_superficie_rows, lot_superficie_totals = build_lot_superficie_rows(champs, structures)
+
     return render_template(
         "facturation.html",
         rows=facture_rows,
@@ -812,6 +818,32 @@ def facturation_page():
         selected_batch=batch_filter,
         grand_total=round(grand_total),
         contracts_count=len(facture_rows),
+        lot_superficie_rows=lot_superficie_rows,
+        lot_superficie_totals=lot_superficie_totals,
+    )
+
+
+@app.route("/facturation/export/superficie")
+def facturation_export_superficie():
+    """Exports the per-lot RAW SURFACE AREA invoice table (.xlsx) modeled
+    exactly on the uploaded reference invoice
+    (OKAPI_WCAG_LARAP_Invoice 1_24042026 v2.xlsx): N° / Lots / Superficie
+    des terres (ha) / Superficie des structures (m²), with a Total row
+    using SUM formulas. This is a SEPARATE export from
+    /facturation/export (the existing per-PAP GNF breakdown), matching a
+    different template model."""
+    champs = db.all_champs()
+    structures = db.all_structures()
+    wb, _rows, _totals = build_invoice_workbook(champs, structures)
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    filename = f"Invoice_Superficies_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    return send_file(
+        buf,
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        as_attachment=True,
+        download_name=filename,
     )
 
 
