@@ -306,19 +306,69 @@ def dashboard_stats():
         })
 
     # --- PAP avec plusieurs enquêtes champs (contrats non fusionnés) ---
+    # Each champs record now carries its own auto-generated "code de
+    # l'enquête" = concat(code_proprietaire, '-', num_enquete_champ), so a
+    # PAP with N champs records has N distinct code_enquete values (one per
+    # future contract). We surface those codes explicitly here.
     per_owner_champ_count = {}
+    per_owner_codes_enquete = {}
     for ch in champs:
         code = ch.get("codeProprietaire", "")
         if code:
             per_owner_champ_count[code] = per_owner_champ_count.get(code, 0) + 1
+            per_owner_codes_enquete.setdefault(code, []).append(
+                code_enquete_for_champ(ch)
+            )
     multi_record_owners = [
-        {"code": code, "nom": next(
-            (ch.get("proprietaireNom", "") for ch in champs if ch.get("codeProprietaire") == code),
-            "",
-        ), "count": cnt}
+        {
+            "code": code,
+            "nom": next(
+                (ch.get("proprietaireNom", "") for ch in champs if ch.get("codeProprietaire") == code),
+                "",
+            ),
+            "count": cnt,
+            "codes_enquete": per_owner_codes_enquete.get(code, []),
+        }
         for code, cnt in per_owner_champ_count.items() if cnt > 1
     ]
     multi_record_owners.sort(key=lambda o: -o["count"])
+
+    # --- Statistiques sur les nouveaux codes auto-générés ---
+    # code_enquete: un par enquête champs (concat codeProprietaire-numEnqueteChamp)
+    # code_parcelle: un par parcelle (concat code_enquete-numOrdreParcelle)
+    # code_champ: un par champ cultivé (concat code_parcelle-numOrdreChamps)
+    codes_enquete_set = set()
+    codes_parcelle_set = set()
+    codes_champ_set = set()
+    total_parcelles_sans_code = 0
+    total_champs_sans_code = 0
+    for ch in champs:
+        ce = code_enquete_for_champ(ch)
+        if ce:
+            codes_enquete_set.add(ce)
+        for p in ch.get("parcelles", []):
+            cp = p.get("codeParcelle", "")
+            if cp:
+                codes_parcelle_set.add(cp)
+            else:
+                total_parcelles_sans_code += 1
+            for champ_agr in p.get("champs", []):
+                cc = champ_agr.get("codeChamp", "")
+                if cc:
+                    codes_champ_set.add(cc)
+                else:
+                    total_champs_sans_code += 1
+
+    distinct_owner_codes = {ch.get("codeProprietaire", "") for ch in champs if ch.get("codeProprietaire")}
+    codes_summary = {
+        "distinct_pap": len(distinct_owner_codes),
+        "distinct_codes_enquete": len(codes_enquete_set),
+        "total_enquetes_champs": len(champs),
+        "distinct_codes_parcelle": len(codes_parcelle_set),
+        "total_parcelles_sans_code": total_parcelles_sans_code,
+        "distinct_codes_champ": len(codes_champ_set),
+        "total_champs_sans_code": total_champs_sans_code,
+    }
 
     return render_template(
         "dashboard_stats.html",
@@ -343,6 +393,7 @@ def dashboard_stats():
         sync_timeline=sync_timeline,
         contracts_per_batch=contracts_per_batch,
         multi_record_owners=multi_record_owners,
+        codes_summary=codes_summary,
         now=datetime.now(),
     )
 

@@ -194,6 +194,42 @@
   </div>
 
   <div class="panel">
+    <h2>Codes auto-générés (Code enquête / Code parcelle / Code champ)</h2>
+    <table class="data-table">
+      <thead><tr><th>Type de code</th><th>Nombre distinct</th><th>Détail</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Code de l'enquête <span class="hint">(codeProprietaire-numEnqueteChamp)</span></td>
+          <td>{{ codes_summary.distinct_codes_enquete }}</td>
+          <td>{{ codes_summary.total_enquetes_champs }} enquête(s) champs pour {{ codes_summary.distinct_pap }} PAP distinct(s)</td>
+        </tr>
+        <tr>
+          <td>Code de parcelle <span class="hint">(codeEnquete-numOrdreParcelle)</span></td>
+          <td>{{ codes_summary.distinct_codes_parcelle }}</td>
+          <td>
+            {% if codes_summary.total_parcelles_sans_code %}
+              <span class="badge lignage">{{ codes_summary.total_parcelles_sans_code }} parcelle(s) sans code (anciennes données non re-synchronisées)</span>
+            {% else %}
+              Toutes les parcelles ont un code
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td>Code de champ <span class="hint">(codeParcelle-numOrdreChamps)</span></td>
+          <td>{{ codes_summary.distinct_codes_champ }}</td>
+          <td>
+            {% if codes_summary.total_champs_sans_code %}
+              <span class="badge lignage">{{ codes_summary.total_champs_sans_code }} champ(s) sans code (anciennes données non re-synchronisées)</span>
+            {% else %}
+              Tous les champs ont un code
+            {% endif %}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
     <h2>Contrats par lot (non fusionnés)</h2>
     <table class="data-table">
       <thead><tr><th>N° de lot</th><th>PAP distincts</th><th>Contrats à générer</th></tr></thead>
@@ -213,13 +249,18 @@
     <h2>PAP ayant plusieurs enquêtes champs (contrats séparés)</h2>
     {% if multi_record_owners %}
     <table class="data-table">
-      <thead><tr><th>Code individu</th><th>Nom</th><th>Nombre d'enquêtes / contrats</th></tr></thead>
+      <thead><tr><th>Code individu</th><th>Nom</th><th>Nombre d'enquêtes / contrats</th><th>Codes de l'enquête</th></tr></thead>
       <tbody>
         {% for o in multi_record_owners %}
         <tr>
           <td><code class="mono">{{ o.code }}</code></td>
           <td>{{ o.nom }}</td>
           <td><span class="badge lignage">{{ o.count }} contrats</span></td>
+          <td>
+            {% for ce in o.codes_enquete %}
+              <code class="mono">{{ ce }}</code>{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
