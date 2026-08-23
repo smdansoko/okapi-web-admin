@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../models/choice_item.dart';
+import '../models/survey_field.dart';
 
 /// Singleton loader for static JSON reference data bundled as assets:
-/// - lib/data/choices.json      (ODK-style select_one choice lists)
-/// - lib/data/price_matrix.json (OKAPI/AMC compensation price matrix)
-/// - lib/data/guinea_admin.json (Guinea region > préfecture > sous-préfecture)
+/// - lib/data/choices.json         (ODK-style select_one choice lists - PARC module)
+/// - lib/data/price_matrix.json    (OKAPI/AMC compensation price matrix)
+/// - lib/data/guinea_admin.json    (Guinea region > préfecture > sous-préfecture)
+/// - lib/data/survey_schema.json   (BIODIVERSITE/SOCIAL form schemas - 11 forms)
+/// - lib/data/survey_choices.json  (BIODIVERSITE/SOCIAL choice lists, sv_ prefixed)
 class ReferenceDataService {
   ReferenceDataService._();
   static final ReferenceDataService instance = ReferenceDataService._();
@@ -13,6 +16,7 @@ class ReferenceDataService {
   Map<String, List<ChoiceItem>> _choices = {};
   Map<String, dynamic> _priceMatrix = {};
   Map<String, Map<String, List<String>>> _adminDivisions = {};
+  Map<String, SurveySchema> _surveyForms = {};
 
   bool _loaded = false;
   bool get isLoaded => _loaded;
@@ -44,7 +48,45 @@ class ReferenceDataService {
       return MapEntry(region, prefs);
     });
 
+    // BIODIVERSITE / SOCIAL survey choices (sv_ prefixed, no collision risk
+    // with the PARC module's choices.json entries) - merge into _choices.
+    final surveyChoicesRaw = await rootBundle.loadString(
+      'lib/data/survey_choices.json',
+    );
+    final surveyChoicesJson =
+        jsonDecode(surveyChoicesRaw) as Map<String, dynamic>;
+    surveyChoicesJson.forEach((key, value) {
+      final list = (value as List)
+          .map((e) => ChoiceItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+      _choices[key] = list;
+    });
+
+    // BIODIVERSITE / SOCIAL survey form schemas (11 forms).
+    final surveySchemaRaw = await rootBundle.loadString(
+      'lib/data/survey_schema.json',
+    );
+    final surveySchemaJson =
+        jsonDecode(surveySchemaRaw) as Map<String, dynamic>;
+    _surveyForms = surveySchemaJson.map((key, value) {
+      return MapEntry(
+        key,
+        SurveySchema.fromJson(value as Map<String, dynamic>),
+      );
+    });
+
     _loaded = true;
+  }
+
+  // ---------------- Survey forms (BIODIVERSITE / SOCIAL) ----------------
+  Map<String, SurveySchema> get surveyForms => _surveyForms;
+
+  SurveySchema? surveySchema(String key) => _surveyForms[key];
+
+  List<SurveySchema> surveySchemasForModule(String module) {
+    final list = _surveyForms.values.where((s) => s.module == module).toList();
+    list.sort((a, b) => a.title.compareTo(b.title));
+    return list;
   }
 
   // ---------------- Choices ----------------

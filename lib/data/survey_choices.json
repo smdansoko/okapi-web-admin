@@ -1,0 +1,9962 @@
+{
+ "sv_ouinon": [
+  {
+   "name": "oui",
+   "label": "Oui"
+  },
+  {
+   "name": "non",
+   "label": "Non"
+  }
+ ],
+ "sv_idequipe": [
+  {
+   "name": "E1",
+   "label": "E1"
+  },
+  {
+   "name": "E2",
+   "label": "E2"
+  },
+  {
+   "name": "E3",
+   "label": "E3"
+  },
+  {
+   "name": "E4",
+   "label": "E4"
+  },
+  {
+   "name": "E5",
+   "label": "E5"
+  }
+ ],
+ "sv_habitat": [
+  {
+   "name": "savane_arboree",
+   "label": "Savane arborée"
+  },
+  {
+   "name": "savane_arbustive",
+   "label": "Savane arbustive"
+  },
+  {
+   "name": "savane_herbeuse",
+   "label": "Savane herbeuse"
+  },
+  {
+   "name": "savane_boisee",
+   "label": "Savane boisée"
+  },
+  {
+   "name": "foret_marecageuse",
+   "label": "Forêt marécageuse"
+  },
+  {
+   "name": "plaine_marecageuse",
+   "label": "Plaine marécageuse"
+  },
+  {
+   "name": "foret_galerie",
+   "label": "Forêt galerie"
+  },
+  {
+   "name": "jachere",
+   "label": "Jachère"
+  },
+  {
+   "name": "plantations",
+   "label": "Plantations"
+  },
+  {
+   "name": "foret_ripicole",
+   "label": "Forêt Ripicole"
+  },
+  {
+   "name": "ilots_forestier",
+   "label": "Ilots forestier"
+  },
+  {
+   "name": "palmeraie_agro_foret",
+   "label": "Palmeraie agro forêt"
+  },
+  {
+   "name": "plantation_danacardier",
+   "label": "Plantation d’anacardier"
+  },
+  {
+   "name": "mangrove",
+   "label": "Mangrove"
+  },
+  {
+   "name": "eau_douce",
+   "label": "Eau douce"
+  },
+  {
+   "name": "formation_champetre",
+   "label": "Formation champêtre"
+  },
+  {
+   "name": "savane_herbeuse_sur_plaine_inondable",
+   "label": "Savane herbeuse sur plaine inondable"
+  },
+  {
+   "name": "bowal",
+   "label": "Bowal"
+  },
+  {
+   "name": "bras_de_mer",
+   "label": "Bras de mer"
+  },
+  {
+   "name": "cours_deau",
+   "label": "Cours d’eau"
+  },
+  {
+   "name": "foret_claire",
+   "label": "Forêt claire"
+  },
+  {
+   "name": "bas_fonds",
+   "label": "Bas-fonds"
+  },
+  {
+   "name": "autre_habitat",
+   "label": "Autre (habitat)"
+  },
+  {
+   "name": "foret_mar_cageuse",
+   "label": "Forêt marécageuse"
+  },
+  {
+   "name": "plaine_mar_cageuse",
+   "label": "Plaine marécageuse"
+  },
+  {
+   "name": "jach_re",
+   "label": "Jachère"
+  },
+  {
+   "name": "formation_champ_tre",
+   "label": "Formation champêtre"
+  },
+  {
+   "name": "cours_d_eau",
+   "label": "Cours d’eau"
+  },
+  {
+   "name": "for_t_claire",
+   "label": "Forêt claire"
+  },
+  {
+   "name": "arboricole",
+   "label": "Arboricole"
+  },
+  {
+   "name": "plantation_deanacardier",
+   "label": "Plantation d’anacardier"
+  },
+  {
+   "name": "cours_deeau",
+   "label": "Cours d’eau"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_observation": [
+  {
+   "name": "direct",
+   "label": "Direct"
+  },
+  {
+   "name": "indirect",
+   "label": "Indirect"
+  },
+  {
+   "name": "autre_observation",
+   "label": "Autre observation"
+  },
+  {
+   "name": "pas_observation",
+   "label": "Pas d'observation"
+  }
+ ],
+ "sv_relief": [
+  {
+   "name": "pente_faible",
+   "label": "Pente faible"
+  },
+  {
+   "name": "pente_moyenne",
+   "label": "Pente moyenne"
+  },
+  {
+   "name": "pente_forte",
+   "label": "Pente forte"
+  }
+ ],
+ "sv_description": [
+  {
+   "name": "a_secher",
+   "label": "A sècher"
+  },
+  {
+   "name": "presence_eau",
+   "label": "Présence d'eau"
+  }
+ ],
+ "sv_indice": [
+  {
+   "name": "crotte",
+   "label": "Crotte"
+  },
+  {
+   "name": "nid",
+   "label": "Nid"
+  },
+  {
+   "name": "reste_alimentaire",
+   "label": "Reste alimentaire"
+  },
+  {
+   "name": "fouille",
+   "label": "Fouille"
+  },
+  {
+   "name": "vocalisation",
+   "label": "Vocalisation"
+  },
+  {
+   "name": "depouille_caracasse",
+   "label": "Dépouille / Cracasse"
+  },
+  {
+   "name": "emprunt",
+   "label": "Emprunt"
+  },
+  {
+   "name": "piste",
+   "label": "Piste"
+  },
+  {
+   "name": "atelier_de_casse",
+   "label": "Atelier de casse"
+  },
+  {
+   "name": "marteau",
+   "label": "Marteau"
+  },
+  {
+   "name": "enclume",
+   "label": "Enclume"
+  },
+  {
+   "name": "saline",
+   "label": "Saline"
+  },
+  {
+   "name": "terrier_trou",
+   "label": "Terrier (Trou)"
+  },
+  {
+   "name": "poile",
+   "label": "Poile"
+  },
+  {
+   "name": "autre_indice",
+   "label": "Autre (indice)"
+  }
+ ],
+ "sv_stade": [
+  {
+   "name": "frais",
+   "label": "Frais"
+  },
+  {
+   "name": "recent",
+   "label": "Récent"
+  },
+  {
+   "name": "vieux",
+   "label": "Vieux"
+  },
+  {
+   "name": "tres_vieux",
+   "label": "Très vieux"
+  }
+ ],
+ "sv_stade_v": [
+  {
+   "name": "stade_1",
+   "label": "Stade 1"
+  },
+  {
+   "name": "stade_2",
+   "label": "Stade 2"
+  },
+  {
+   "name": "stade_3",
+   "label": "Stade 3"
+  },
+  {
+   "name": "stade_4",
+   "label": "Stade 4"
+  }
+ ],
+ "sv_meteo": [
+  {
+   "name": "ensoleill",
+   "label": "Ensoleillé"
+  },
+  {
+   "name": "nuageux",
+   "label": "Nuageux"
+  },
+  {
+   "name": "pluvieux",
+   "label": "Pluvieux"
+  }
+ ],
+ "sv_hauteur": [
+  {
+   "name": "0-2",
+   "label": "0 à 2 m"
+  },
+  {
+   "name": "2-4",
+   "label": "2 à 4 m"
+  },
+  {
+   "name": "4-6",
+   "label": "4 à 6 m"
+  },
+  {
+   "name": "6-8",
+   "label": "6 à 8 m"
+  },
+  {
+   "name": "8-10",
+   "label": "8 à 10 m"
+  },
+  {
+   "name": "10-12",
+   "label": "10 à 12 m"
+  },
+  {
+   "name": "12-14",
+   "label": "12 à 14 m"
+  },
+  {
+   "name": "14-16",
+   "label": "14 à 16 m"
+  },
+  {
+   "name": "16-18",
+   "label": "16 à 18 m"
+  },
+  {
+   "name": "18-20",
+   "label": "18 à 20 m"
+  },
+  {
+   "name": "20-22",
+   "label": "20 à 22 m"
+  },
+  {
+   "name": "22-24",
+   "label": "22 à 24 m"
+  },
+  {
+   "name": "24-26",
+   "label": "24 à 26 m"
+  },
+  {
+   "name": "26-28",
+   "label": "26 à 28 m"
+  },
+  {
+   "name": "28-30",
+   "label": "28 à 30 m"
+  },
+  {
+   "name": "30-32",
+   "label": "30 à 32 m"
+  },
+  {
+   "name": "32-34",
+   "label": "32 à 34 m"
+  },
+  {
+   "name": "34-36",
+   "label": "34 à 36 m"
+  },
+  {
+   "name": "36-38",
+   "label": "36 à 38 m"
+  },
+  {
+   "name": "38-40",
+   "label": "38 à 40 m"
+  },
+  {
+   "name": ".>40",
+   "label": "Plus de 40 m"
+  }
+ ],
+ "sv_local": [
+  {
+   "name": "amphibien",
+   "label": "Amphibien"
+  },
+  {
+   "name": "antilope_rouanne",
+   "label": "Antilope Rouanne"
+  },
+  {
+   "name": "antilope_royale",
+   "label": "Antilope Royale"
+  },
+  {
+   "name": "autrenomlocal",
+   "label": "Autre non commun"
+  },
+  {
+   "name": "bongo",
+   "label": "Bongo"
+  },
+  {
+   "name": "bubale_roux",
+   "label": "Bubale roux"
+  },
+  {
+   "name": "buffle_afrique",
+   "label": "Buffle d'Afrique"
+  },
+  {
+   "name": "cephalophe_a_dos_jaune",
+   "label": "Céphalophe à dos jaune"
+  },
+  {
+   "name": "cephalophe_a_flanc_roux",
+   "label": "Cephalophe à flanc roux"
+  },
+  {
+   "name": "cephalophe_bande_dorsale",
+   "label": "Cephalophe bande à dorsale"
+  },
+  {
+   "name": "cephalophe_grimm",
+   "label": "Céphalophe de grimm"
+  },
+  {
+   "name": "cobe_croissant",
+   "label": "Cobe à Croissant"
+  },
+  {
+   "name": "cobe_buffon",
+   "label": "Cobe de buffon"
+  },
+  {
+   "name": "cobe_des_roseaux",
+   "label": "Cobe des roseaux"
+  },
+  {
+   "name": "eland_geant",
+   "label": "Eland géant"
+  },
+  {
+   "name": "guib_harnache",
+   "label": "Guib harnaché"
+  },
+  {
+   "name": "hippopotame_amphibie",
+   "label": "Hippopotame amphibie"
+  },
+  {
+   "name": "hylochere",
+   "label": "Hylochère"
+  },
+  {
+   "name": "ourebi",
+   "label": "Ourèbi"
+  },
+  {
+   "name": "phocochere_commun",
+   "label": "Phocochère commun"
+  },
+  {
+   "name": "potomochere_roux",
+   "label": "Potomochère Roux"
+  },
+  {
+   "name": "sitatunga",
+   "label": "Sitatunga"
+  },
+  {
+   "name": "chacal_flancs_rayes",
+   "label": "Chacal à flancs rayes"
+  },
+  {
+   "name": "chat_dore",
+   "label": "Chat Doré"
+  },
+  {
+   "name": "civette_africain",
+   "label": "Civette Africain"
+  },
+  {
+   "name": "civette_palmiste_africaine",
+   "label": "Civette palmiste Africaine"
+  },
+  {
+   "name": "genette_de_thierry",
+   "label": "Genette de Thierry"
+  },
+  {
+   "name": "genette_tigrine",
+   "label": "Genette tigrine"
+  },
+  {
+   "name": "hyene_tachetee",
+   "label": "Hyène tachetée"
+  },
+  {
+   "name": "leopard",
+   "label": "Léopard"
+  },
+  {
+   "name": "loutre_cou_tachete",
+   "label": "Loutre à cou tacheté"
+  },
+  {
+   "name": "loutre_joues_blanches",
+   "label": "Loutre à joues blanches"
+  },
+  {
+   "name": "lycaon_chien_sauvage",
+   "label": "Lycaon ou chien sauvage"
+  },
+  {
+   "name": "mangouste_queue_blanche",
+   "label": "Mangouste à queue blanche"
+  },
+  {
+   "name": "mangouste_de_Gambie",
+   "label": "Mangouste de Gambie"
+  },
+  {
+   "name": "Mangouste_des_marais",
+   "label": "Mangouste des marais"
+  },
+  {
+   "name": "mangouste_ichneumon",
+   "label": "Mangouste ichneumon"
+  },
+  {
+   "name": "mangouste_rouge",
+   "label": "Mangouste rouge"
+  },
+  {
+   "name": "ratel",
+   "label": "Ratel"
+  },
+  {
+   "name": "serval",
+   "label": "Serval"
+  },
+  {
+   "name": "cephalope_de_maxwell",
+   "label": "Céphalope de maxwell"
+  },
+  {
+   "name": "herisson_ventre_blanc",
+   "label": "Hérisson à ventre blanc"
+  },
+  {
+   "name": "damans_des_rochers",
+   "label": "Damans des rochers"
+  },
+  {
+   "name": "damans_des_arbres",
+   "label": "Damans des arbres"
+  },
+  {
+   "name": "lievre_de_savane_africaine",
+   "label": "Lièvre de savane africaine"
+  },
+  {
+   "name": "lievre_des_buissons",
+   "label": "Lièvre des buissons"
+  },
+  {
+   "name": "pangolin_ecailles_tricuspides",
+   "label": "Pangolin à écailles tricuspides"
+  },
+  {
+   "name": "pangolin_longue_queue",
+   "label": "Pangolin à longue queue"
+  },
+  {
+   "name": "pangolin_petite_ecailles",
+   "label": "Pangolin à pétite écailles"
+  },
+  {
+   "name": "pangolin_geant",
+   "label": "Pangolin Géant"
+  },
+  {
+   "name": "babouin_de_Guinee",
+   "label": "Babouin de Guinée"
+  },
+  {
+   "name": "chimpanze_afrique_ouest",
+   "label": "Chimpanzé d'Afrique de l'Ouest"
+  },
+  {
+   "name": "colobe_longs_poils",
+   "label": "Colobe à longs poils"
+  },
+  {
+   "name": "colobe_bai_afrique_occidentale",
+   "label": "Colobe Bai d'Afrique occidentale"
+  },
+  {
+   "name": "colobe_bai_Temminck",
+   "label": "Colobe Bai de Temminck"
+  },
+  {
+   "name": "galago_du_senegal",
+   "label": "Galago du senegal"
+  },
+  {
+   "name": "hocheur_blanc_nez",
+   "label": "Hocheur Blanc-Nez"
+  },
+  {
+   "name": "mangabey_enfume",
+   "label": "Mangabey Enfumé"
+  },
+  {
+   "name": "mone_de_campbell",
+   "label": "Mone de Campbell"
+  },
+  {
+   "name": "patas",
+   "label": "Patas"
+  },
+  {
+   "name": "potto_de_bosman",
+   "label": "Potto de Bosman"
+  },
+  {
+   "name": "singe_vert",
+   "label": "Singe vert"
+  },
+  {
+   "name": "elephant_de_foret",
+   "label": "Eléphant de foret"
+  },
+  {
+   "name": "cricetome_des_savanes",
+   "label": "Cricétome des savanes"
+  },
+  {
+   "name": "grand_aulacode",
+   "label": "Grand aulacode"
+  },
+  {
+   "name": "ecureuil_fouisseur",
+   "label": "L'écureuil fouisseur"
+  },
+  {
+   "name": "porc_epic_crete",
+   "label": "Porc-épic à crête"
+  },
+  {
+   "name": "atherure",
+   "label": "Atherure"
+  },
+  {
+   "name": "lamantin_afrique_ouest",
+   "label": "Lamantin d'Afrique de l'Ouest"
+  },
+  {
+   "name": "chat_sauvage_afrique",
+   "label": "Chat sauvage d'Afrique"
+  },
+  {
+   "name": "orycterope_du_cap",
+   "label": "Oryctèrope du cap"
+  }
+ ],
+ "sv_nomlatin": [
+  {
+   "name": "phrynobatrachus_alleni_lc",
+   "label": "Phrynobatrachus alleni (LC)",
+   "type": "amphibien"
+  },
+  {
+   "name": "phrynobatrachus_francisci_lc",
+   "label": "Phrynobatrachus francisci (LC)",
+   "type": "amphibien"
+  },
+  {
+   "name": "phrynobatrachus_gutturosus_lc",
+   "label": "Phrynobatrachus gutturosus (LC)",
+   "type": "amphibien"
+  },
+  {
+   "name": "hippotragus_equinus_lc",
+   "label": "Hippotragus equinus (LC)",
+   "type": "antilope_rouanne"
+  },
+  {
+   "name": "neotragus_pygmaeus_lc",
+   "label": "Neotragus pygmaeus (LC)",
+   "type": "antilope_royale"
+  },
+  {
+   "name": "tragelaphus_euryceros_nt",
+   "label": "Tragelaphus euryceros (NT)",
+   "type": "bongo"
+  },
+  {
+   "name": "alcelaphus_buselaphus_major_nt",
+   "label": "Alcelaphus buselaphus major (NT)",
+   "type": "bubale_roux"
+  },
+  {
+   "name": "syncerus_caffer_caffer_nt",
+   "label": "Syncerus caffer caffer (NT)",
+   "type": "buffle_afrique"
+  },
+  {
+   "name": "syncerus_caffer_nanus_nt",
+   "label": "Syncerus caffer nanus (NT)",
+   "type": "buffle_afrique"
+  },
+  {
+   "name": "cephalophus_silvicultor_nt",
+   "label": "Cephalophus silvicultor (NT)",
+   "type": "cephalophe_a_dos_jaune"
+  },
+  {
+   "name": "cephalophus_rufilatus_lc",
+   "label": "Cephalophus rufilatus (LC)",
+   "type": "cephalophe_a_flanc_roux"
+  },
+  {
+   "name": "cephalophus_dorsalis_nt",
+   "label": "Cephalophus dorsalis (NT)",
+   "type": "cephalophe_bande_dorsale"
+  },
+  {
+   "name": "sylvicapra_grimmia_lc",
+   "label": "Sylvicapra grimmia (LC)",
+   "type": "cephalophe_grimm"
+  },
+  {
+   "name": "kobus_ellipsiprymnus_lc",
+   "label": "Kobus ellipsiprymnus (LC)",
+   "type": "cobe_croissant"
+  },
+  {
+   "name": "kobus_kob_lc",
+   "label": "Kobus kob (LC)",
+   "type": "cobe_buffon"
+  },
+  {
+   "name": "redunca_redunca_lc",
+   "label": "Redunca redunca (LC)",
+   "type": "cobe_des_roseaux"
+  },
+  {
+   "name": "taurotragus_derbianus_vu",
+   "label": "Taurotragus derbianus (VU)",
+   "type": "eland_geant"
+  },
+  {
+   "name": "tragelaphus_scriptus_vu",
+   "label": "Tragelaphus scriptus (VU)",
+   "type": "guib_harnache"
+  },
+  {
+   "name": "hippopotamus_amphibius_vu",
+   "label": "Hippopotamus amphibius (VU)",
+   "type": "hippopotame_amphibie"
+  },
+  {
+   "name": "hylochoerus_meinertzhageni_lc",
+   "label": "Hylochoerus meinertzhageni (LC)",
+   "type": "hylochere"
+  },
+  {
+   "name": "ourebia_ourebi_lc",
+   "label": "Ourebia ourebi (LC)",
+   "type": "ourebi"
+  },
+  {
+   "name": "phacochoerus_africanus_lc",
+   "label": "Phacochoerus africanus (LC)",
+   "type": "phocochere_commun"
+  },
+  {
+   "name": "potamochoerus_porcus_lc",
+   "label": "Potamochoerus porcus (LC)",
+   "type": "potomochere_roux"
+  },
+  {
+   "name": "tragelaphus_spekii_lc",
+   "label": "Tragelaphus spekii (LC)",
+   "type": "sitatunga"
+  },
+  {
+   "name": "herpestes_sanguineus_lc",
+   "label": "Herpestes sanguineus (LC)",
+   "type": "mangouste_rouge"
+  },
+  {
+   "name": "canis_adustus_lc",
+   "label": "Canis adustus (LC)",
+   "type": "chacal_flancs_rayes"
+  },
+  {
+   "name": "caracal_profelis_aurata_vu",
+   "label": "Caracal (Profelis) aurata (VU)",
+   "type": "chat_dore"
+  },
+  {
+   "name": "civettictis_civetta_lc",
+   "label": "Civettictis civetta (LC)",
+   "type": "civette_africain"
+  },
+  {
+   "name": "nandinia_binotata_lc",
+   "label": "Nandinia binotata (LC)",
+   "type": "civette_palmiste_africaine"
+  },
+  {
+   "name": "genetta_thierryi_lc",
+   "label": "Genetta thierryi (LC)",
+   "type": "genette_de_thierry"
+  },
+  {
+   "name": "genetta_tigrina_lc",
+   "label": "Genetta tigrina (LC)",
+   "type": "genette_tigrine"
+  },
+  {
+   "name": "crocuta_crocuta_lc",
+   "label": "Crocuta crocuta (LC)",
+   "type": "hyene_tachetee"
+  },
+  {
+   "name": "panthera_pardus_vu",
+   "label": "Panthera pardus (VU)",
+   "type": "leopard"
+  },
+  {
+   "name": "hydrictis_maculicollis_nt",
+   "label": "Hydrictis maculicollis (NT)",
+   "type": "loutre_cou_tachete"
+  },
+  {
+   "name": "lutra_hydrictis_maculicollis_nt",
+   "label": "Lutra (Hydrictis) maculicollis (NT)",
+   "type": "loutre_cou_tachete"
+  },
+  {
+   "name": "aonyx_capensis_nt",
+   "label": "Aonyx capensis (NT)",
+   "type": "loutre_joues_blanches"
+  },
+  {
+   "name": "lycaon_pictus_en",
+   "label": "Lycaon pictus (EN)",
+   "type": "lycaon_chien_sauvage"
+  },
+  {
+   "name": "ichneumia_albicauda_lc",
+   "label": "Ichneumia albicauda (LC)",
+   "type": "mangouste_queue_blanche"
+  },
+  {
+   "name": "mungos_gambianus_lc",
+   "label": "Mungos gambianus (LC)",
+   "type": "mangouste_de_Gambie"
+  },
+  {
+   "name": "atilax_paludinosus_lc",
+   "label": "Atilax paludinosus (LC)",
+   "type": "Mangouste_des_marais"
+  },
+  {
+   "name": "herpestes ichneumon (lc)",
+   "label": "Herpestes ichneumon (LC)",
+   "type": "mangouste_ichneumon"
+  },
+  {
+   "name": "galerella_herpestes_sanguineus_lc",
+   "label": "Galerella (Herpestes) sanguineus (LC)",
+   "type": "mangouste_rouge"
+  },
+  {
+   "name": "mellivora_capensis_lc",
+   "label": "Mellivora capensis (LC)",
+   "type": "ratel"
+  },
+  {
+   "name": "leptailurus_serval_lc",
+   "label": "Leptailurus serval (LC)",
+   "type": "serval"
+  },
+  {
+   "name": "cephalophus_maxwellii_lc",
+   "label": "Cephalophus maxwellii (LC)",
+   "type": "cephalope_de_maxwell"
+  },
+  {
+   "name": "philantomba_maxwellii_lc",
+   "label": "Philantomba maxwellii (LC)",
+   "type": "cephalope_de_maxwell"
+  },
+  {
+   "name": "atelerix_albiventris_lc",
+   "label": "Atelerix albiventris (LC)",
+   "type": "herisson_ventre_blanc"
+  },
+  {
+   "name": "procavia_capensis_lc",
+   "label": "Procavia capensis (LC)",
+   "type": "damans_des_rochers"
+  },
+  {
+   "name": "dendrohyrax_dorsalis_lc",
+   "label": "Dendrohyrax dorsalis (LC)",
+   "type": "damans_des_arbres"
+  },
+  {
+   "name": "lepusvictoriae_lc",
+   "label": "Lepusvictoriae (LC)",
+   "type": "lievre_de_savane_africaine"
+  },
+  {
+   "name": "lepus_saxatilis_lc",
+   "label": "Lepus saxatilis (LC)",
+   "type": "lievre_des_buissons"
+  },
+  {
+   "name": "phataginus_tricuspis_lc",
+   "label": "Phataginus tricuspis (EN )",
+   "type": "pangolin_ecailles_tricuspides"
+  },
+  {
+   "name": "phataginus_tetradactyla_vu",
+   "label": "Phataginus tetradactyla (VU)",
+   "type": "pangolin_longue_queue"
+  },
+  {
+   "name": "phataginus_tricuspis_en",
+   "label": "Phataginus tricuspis (EN)",
+   "type": "pangolin_petite_ecailles"
+  },
+  {
+   "name": "manis_gigantea_en",
+   "label": "Manis gigantea (EN)",
+   "type": "pangolin_geant"
+  },
+  {
+   "name": "papio_papio_nt",
+   "label": "Papio papio (NT)",
+   "type": "babouin_de_Guinee"
+  },
+  {
+   "name": "pan_troglodytes_verus_en",
+   "label": "Pan troglodytes verus (EN)",
+   "type": "chimpanze_afrique_ouest"
+  },
+  {
+   "name": "colobus_polykomos_en",
+   "label": "Colobus polykomos (EN)",
+   "type": "colobe_longs_poils"
+  },
+  {
+   "name": "piliocolobus_badius_ssp.badius_en",
+   "label": "Piliocolobus badius ssp. badius (EN)",
+   "type": "colobe_bai_afrique_occidentale"
+  },
+  {
+   "name": "piliocolobus_badius_ssp.temminckii_en",
+   "label": "Piliocolobus badius ssp. Temminckii (EN)",
+   "type": "colobe_bai_Temminck"
+  },
+  {
+   "name": "galago_senegalensis_lc",
+   "label": "Galago senegalensis (LC)",
+   "type": "galago_du_senegal"
+  },
+  {
+   "name": "cercopithecus_petaurista_nt",
+   "label": "Cercopithecus petaurista (NT)",
+   "type": "hocheur_blanc_nez"
+  },
+  {
+   "name": "cercocebus_atys_vu",
+   "label": "Cercocebus atys (VU)",
+   "type": "mangabey_enfume"
+  },
+  {
+   "name": "cercopithecus_campbelli_nt",
+   "label": "Cercopithecus campbelli (NT)",
+   "type": "mone_de_campbell"
+  },
+  {
+   "name": "erythrocebus_patas_nt",
+   "label": "Erythrocebus patas (NT)",
+   "type": "patas"
+  },
+  {
+   "name": "perodicticus_potto_nt",
+   "label": "Perodicticus potto (NT)",
+   "type": "potto_de_bosman"
+  },
+  {
+   "name": "chlorocebus_sabaeus_lc",
+   "label": "Chlorocebus sabaeus (LC)",
+   "type": "singe_vert"
+  },
+  {
+   "name": "loxodonta_cyclotis_cr",
+   "label": "Loxodonta cyclotis (CR)",
+   "type": "elephant_de_foret"
+  },
+  {
+   "name": "cricetomys_gambianus_lc",
+   "label": "Cricetomys gambianus (LC)",
+   "type": "cricetome_des_savanes"
+  },
+  {
+   "name": "tryonomys_swinderianus_lc",
+   "label": "Tryonomys swinderianus (LC)",
+   "type": "grand_aulacode"
+  },
+  {
+   "name": "xerus_erythropus_lc",
+   "label": "Xerus erythropus (LC)",
+   "type": "ecureuil_fouisseur"
+  },
+  {
+   "name": "hystrix_cristata_lc",
+   "label": "Hystrix cristata (LC)",
+   "type": "porc_epic_crete"
+  },
+  {
+   "name": "atherurus_africanus_lc",
+   "label": "Atherurus africanus (LC)",
+   "type": "atherure"
+  },
+  {
+   "name": "trichechus_senegalensis_vu",
+   "label": "Trichechus senegalensis (VU)",
+   "type": "lamantin_afrique_ouest"
+  },
+  {
+   "name": "felis_lybica_lc",
+   "label": "Felis lybica (LC)",
+   "type": "chat_sauvage_afrique"
+  },
+  {
+   "name": "orycteropus_afer_lc",
+   "label": "Orycteropus afer (LC)",
+   "type": "orycterope_du_cap"
+  }
+ ],
+ "sv_famille": [
+  {
+   "name": "phrynobatrachidae",
+   "label": "Phrynobatrachidae",
+   "type": "amphibien"
+  },
+  {
+   "name": "bovidae",
+   "label": "Bovidae",
+   "type": "antilope_rouanne"
+  },
+  {
+   "name": "bovidae2",
+   "label": "Bovidae",
+   "type": "antilope_royale"
+  },
+  {
+   "name": "bovidae3",
+   "label": "Bovidae",
+   "type": "bongo"
+  },
+  {
+   "name": "bovidae4",
+   "label": "Bovidae",
+   "type": "bubale_roux"
+  },
+  {
+   "name": "bovidae5",
+   "label": "Bovidae",
+   "type": "buffle_afrique"
+  },
+  {
+   "name": "bovidae7",
+   "label": "Bovidae",
+   "type": "cephalophe_a_dos_jaune"
+  },
+  {
+   "name": "bovidae8",
+   "label": "Bovidae",
+   "type": "cephalophe_a_flanc_roux"
+  },
+  {
+   "name": "bovidae9",
+   "label": "Bovidae",
+   "type": "cephalophe_bande_dorsale"
+  },
+  {
+   "name": "bovidae10",
+   "label": "Bovidae",
+   "type": "cephalophe_grimm"
+  },
+  {
+   "name": "bovidae11",
+   "label": "Bovidae",
+   "type": "cobe_croissant"
+  },
+  {
+   "name": "bovidae12",
+   "label": "Bovidae",
+   "type": "cobe_buffon"
+  },
+  {
+   "name": "bovidae13",
+   "label": "Bovidae",
+   "type": "cobe_des_roseaux"
+  },
+  {
+   "name": "bovidae14",
+   "label": "Bovidae",
+   "type": "eland_geant"
+  },
+  {
+   "name": "bovidae15",
+   "label": "Bovidae",
+   "type": "guib_harnache"
+  },
+  {
+   "name": "hippopotamidae",
+   "label": "Hippopotamidae",
+   "type": "hippopotame_amphibie"
+  },
+  {
+   "name": "suidae",
+   "label": "Suidae",
+   "type": "hylochere"
+  },
+  {
+   "name": "bovidae16",
+   "label": "Bovidae",
+   "type": "ourebi"
+  },
+  {
+   "name": "suidae2",
+   "label": "Suidae",
+   "type": "phocochere_commun"
+  },
+  {
+   "name": "suidae3",
+   "label": "Suidae",
+   "type": "potomochere_roux"
+  },
+  {
+   "name": "bovidae17",
+   "label": "Bovidae",
+   "type": "sitatunga"
+  },
+  {
+   "name": "herpestidae2",
+   "label": "Herpestidae",
+   "type": "mangouste_rouge"
+  },
+  {
+   "name": "canidae2",
+   "label": "Canidae",
+   "type": "chacal_flancs_rayes"
+  },
+  {
+   "name": "felidae2",
+   "label": "Felidae",
+   "type": "chat_dore"
+  },
+  {
+   "name": "viverridae2",
+   "label": "Viverridae",
+   "type": "civette_africain"
+  },
+  {
+   "name": "nandiniidae",
+   "label": "Nandiniidae",
+   "type": "civette_palmiste_africaine"
+  },
+  {
+   "name": "viverridae3",
+   "label": "Viverridae",
+   "type": "genette_de_thierry"
+  },
+  {
+   "name": "viverridae",
+   "label": "Viverridae",
+   "type": "genette_tigrine"
+  },
+  {
+   "name": "hyaenidae",
+   "label": "Hyaenidae",
+   "type": "hyene_tachetee"
+  },
+  {
+   "name": "felidae3",
+   "label": "Felidae",
+   "type": "leopard"
+  },
+  {
+   "name": "mustelidae2",
+   "label": "Mustelidae",
+   "type": "loutre_cou_tachete"
+  },
+  {
+   "name": "mustelidae4",
+   "label": "Mustelidae",
+   "type": "loutre_joues_blanches"
+  },
+  {
+   "name": "canidae",
+   "label": "Canidae",
+   "type": "lycaon_chien_sauvage"
+  },
+  {
+   "name": "herpestidae3",
+   "label": "Herpestidae",
+   "type": "mangouste_queue_blanche"
+  },
+  {
+   "name": "herpestidae4",
+   "label": "Herpestidae",
+   "type": "mangouste_de_Gambie"
+  },
+  {
+   "name": "herpestidae5",
+   "label": "Herpestidae",
+   "type": "Mangouste_des_marais"
+  },
+  {
+   "name": "herpestidae6",
+   "label": "Herpestidae",
+   "type": "mangouste_ichneumon"
+  },
+  {
+   "name": "herpestidae7",
+   "label": "Herpestidae",
+   "type": "mangouste_rouge"
+  },
+  {
+   "name": "mustelidae",
+   "label": "Mustelidae",
+   "type": "ratel"
+  },
+  {
+   "name": "felidae4",
+   "label": "Felidae",
+   "type": "serval"
+  },
+  {
+   "name": "bovidae18",
+   "label": "Bovidae",
+   "type": "cephalope_de_maxwell"
+  },
+  {
+   "name": "erinaceidae",
+   "label": "Erinaceidae",
+   "type": "herisson_ventre_blanc"
+  },
+  {
+   "name": "procaviidae2",
+   "label": "Procaviidae",
+   "type": "damans_des_rochers"
+  },
+  {
+   "name": "procaviidae",
+   "label": "Procaviidae",
+   "type": "damans_des_arbres"
+  },
+  {
+   "name": "leporidae",
+   "label": "Leporidae",
+   "type": "lievre_de_savane_africaine"
+  },
+  {
+   "name": "leporidae2",
+   "label": "Leporidae",
+   "type": "lievre_des_buissons"
+  },
+  {
+   "name": "manidae",
+   "label": "Manidae",
+   "type": "pangolin_ecailles_tricuspides"
+  },
+  {
+   "name": "manidae2",
+   "label": "Manidae",
+   "type": "pangolin_longue_queue"
+  },
+  {
+   "name": "manidae3",
+   "label": "Manidae",
+   "type": "pangolin_petite_ecailles"
+  },
+  {
+   "name": "manidae4",
+   "label": "Manidae",
+   "type": "pangolin_geant"
+  },
+  {
+   "name": "cercopithecidae",
+   "label": "Cercopithecidae",
+   "type": "babouin_de_Guinee"
+  },
+  {
+   "name": "hominidae",
+   "label": "Hominidae",
+   "type": "chimpanze_afrique_ouest"
+  },
+  {
+   "name": "cercopithecidae2",
+   "label": "Cercopithecidae",
+   "type": "colobe_longs_poils"
+  },
+  {
+   "name": "cercopithecidae3",
+   "label": "Cercopithecidae",
+   "type": "colobe_bai_afrique_occidentale"
+  },
+  {
+   "name": "cercopithecidae4",
+   "label": "Cercopithecidae",
+   "type": "colobe_bai_Temminck"
+  },
+  {
+   "name": "galagidae",
+   "label": "Galagidae",
+   "type": "galago_du_senegal"
+  },
+  {
+   "name": "cercopithecidae5",
+   "label": "Cercopithecidae",
+   "type": "hocheur_blanc_nez"
+  },
+  {
+   "name": "cercopithecidae6",
+   "label": "Cercopithecidae",
+   "type": "mangabey_enfume"
+  },
+  {
+   "name": "cercopithecidae7",
+   "label": "Cercopithecidae",
+   "type": "mone_de_campbell"
+  },
+  {
+   "name": "cercopithecidae8",
+   "label": "Cercopithecidae",
+   "type": "patas"
+  },
+  {
+   "name": "lorisidae",
+   "label": "Lorisidae",
+   "type": "potto_de_bosman"
+  },
+  {
+   "name": "cercopithecidae9",
+   "label": "Cercopithecidae",
+   "type": "singe_vert"
+  },
+  {
+   "name": "elephantidae",
+   "label": "Elephantidae",
+   "type": "elephant_de_foret"
+  },
+  {
+   "name": "nesomyidae",
+   "label": "Nesomyidae",
+   "type": "cricetome_des_savanes"
+  },
+  {
+   "name": "thryonomyidea",
+   "label": "Thryonomyidea",
+   "type": "grand_aulacode"
+  },
+  {
+   "name": "sciuridae",
+   "label": "Sciuridae",
+   "type": "ecureuil_fouisseur"
+  },
+  {
+   "name": "hystricidae8",
+   "label": "Hystricidae",
+   "type": "porc_epic_crete"
+  },
+  {
+   "name": "hystricidae",
+   "label": "Hystricidae",
+   "type": "atherure"
+  },
+  {
+   "name": "trichechidae",
+   "label": "Trichechidae",
+   "type": "lamantin_afrique_ouest"
+  },
+  {
+   "name": "felidae",
+   "label": "Felidae",
+   "type": "chat_sauvage_afrique"
+  },
+  {
+   "name": "orycteropodidae",
+   "label": "Orycteropodidae",
+   "type": "orycterope_du_cap"
+  }
+ ],
+ "sv_ordre": [
+  {
+   "name": "anura",
+   "label": "Anura",
+   "type": "amphibien"
+  },
+  {
+   "name": "artiodactyles",
+   "label": "Artiodactyles",
+   "type": "antilope_rouanne"
+  },
+  {
+   "name": "artiodactyles2",
+   "label": "Artiodactyles",
+   "type": "antilope_royale"
+  },
+  {
+   "name": "artiodactyles3",
+   "label": "Artiodactyles",
+   "type": "bongo"
+  },
+  {
+   "name": "artiodactyles4",
+   "label": "Artiodactyles",
+   "type": "bubale_roux"
+  },
+  {
+   "name": "artiodactyles5",
+   "label": "Artiodactyles",
+   "type": "buffle_afrique"
+  },
+  {
+   "name": "artiodactyles7",
+   "label": "Artiodactyles",
+   "type": "cephalophe_a_dos_jaune"
+  },
+  {
+   "name": "artiodactyles8",
+   "label": "Artiodactyles",
+   "type": "cephalophe_a_flanc_roux"
+  },
+  {
+   "name": "artiodactyles9",
+   "label": "Artiodactyles",
+   "type": "cephalophe_bande_dorsale"
+  },
+  {
+   "name": "artiodactyles10",
+   "label": "Artiodactyles",
+   "type": "cephalophe_grimm"
+  },
+  {
+   "name": "artiodactyles11",
+   "label": "Artiodactyles",
+   "type": "cobe_croissant"
+  },
+  {
+   "name": "artiodactyles12",
+   "label": "Artiodactyles",
+   "type": "cobe_buffon"
+  },
+  {
+   "name": "artiodactyles13",
+   "label": "Artiodactyles",
+   "type": "cobe_des_roseaux"
+  },
+  {
+   "name": "artiodactyles14",
+   "label": "Artiodactyles",
+   "type": "eland_geant"
+  },
+  {
+   "name": "artiodactyles15",
+   "label": "Artiodactyles",
+   "type": "guib_harnache"
+  },
+  {
+   "name": "artiodactyles16",
+   "label": "Artiodactyles",
+   "type": "hippopotame_amphibie"
+  },
+  {
+   "name": "artiodactyles17",
+   "label": "Artiodactyles",
+   "type": "hylochere"
+  },
+  {
+   "name": "artiodactyles18",
+   "label": "Artiodactyles",
+   "type": "ourebi"
+  },
+  {
+   "name": "artiodactyles19",
+   "label": "Artiodactyles",
+   "type": "phocochere_commun"
+  },
+  {
+   "name": "artiodactyles20",
+   "label": "Artiodactyles",
+   "type": "potomochere_roux"
+  },
+  {
+   "name": "artiodactyles21",
+   "label": "Artiodactyles",
+   "type": "sitatunga"
+  },
+  {
+   "name": "carnivores",
+   "label": "Carnivores",
+   "type": "mangouste_rouge"
+  },
+  {
+   "name": "carnivores2",
+   "label": "Carnivores",
+   "type": "chacal_flancs_rayes"
+  },
+  {
+   "name": "carnivores3",
+   "label": "Carnivores",
+   "type": "chat_dore"
+  },
+  {
+   "name": "carnivores4",
+   "label": "Carnivores",
+   "type": "civette_africain"
+  },
+  {
+   "name": "carnivores5",
+   "label": "Carnivores",
+   "type": "civette_palmiste_africaine"
+  },
+  {
+   "name": "carnivores6",
+   "label": "Carnivores",
+   "type": "genette_de_thierry"
+  },
+  {
+   "name": "carnivores7",
+   "label": "Carnivores",
+   "type": "genette_tigrine"
+  },
+  {
+   "name": "carnivores8",
+   "label": "Carnivores",
+   "type": "hyene_tachetee"
+  },
+  {
+   "name": "carnivores9",
+   "label": "Carnivores",
+   "type": "leopard"
+  },
+  {
+   "name": "carnivores10",
+   "label": "Carnivores",
+   "type": "loutre_cou_tachete"
+  },
+  {
+   "name": "carnivores12",
+   "label": "Carnivores",
+   "type": "loutre_joues_blanches"
+  },
+  {
+   "name": "carnivores13",
+   "label": "Carnivores",
+   "type": "lycaon_chien_sauvage"
+  },
+  {
+   "name": "carnivores14",
+   "label": "Carnivores",
+   "type": "mangouste_queue_blanche"
+  },
+  {
+   "name": "carnivores15",
+   "label": "Carnivores",
+   "type": "mangouste_de_Gambie"
+  },
+  {
+   "name": "carnivores16",
+   "label": "Carnivores",
+   "type": "Mangouste_des_marais"
+  },
+  {
+   "name": "carnivores17",
+   "label": "Carnivores",
+   "type": "mangouste_ichneumon"
+  },
+  {
+   "name": "carnivores18",
+   "label": "Carnivores",
+   "type": "mangouste_rouge"
+  },
+  {
+   "name": "carnivores19",
+   "label": "Carnivores",
+   "type": "ratel"
+  },
+  {
+   "name": "carnivores20",
+   "label": "Carnivores",
+   "type": "serval"
+  },
+  {
+   "name": "cetartiodactyles",
+   "label": "Cetartiodactyles",
+   "type": "cephalope_de_maxwell"
+  },
+  {
+   "name": "eulipotyphla",
+   "label": "Eulipotyphla",
+   "type": "herisson_ventre_blanc"
+  },
+  {
+   "name": "hyracoidea",
+   "label": "Hyracoidea",
+   "type": "damans_des_rochers"
+  },
+  {
+   "name": "hyracoides",
+   "label": "Hyracoides",
+   "type": "damans_des_arbres"
+  },
+  {
+   "name": "lagomorpha",
+   "label": "Lagomorpha",
+   "type": "lievre_de_savane_africaine"
+  },
+  {
+   "name": "lagomorpha2",
+   "label": "Lagomorpha",
+   "type": "lievre_des_buissons"
+  },
+  {
+   "name": "pholidota",
+   "label": "Pholidota",
+   "type": "pangolin_ecailles_tricuspides"
+  },
+  {
+   "name": "pholidota2",
+   "label": "Pholidota",
+   "type": "pangolin_longue_queue"
+  },
+  {
+   "name": "pholidota3",
+   "label": "Pholidota",
+   "type": "pangolin_petite_ecailles"
+  },
+  {
+   "name": "pholidota4",
+   "label": "Pholidota",
+   "type": "pangolin_geant"
+  },
+  {
+   "name": "primates",
+   "label": "Primates",
+   "type": "babouin_de_Guinee"
+  },
+  {
+   "name": "primates2",
+   "label": "Primates",
+   "type": "chimpanze_afrique_ouest"
+  },
+  {
+   "name": "primates3",
+   "label": "Primates",
+   "type": "colobe_longs_poils"
+  },
+  {
+   "name": "primates4",
+   "label": "Primates",
+   "type": "colobe_bai_afrique_occidentale"
+  },
+  {
+   "name": "primates5",
+   "label": "Primates",
+   "type": "colobe_bai_Temminck"
+  },
+  {
+   "name": "primates6",
+   "label": "Primates",
+   "type": "galago_du_senegal"
+  },
+  {
+   "name": "primates7",
+   "label": "Primates",
+   "type": "hocheur_blanc_nez"
+  },
+  {
+   "name": "primates8",
+   "label": "Primates",
+   "type": "mangabey_enfume"
+  },
+  {
+   "name": "primates9",
+   "label": "Primates",
+   "type": "mone_de_campbell"
+  },
+  {
+   "name": "primates10",
+   "label": "Primates",
+   "type": "patas"
+  },
+  {
+   "name": "primates11",
+   "label": "Primates",
+   "type": "potto_de_bosman"
+  },
+  {
+   "name": "primates12",
+   "label": "Primates",
+   "type": "singe_vert"
+  },
+  {
+   "name": "proboscides",
+   "label": "Proboscides",
+   "type": "elephant_de_foret"
+  },
+  {
+   "name": "rodentia",
+   "label": "Rodentia",
+   "type": "cricetome_des_savanes"
+  },
+  {
+   "name": "rodentia2",
+   "label": "Rodentia",
+   "type": "grand_aulacode"
+  },
+  {
+   "name": "rodentia3",
+   "label": "Rodentia",
+   "type": "ecureuil_fouisseur"
+  },
+  {
+   "name": "rodentia4",
+   "label": "Rodentia",
+   "type": "porc_epic_crete"
+  },
+  {
+   "name": "rongeurs",
+   "label": "Rongeurs",
+   "type": "atherure"
+  },
+  {
+   "name": "sirenia",
+   "label": "Sirenia",
+   "type": "lamantin_afrique_ouest"
+  },
+  {
+   "name": "tubulidentata",
+   "label": "Tubulidentata",
+   "type": "chat_sauvage_afrique"
+  },
+  {
+   "name": "tubulidentata2",
+   "label": "Tubulidentata",
+   "type": "orycterope_du_cap"
+  }
+ ],
+ "sv_camera": [
+  {
+   "name": "cam001",
+   "label": "cam001"
+  },
+  {
+   "name": "cam002",
+   "label": "cam002"
+  },
+  {
+   "name": "cam003",
+   "label": "cam003"
+  },
+  {
+   "name": "cam004",
+   "label": "cam004"
+  },
+  {
+   "name": "cam005",
+   "label": "cam005"
+  },
+  {
+   "name": "cam006",
+   "label": "cam006"
+  },
+  {
+   "name": "cam007",
+   "label": "cam007"
+  },
+  {
+   "name": "cam008",
+   "label": "cam008"
+  },
+  {
+   "name": "cam009",
+   "label": "cam009"
+  },
+  {
+   "name": "cam010",
+   "label": "cam010"
+  },
+  {
+   "name": "cam011",
+   "label": "cam011"
+  },
+  {
+   "name": "cam012",
+   "label": "cam012"
+  },
+  {
+   "name": "cam013",
+   "label": "cam013"
+  },
+  {
+   "name": "cam014",
+   "label": "cam014"
+  },
+  {
+   "name": "cam015",
+   "label": "cam015"
+  },
+  {
+   "name": "cam016",
+   "label": "cam016"
+  },
+  {
+   "name": "cam017",
+   "label": "cam017"
+  },
+  {
+   "name": "cam018",
+   "label": "cam018"
+  },
+  {
+   "name": "cam019",
+   "label": "cam019"
+  },
+  {
+   "name": "cam020",
+   "label": "cam020"
+  },
+  {
+   "name": "cam021",
+   "label": "cam021"
+  },
+  {
+   "name": "cam022",
+   "label": "cam022"
+  },
+  {
+   "name": "cam023",
+   "label": "cam023"
+  },
+  {
+   "name": "cam024",
+   "label": "cam024"
+  },
+  {
+   "name": "cam025",
+   "label": "cam025"
+  },
+  {
+   "name": "cam026",
+   "label": "cam026"
+  },
+  {
+   "name": "cam027",
+   "label": "cam027"
+  },
+  {
+   "name": "cam028",
+   "label": "cam028"
+  },
+  {
+   "name": "cam029",
+   "label": "cam029"
+  },
+  {
+   "name": "cam030",
+   "label": "cam030"
+  },
+  {
+   "name": "cam031",
+   "label": "cam031"
+  },
+  {
+   "name": "cam032",
+   "label": "cam032"
+  },
+  {
+   "name": "cam033",
+   "label": "cam033"
+  },
+  {
+   "name": "cam034",
+   "label": "cam034"
+  },
+  {
+   "name": "cam035",
+   "label": "cam035"
+  },
+  {
+   "name": "cam036",
+   "label": "cam036"
+  },
+  {
+   "name": "cam037",
+   "label": "cam037"
+  },
+  {
+   "name": "cam038",
+   "label": "cam038"
+  },
+  {
+   "name": "cam039",
+   "label": "cam039"
+  },
+  {
+   "name": "cam040",
+   "label": "cam040"
+  },
+  {
+   "name": "cam041",
+   "label": "cam041"
+  },
+  {
+   "name": "cam042",
+   "label": "cam042"
+  },
+  {
+   "name": "cam043",
+   "label": "cam043"
+  },
+  {
+   "name": "cam044",
+   "label": "cam044"
+  },
+  {
+   "name": "cam045",
+   "label": "cam045"
+  },
+  {
+   "name": "cam046",
+   "label": "cam046"
+  },
+  {
+   "name": "cam047",
+   "label": "cam047"
+  },
+  {
+   "name": "cam048",
+   "label": "cam048"
+  },
+  {
+   "name": "cam049",
+   "label": "cam049"
+  },
+  {
+   "name": "cam050",
+   "label": "cam050"
+  }
+ ],
+ "sv_cartesd": [
+  {
+   "name": "cartesd001",
+   "label": "cartesd001"
+  },
+  {
+   "name": "cartesd002",
+   "label": "cartesd002"
+  },
+  {
+   "name": "cartesd003",
+   "label": "cartesd003"
+  },
+  {
+   "name": "cartesd004",
+   "label": "cartesd004"
+  },
+  {
+   "name": "cartesd005",
+   "label": "cartesd005"
+  },
+  {
+   "name": "cartesd006",
+   "label": "cartesd006"
+  },
+  {
+   "name": "cartesd007",
+   "label": "cartesd007"
+  },
+  {
+   "name": "cartesd008",
+   "label": "cartesd008"
+  },
+  {
+   "name": "cartesd009",
+   "label": "cartesd009"
+  },
+  {
+   "name": "cartesd010",
+   "label": "cartesd010"
+  },
+  {
+   "name": "cartesd011",
+   "label": "cartesd011"
+  },
+  {
+   "name": "cartesd012",
+   "label": "cartesd012"
+  },
+  {
+   "name": "cartesd013",
+   "label": "cartesd013"
+  },
+  {
+   "name": "cartesd014",
+   "label": "cartesd014"
+  },
+  {
+   "name": "cartesd015",
+   "label": "cartesd015"
+  },
+  {
+   "name": "cartesd016",
+   "label": "cartesd016"
+  },
+  {
+   "name": "cartesd017",
+   "label": "cartesd017"
+  },
+  {
+   "name": "cartesd018",
+   "label": "cartesd018"
+  },
+  {
+   "name": "cartesd019",
+   "label": "cartesd019"
+  },
+  {
+   "name": "cartesd020",
+   "label": "cartesd020"
+  },
+  {
+   "name": "cartesd021",
+   "label": "cartesd021"
+  },
+  {
+   "name": "cartesd022",
+   "label": "cartesd022"
+  },
+  {
+   "name": "cartesd023",
+   "label": "cartesd023"
+  },
+  {
+   "name": "cartesd024",
+   "label": "cartesd024"
+  },
+  {
+   "name": "cartesd025",
+   "label": "cartesd025"
+  },
+  {
+   "name": "cartesd026",
+   "label": "cartesd026"
+  },
+  {
+   "name": "cartesd027",
+   "label": "cartesd027"
+  },
+  {
+   "name": "cartesd028",
+   "label": "cartesd028"
+  },
+  {
+   "name": "cartesd029",
+   "label": "cartesd029"
+  },
+  {
+   "name": "cartesd030",
+   "label": "cartesd030"
+  },
+  {
+   "name": "cartesd031",
+   "label": "cartesd031"
+  },
+  {
+   "name": "cartesd032",
+   "label": "cartesd032"
+  },
+  {
+   "name": "cartesd033",
+   "label": "cartesd033"
+  },
+  {
+   "name": "cartesd034",
+   "label": "cartesd034"
+  },
+  {
+   "name": "cartesd035",
+   "label": "cartesd035"
+  },
+  {
+   "name": "cartesd036",
+   "label": "cartesd036"
+  },
+  {
+   "name": "cartesd037",
+   "label": "cartesd037"
+  },
+  {
+   "name": "cartesd038",
+   "label": "cartesd038"
+  },
+  {
+   "name": "cartesd039",
+   "label": "cartesd039"
+  },
+  {
+   "name": "cartesd040",
+   "label": "cartesd040"
+  },
+  {
+   "name": "cartesd041",
+   "label": "cartesd041"
+  },
+  {
+   "name": "cartesd042",
+   "label": "cartesd042"
+  },
+  {
+   "name": "cartesd043",
+   "label": "cartesd043"
+  },
+  {
+   "name": "cartesd044",
+   "label": "cartesd044"
+  },
+  {
+   "name": "cartesd045",
+   "label": "cartesd045"
+  },
+  {
+   "name": "cartesd046",
+   "label": "cartesd046"
+  },
+  {
+   "name": "cartesd047",
+   "label": "cartesd047"
+  },
+  {
+   "name": "cartesd048",
+   "label": "cartesd048"
+  },
+  {
+   "name": "cartesd049",
+   "label": "cartesd049"
+  },
+  {
+   "name": "cartesd050",
+   "label": "cartesd050"
+  }
+ ],
+ "sv_oui_non": [
+  {
+   "name": "oui",
+   "label": "Oui"
+  },
+  {
+   "name": "non",
+   "label": "Non"
+  },
+  {
+   "name": "Oui",
+   "label": "Oui"
+  },
+  {
+   "name": "Non",
+   "label": "Non"
+  }
+ ],
+ "sv_saison": [
+  {
+   "name": "Saison pluvieuse",
+   "label": "Saison pluvieuse"
+  },
+  {
+   "name": "Saison sèche",
+   "label": "Saison sèche"
+  },
+  {
+   "name": "Toute l'année",
+   "label": "Toute l'année"
+  }
+ ],
+ "sv_biome": [
+  {
+   "name": "terrestre",
+   "label": "Terrestre"
+  },
+  {
+   "name": "aquatique",
+   "label": "Aquatique"
+  },
+  {
+   "name": "fluvialtile",
+   "label": "Fluvialtile"
+  },
+  {
+   "name": "eau_douce",
+   "label": "Eau douce"
+  },
+  {
+   "name": "marine",
+   "label": "Marine"
+  },
+  {
+   "name": "pelagique",
+   "label": "Pelagique"
+  },
+  {
+   "name": "aquantique",
+   "label": "Aquantique"
+  }
+ ],
+ "sv_obser": [
+  {
+   "name": "direct",
+   "label": "Direct"
+  },
+  {
+   "name": "indirecte",
+   "label": "Indirecte"
+  },
+  {
+   "name": "indirect",
+   "label": "Indirect"
+  }
+ ],
+ "sv_methode": [
+  {
+   "name": "peche_active",
+   "label": "Pêche active"
+  },
+  {
+   "name": "peche_passive",
+   "label": "Pêche passive"
+  },
+  {
+   "name": "placette",
+   "label": "Relevé sur placette"
+  },
+  {
+   "name": "transects",
+   "label": "Relevé de transects (itinérant)"
+  },
+  {
+   "name": "recces",
+   "label": "Marche lente de reconnaissance (Recces)"
+  },
+  {
+   "name": "capture",
+   "label": "Capture et recapture aux filets japonais"
+  },
+  {
+   "name": "ecoutes_nocturnes",
+   "label": "Écoutes nocturnes à partir de stations fixes sur transects"
+  },
+  {
+   "name": "comptage_ponctuels",
+   "label": "Comptage pomctuels"
+  },
+  {
+   "name": "capture_filet_japonais",
+   "label": "Capture a filets japonais"
+  },
+  {
+   "name": "inventaire",
+   "label": "Méthode active"
+  },
+  {
+   "name": "interview",
+   "label": "Méthode passive ou d'écoute"
+  },
+  {
+   "name": "recce",
+   "label": "Recces"
+  },
+  {
+   "name": "enquete",
+   "label": "Enquête"
+  },
+  {
+   "name": "transect",
+   "label": "Transect"
+  },
+  {
+   "name": "pitfall",
+   "label": "Pitfall"
+  },
+  {
+   "name": "shearaman",
+   "label": "Shearaman"
+  }
+ ],
+ "sv_poisson": [
+  {
+   "name": "Acanthurus monroviae_LC",
+   "label": "Acanthurus monroviae (LC)"
+  },
+  {
+   "name": "Albula vulpes_NT",
+   "label": "Albula vulpes (NT)"
+  },
+  {
+   "name": "Alectis alexandrina_LC",
+   "label": "Alectis alexandrina (LC)"
+  },
+  {
+   "name": "Amphilius kakrimensis_VU",
+   "label": "Amphilius kakrimensis (VU)"
+  },
+  {
+   "name": "Anomalochromis thomasi_LC",
+   "label": "Anomalochromis thomasi (LC)"
+  },
+  {
+   "name": "Auchenoglanis biscutatus_LC",
+   "label": "Auchenoglanis biscutatus (LC)"
+  },
+  {
+   "name": "Auchenoglanis occidentalis_LC",
+   "label": "Auchenoglanis occidentalis (LC)"
+  },
+  {
+   "name": "Balistes capriscus_VU",
+   "label": "Balistes capriscus (VU)"
+  },
+  {
+   "name": "Bostrychus africanus_LC",
+   "label": "Bostrychus africanus (LC)"
+  },
+  {
+   "name": "Brachydeuterus auritus_NT",
+   "label": "Brachydeuterus auritus (NT)"
+  },
+  {
+   "name": "Brienomyrus brachyistius_LC",
+   "label": "Brienomyrus brachyistius (LC)"
+  },
+  {
+   "name": "Brienomyrus longianalis_LC",
+   "label": "Brienomyrus longianalis (LC)"
+  },
+  {
+   "name": "Brycinus imberi_LC",
+   "label": "Brycinus imberi (LC)"
+  },
+  {
+   "name": "Brycinus macrolepidotus_LC",
+   "label": "Brycinus macrolepidotus (LC)"
+  },
+  {
+   "name": "Brycinus nurse_LC",
+   "label": "Brycinus nurse (LC)"
+  },
+  {
+   "name": "Bryconalestes longipinnis_LC",
+   "label": "Bryconalestes longipinnis (LC)"
+  },
+  {
+   "name": "Caranx caninus_LC",
+   "label": "Caranx caninus (LC)"
+  },
+  {
+   "name": "Caranx senegallus_LC",
+   "label": "Caranx senegallus (LC)"
+  },
+  {
+   "name": "Carlarius heudelotii_LC",
+   "label": "Carlarius heudelotii (LC)"
+  },
+  {
+   "name": "Carlarius latiscutatus_LC",
+   "label": "Carlarius latiscutatus (LC)"
+  },
+  {
+   "name": "Carlarius parkii_LC",
+   "label": "Carlarius parkii (LC)"
+  },
+  {
+   "name": "Chaetodipterus lippei_LC",
+   "label": "Chaetodipterus lippei (LC)"
+  },
+  {
+   "name": "Chloroscombrus chrysurus_LC",
+   "label": "Chloroscombrus chrysurus (LC)"
+  },
+  {
+   "name": "Chrysichthys johnelsi_LC",
+   "label": "Chrysichthys johnelsi (LC)"
+  },
+  {
+   "name": "Chrysichthys maurus_LC",
+   "label": "Chrysichthys maurus (LC)"
+  },
+  {
+   "name": "Chrysichthys nigrodigitatus_LC",
+   "label": "Chrysichthys nigrodigitatus (LC)"
+  },
+  {
+   "name": "Chrysichthys teugelsi_LC",
+   "label": "Chrysichthys teugelsi (LC)"
+  },
+  {
+   "name": "Clarias anguillaris_DD",
+   "label": "Clarias anguillaris (DD)"
+  },
+  {
+   "name": "Clarias buettikoferi_LC",
+   "label": "Clarias buettikoferi (LC)"
+  },
+  {
+   "name": "Clarias gariepinus_LC",
+   "label": "Clarias gariepinus (LC)"
+  },
+  {
+   "name": "Clarias laeviceps_VU",
+   "label": "Clarias laeviceps (VU)"
+  },
+  {
+   "name": "Clarias salae_LC",
+   "label": "Clarias salae (LC)"
+  },
+  {
+   "name": "Coptodon guineensis_LC",
+   "label": "Coptodon guineensis (LC)"
+  },
+  {
+   "name": "Coptodon louka_LC",
+   "label": "Coptodon louka (LC)"
+  },
+  {
+   "name": "Coptodon zillii_LC",
+   "label": "Coptodon zillii (LC)"
+  },
+  {
+   "name": "Ctenopoma kingsleyae_LC",
+   "label": "Ctenopoma kingsleyae (LC)"
+  },
+  {
+   "name": "Ctenopoma petherici_LC",
+   "label": "Ctenopoma petherici (LC)"
+  },
+  {
+   "name": "Cynoglossus monodi_NT",
+   "label": "Cynoglossus monodi (NT)"
+  },
+  {
+   "name": "Cynoglossus senegalensis_NT",
+   "label": "Cynoglossus senegalensis (NT)"
+  },
+  {
+   "name": "Dasyatis sp._NE",
+   "label": "Dasyatis sp. (NE)"
+  },
+  {
+   "name": "Decapterus punctatus_LC",
+   "label": "Decapterus punctatus (LC)"
+  },
+  {
+   "name": "Dentex gibbosus_LC",
+   "label": "Dentex gibbosus (LC)"
+  },
+  {
+   "name": "Dentex sp._NE",
+   "label": "Dentex sp. (NE)"
+  },
+  {
+   "name": "Drepane africana_LC",
+   "label": "Drepane africana (LC)"
+  },
+  {
+   "name": "Echelus myrus_LC",
+   "label": "Echelus myrus (LC)"
+  },
+  {
+   "name": "Eleotris senegalensis_LC",
+   "label": "Eleotris senegalensis (LC)"
+  },
+  {
+   "name": "Elops lacerta_LC",
+   "label": "Elops lacerta (LC)"
+  },
+  {
+   "name": "Engraulis encrasicolus_LC",
+   "label": "Engraulis encrasicolus (LC)"
+  },
+  {
+   "name": "Enteromius aliciae_VU",
+   "label": "Enteromius aliciae (VU)"
+  },
+  {
+   "name": "Enteromius ditinensis_LC",
+   "label": "Enteromius ditinensis (LC)"
+  },
+  {
+   "name": "Enteromius huguenyi_VU",
+   "label": "Enteromius huguenyi (VU)"
+  },
+  {
+   "name": "Enteromius macrops_LC",
+   "label": "Enteromius macrops (LC)"
+  },
+  {
+   "name": "Enteromius pobeguini_LC",
+   "label": "Enteromius pobeguini (LC)"
+  },
+  {
+   "name": "Enteromius tiekoroi_NT",
+   "label": "Enteromius tiekoroi (NT)"
+  },
+  {
+   "name": "Ephippion guttifer_LC",
+   "label": "Ephippion guttifer (LC)"
+  },
+  {
+   "name": "Ephippus goreensis_LC",
+   "label": "Ephippus goreensis (LC)"
+  },
+  {
+   "name": "Epiplatys barmoiensis_LC",
+   "label": "Epiplatys barmoiensis (LC)"
+  },
+  {
+   "name": "Epiplatys bifasciatus_LC",
+   "label": "Epiplatys bifasciatus (LC)"
+  },
+  {
+   "name": "Epiplatys fasciolatus  _LC",
+   "label": "Epiplatys fasciolatus   (LC)"
+  },
+  {
+   "name": "Epiplatys guineensis_VU",
+   "label": "Epiplatys guineensis (VU)"
+  },
+  {
+   "name": "Epiplatys njalaensis_NT",
+   "label": "Epiplatys njalaensis (NT)"
+  },
+  {
+   "name": "Epiplatys olbrechtsi_LC",
+   "label": "Epiplatys olbrechtsi (LC)"
+  },
+  {
+   "name": "Ethmalosa fimbriata_LC",
+   "label": "Ethmalosa fimbriata (LC)"
+  },
+  {
+   "name": "Eucinostomus melanopterus_LC",
+   "label": "Eucinostomus melanopterus (LC)"
+  },
+  {
+   "name": "Fontitrygon margarita_VU",
+   "label": "Fontitrygon margarita (VU)"
+  },
+  {
+   "name": "Galeoides decadactylus_NT",
+   "label": "Galeoides decadactylus (NT)"
+  },
+  {
+   "name": "Ginglymostoma cirratum_VU",
+   "label": "Ginglymostoma cirratum (VU)"
+  },
+  {
+   "name": "Glaucostegus cemiculus_CR",
+   "label": "Glaucostegus cemiculus (CR)"
+  },
+  {
+   "name": "Gobioides sagitta_LC",
+   "label": "Gobioides sagitta (LC)"
+  },
+  {
+   "name": "Gymnallabes typus_LC",
+   "label": "Gymnallabes typus (LC)"
+  },
+  {
+   "name": "Gymnura micrura_NT",
+   "label": "Gymnura micrura (NT)"
+  },
+  {
+   "name": "Halobatrachus didactylus_LC",
+   "label": "Halobatrachus didactylus (LC)"
+  },
+  {
+   "name": "Hemicaranx bicolor_LC",
+   "label": "Hemicaranx bicolor (LC)"
+  },
+  {
+   "name": "Hemichromis bimaculatus_LC",
+   "label": "Hemichromis bimaculatus (LC)"
+  },
+  {
+   "name": "Hemichromis fasciatus_LC",
+   "label": "Hemichromis fasciatus (LC)"
+  },
+  {
+   "name": "Hepsetus odoe_LC",
+   "label": "Hepsetus odoe (LC)"
+  },
+  {
+   "name": "Heterobranchus isopterus_LC",
+   "label": "Heterobranchus isopterus (LC)"
+  },
+  {
+   "name": "Heterobranchus longifilis_LC",
+   "label": "Heterobranchus longifilis (LC)"
+  },
+  {
+   "name": "Heterotilapia buettikoferi_LC",
+   "label": "Heterotilapia buettikoferi (LC)"
+  },
+  {
+   "name": "Hydrocynus forskahlii_LC",
+   "label": "Hydrocynus forskahlii (LC)"
+  },
+  {
+   "name": "Hydrocynus vittatus_LC",
+   "label": "Hydrocynus vittatus (LC)"
+  },
+  {
+   "name": "Ichthyborus quadrilineatus_VU",
+   "label": "Ichthyborus quadrilineatus (VU)"
+  },
+  {
+   "name": "Ilisha africana_LC",
+   "label": "Ilisha africana (LC)"
+  },
+  {
+   "name": "Labeobarbus gruveli_VU",
+   "label": "Labeobarbus gruveli (VU)"
+  },
+  {
+   "name": "Lagocephalus laevigatus_LC",
+   "label": "Lagocephalus laevigatus (LC)"
+  },
+  {
+   "name": "Liza grandisquamis_DD",
+   "label": "Liza grandisquamis (DD)"
+  },
+  {
+   "name": "Lobotes surinamensis_LC",
+   "label": "Lobotes surinamensis (LC)"
+  },
+  {
+   "name": "Lophiodes Kempi_DD",
+   "label": "Lophiodes Kempi (DD)"
+  },
+  {
+   "name": "Lutjanus agennes_DD",
+   "label": "Lutjanus agennes (DD)"
+  },
+  {
+   "name": "Lutjanus goreensis_DD",
+   "label": "Lutjanus goreensis (DD)"
+  },
+  {
+   "name": "Malapterurus electricus_LC",
+   "label": "Malapterurus electricus (LC)"
+  },
+  {
+   "name": "Malapterurus teugelsi_VU",
+   "label": "Malapterurus teugelsi (VU)"
+  },
+  {
+   "name": "Marcusenius mento_LC",
+   "label": "Marcusenius mento (LC)"
+  },
+  {
+   "name": "Marcusenius senegalensis_LC",
+   "label": "Marcusenius senegalensis (LC)"
+  },
+  {
+   "name": "Marcusenius thomasi_LC",
+   "label": "Marcusenius thomasi (LC)"
+  },
+  {
+   "name": "Marcusenius ussheri_LC",
+   "label": "Marcusenius ussheri (LC)"
+  },
+  {
+   "name": "Mastacembelus liberiensis_LC",
+   "label": "Mastacembelus liberiensis (LC)"
+  },
+  {
+   "name": "Miracorvina angolensis_LC",
+   "label": "Miracorvina angolensis (LC)"
+  },
+  {
+   "name": "Monodactylus sebae_LC",
+   "label": "Monodactylus sebae (LC)"
+  },
+  {
+   "name": "Mormyrops anguilloides_LC",
+   "label": "Mormyrops anguilloides (LC)"
+  },
+  {
+   "name": "Mormyrops breviceps_LC",
+   "label": "Mormyrops breviceps (LC)"
+  },
+  {
+   "name": "Mycteroperca costae_DD",
+   "label": "Mycteroperca costae (DD)"
+  },
+  {
+   "name": "Nannocharax fasciatus_LC",
+   "label": "Nannocharax fasciatus (LC)"
+  },
+  {
+   "name": "Nematogobius maindroni_LC",
+   "label": "Nematogobius maindroni (LC)"
+  },
+  {
+   "name": "Neochelon falcipinnis_DD",
+   "label": "Neochelon falcipinnis (DD)"
+  },
+  {
+   "name": "Notoglanidium depierrei_DD",
+   "label": "Notoglanidium depierrei (DD)"
+  },
+  {
+   "name": "Orcynopsis unicolor_LC",
+   "label": "Orcynopsis unicolor (LC)"
+  },
+  {
+   "name": "Papyrocranus afer_LC",
+   "label": "Papyrocranus afer (LC)"
+  },
+  {
+   "name": "Parachanna obscura_LC",
+   "label": "Parachanna obscura (LC)"
+  },
+  {
+   "name": "Parachelon grandisquamis_NE",
+   "label": "Parachelon grandisquamis (NE)"
+  },
+  {
+   "name": "Pellonula leonensis_LC",
+   "label": "Pellonula leonensis (LC)"
+  },
+  {
+   "name": "Pelmatochromis buettikoferi_LC",
+   "label": "Pelmatochromis buettikoferi (LC)"
+  },
+  {
+   "name": "Pentanemus quinquarius_VU",
+   "label": "Pentanemus quinquarius (VU)"
+  },
+  {
+   "name": "Periophthalmus barbarus_LC",
+   "label": "Periophthalmus barbarus (LC)"
+  },
+  {
+   "name": "Petrocephalus bovei_LC",
+   "label": "Petrocephalus bovei (LC)"
+  },
+  {
+   "name": "Petrocephalus pellegrini_LC",
+   "label": "Petrocephalus pellegrini (LC)"
+  },
+  {
+   "name": "Petrocephalus tenuicauda_LC",
+   "label": "Petrocephalus tenuicauda (LC)"
+  },
+  {
+   "name": "Plectorinchus macrolepis_LC",
+   "label": "Plectorinchus macrolepis (LC)"
+  },
+  {
+   "name": "Polydactylus quadrifilis_LC",
+   "label": "Polydactylus quadrifilis (LC)"
+  },
+  {
+   "name": "Polypterus palmas_LC",
+   "label": "Polypterus palmas (LC)"
+  },
+  {
+   "name": "Polypterus senegalus_LC",
+   "label": "Polypterus senegalus (LC)"
+  },
+  {
+   "name": "Pomadasys incisus_LC",
+   "label": "Pomadasys incisus (LC)"
+  },
+  {
+   "name": "Pomadasys jubelini_LC",
+   "label": "Pomadasys jubelini (LC)"
+  },
+  {
+   "name": "Pomadasys perotaei_LC",
+   "label": "Pomadasys perotaei (LC)"
+  },
+  {
+   "name": "Pomadasys rogerii_LC",
+   "label": "Pomadasys rogerii (LC)"
+  },
+  {
+   "name": "Poropanchax normani_LC",
+   "label": "Poropanchax normani (LC)"
+  },
+  {
+   "name": "Pseudotolithus elongatus_LC",
+   "label": "Pseudotolithus elongatus (LC)"
+  },
+  {
+   "name": "Pseudotolithus epipercus_LC",
+   "label": "Pseudotolithus epipercus (LC)"
+  },
+  {
+   "name": "Pseudotolithus senegalensis_EN",
+   "label": "Pseudotolithus senegalensis (EN)"
+  },
+  {
+   "name": "Pseudotolithus senegallus_VU",
+   "label": "Pseudotolithus senegallus (VU)"
+  },
+  {
+   "name": "Pseudotolithus typus_LC",
+   "label": "Pseudotolithus typus (LC)"
+  },
+  {
+   "name": "Pseudupeneus prayensis_VU",
+   "label": "Pseudupeneus prayensis (VU)"
+  },
+  {
+   "name": "Pteroscion peli_LC",
+   "label": "Pteroscion peli (LC)"
+  },
+  {
+   "name": "Rachycentron canadum_LC",
+   "label": "Rachycentron canadum (LC)"
+  },
+  {
+   "name": "Raiamas steindachneri_LC",
+   "label": "Raiamas steindachneri (LC)"
+  },
+  {
+   "name": "Rhabdalestes septentrionalis_LC",
+   "label": "Rhabdalestes septentrionalis (LC)"
+  },
+  {
+   "name": "Rhinoptera marginata_CR",
+   "label": "Rhinoptera marginata (CR)"
+  },
+  {
+   "name": "Sardina pilchardus_LC",
+   "label": "Sardina pilchardus (LC)"
+  },
+  {
+   "name": "Sardinella aurita_LC",
+   "label": "Sardinella aurita (LC)"
+  },
+  {
+   "name": "Sardinella maderensis_VU",
+   "label": "Sardinella maderensis (VU)"
+  },
+  {
+   "name": "Sarotherodon caudomarginatus_LC",
+   "label": "Sarotherodon caudomarginatus (LC)"
+  },
+  {
+   "name": "Sarotherodon galilaeus_LC",
+   "label": "Sarotherodon galilaeus (LC)"
+  },
+  {
+   "name": "Sarotherodon melanotheron_LC",
+   "label": "Sarotherodon melanotheron (LC)"
+  },
+  {
+   "name": "Sarotherodon occidentalis_LC",
+   "label": "Sarotherodon occidentalis (LC)"
+  },
+  {
+   "name": "Schilbe mandibularis_LC",
+   "label": "Schilbe mandibularis (LC)"
+  },
+  {
+   "name": "Schilbe micropogon_LC",
+   "label": "Schilbe micropogon (LC)"
+  },
+  {
+   "name": "Schilbe mystus_LC",
+   "label": "Schilbe mystus (LC)"
+  },
+  {
+   "name": "Scomberomorus tritor_LC",
+   "label": "Scomberomorus tritor (LC)"
+  },
+  {
+   "name": "Scriptaphyosemion geryi_LC",
+   "label": "Scriptaphyosemion geryi (LC)"
+  },
+  {
+   "name": "Selene dorsalis_LC",
+   "label": "Selene dorsalis (LC)"
+  },
+  {
+   "name": "Sphyraena barracuda_LC",
+   "label": "Sphyraena barracuda (LC)"
+  },
+  {
+   "name": "Sphyraena guachancho_LC",
+   "label": "Sphyraena guachancho (LC)"
+  },
+  {
+   "name": "Stomatepia mongo_CR",
+   "label": "Stomatepia mongo (CR)"
+  },
+  {
+   "name": "Synodontis eupterus_LC",
+   "label": "Synodontis eupterus (LC)"
+  },
+  {
+   "name": "Synodontis levequei_VU",
+   "label": "Synodontis levequei (VU)"
+  },
+  {
+   "name": "Synodontis thysi_LC",
+   "label": "Synodontis thysi (LC)"
+  },
+  {
+   "name": "Synodontis waterloti_LC",
+   "label": "Synodontis waterloti (LC)"
+  },
+  {
+   "name": "Tilapia brevimanus_LC",
+   "label": "Tilapia brevimanus (LC)"
+  },
+  {
+   "name": "Trachinotus maxillosus_LC",
+   "label": "Trachinotus maxillosus (LC)"
+  },
+  {
+   "name": "Trachinotus teraia_LC",
+   "label": "Trachinotus teraia (LC)"
+  },
+  {
+   "name": "Trichiurus lepturus_LC",
+   "label": "Trichiurus lepturus (LC)"
+  },
+  {
+   "name": "Tylochromis intermedius_LC",
+   "label": "Tylochromis intermedius (LC)"
+  },
+  {
+   "name": "Tylochromis leonensis_LC",
+   "label": "Tylochromis leonensis (LC)"
+  },
+  {
+   "name": "Tylosorus crocodilus_NE",
+   "label": "Tylosorus crocodilus (NE)"
+  },
+  {
+   "name": "Wallaceochromis humilis_NE",
+   "label": "Wallaceochromis humilis (NE)"
+  },
+  {
+   "name": "autre_poisson",
+   "label": "Autre (à précisé)"
+  }
+ ],
+ "sv_nom": [
+  {
+   "name": "moussa dibate",
+   "label": "Moussa DIABATE"
+  }
+ ],
+ "sv_empleur": [
+  {
+   "name": "faible",
+   "label": "Faible"
+  },
+  {
+   "name": "moyenne",
+   "label": "Moyenne"
+  },
+  {
+   "name": "elevee",
+   "label": "Elévée"
+  }
+ ],
+ "sv_type_espece": [
+  {
+   "name": "espece_locale",
+   "label": "Espèce locale"
+  },
+  {
+   "name": "espece_exotique",
+   "label": "Espèce exotique"
+  }
+ ],
+ "sv_nature": [
+  {
+   "name": "envahissante",
+   "label": "Envahissante"
+  },
+  {
+   "name": "non_envahissante",
+   "label": "Non envahissante"
+  }
+ ],
+ "sv_flore": [
+  {
+   "name": "Abelmoschus esculentus_NE",
+   "label": "Abelmoschus esculentus (NE)"
+  },
+  {
+   "name": "Abrus canescens_NE",
+   "label": "Abrus canescens (NE)"
+  },
+  {
+   "name": "Abrus precatorius_NE",
+   "label": "Abrus precatorius (NE)"
+  },
+  {
+   "name": "Acacia ataxacantha  _LC",
+   "label": "Acacia ataxacantha   (LC)"
+  },
+  {
+   "name": "Acacia auriculiformis_LC",
+   "label": "Acacia auriculiformis (LC)"
+  },
+  {
+   "name": "Acacia mangium_LC",
+   "label": "Acacia mangium (LC)"
+  },
+  {
+   "name": "Acacia sp,_NE",
+   "label": "Acacia sp, (NE)"
+  },
+  {
+   "name": "Achyranthes aspera_NE",
+   "label": "Achyranthes aspera (NE)"
+  },
+  {
+   "name": "Acmella uliginosa_LC",
+   "label": "Acmella uliginosa (LC)"
+  },
+  {
+   "name": "Adansonia digitata_NE",
+   "label": "Adansonia digitata (NE)"
+  },
+  {
+   "name": "Aeglopsis chevalieri_NT",
+   "label": "Aeglopsis chevalieri (NT)"
+  },
+  {
+   "name": "Aframomum latifolium_NE",
+   "label": "Aframomum latifolium (NE)"
+  },
+  {
+   "name": "Aframomum melegueta_DD",
+   "label": "Aframomum melegueta (DD)"
+  },
+  {
+   "name": "Aframomum sulcatum_LC",
+   "label": "Aframomum sulcatum (LC)"
+  },
+  {
+   "name": "Afrotrilepis pilosa_NE",
+   "label": "Afrotrilepis pilosa (NE)"
+  },
+  {
+   "name": "Afrotrilepis sp._NE",
+   "label": "Afrotrilepis sp. (NE)"
+  },
+  {
+   "name": "Afzelia africana_VU",
+   "label": "Afzelia africana (VU)"
+  },
+  {
+   "name": "Agelaea pentagyna_NE",
+   "label": "Agelaea pentagyna (NE)"
+  },
+  {
+   "name": "Ageratum conyzoides _LC",
+   "label": "Ageratum conyzoides  (LC)"
+  },
+  {
+   "name": "Aidia genipiflora_LC",
+   "label": "Aidia genipiflora (LC)"
+  },
+  {
+   "name": "Albizia adianthifolia_LC",
+   "label": "Albizia adianthifolia (LC)"
+  },
+  {
+   "name": "Albizia altissima_LC",
+   "label": "Albizia altissima (LC)"
+  },
+  {
+   "name": "Albizia dinklagei_LC",
+   "label": "Albizia dinklagei (LC)"
+  },
+  {
+   "name": "Albizia ferruginea _NT",
+   "label": "Albizia ferruginea  (NT)"
+  },
+  {
+   "name": "Albizia zygia_LC",
+   "label": "Albizia zygia (LC)"
+  },
+  {
+   "name": "Alchornea cordifolia_LC",
+   "label": "Alchornea cordifolia (LC)"
+  },
+  {
+   "name": "Alchornea floribunda _LC",
+   "label": "Alchornea floribunda  (LC)"
+  },
+  {
+   "name": "Allophylus africanus_LC",
+   "label": "Allophylus africanus (LC)"
+  },
+  {
+   "name": "Alstonia boonei_LC",
+   "label": "Alstonia boonei (LC)"
+  },
+  {
+   "name": "Amorphophallus abyssinicus _NE",
+   "label": "Amorphophallus abyssinicus  (NE)"
+  },
+  {
+   "name": "Anacardium occidentale_LC",
+   "label": "Anacardium occidentale (LC)"
+  },
+  {
+   "name": "Ananas comosus_NE",
+   "label": "Ananas comosus (NE)"
+  },
+  {
+   "name": "Ananas sativus_NE",
+   "label": "Ananas sativus (NE)"
+  },
+  {
+   "name": "Anchomanes difformis_LC",
+   "label": "Anchomanes difformis (LC)"
+  },
+  {
+   "name": "Ancistrophyllum secondiflorum_NE",
+   "label": "Ancistrophyllum secondiflorum (NE)"
+  },
+  {
+   "name": "Andropogon fastigiatus_NE",
+   "label": "Andropogon fastigiatus (NE)"
+  },
+  {
+   "name": "Andropogon gayanus_NE",
+   "label": "Andropogon gayanus (NE)"
+  },
+  {
+   "name": "Andropogon pseudapricus_NE",
+   "label": "Andropogon pseudapricus (NE)"
+  },
+  {
+   "name": "Andropogon schirensis_NE",
+   "label": "Andropogon schirensis (NE)"
+  },
+  {
+   "name": "Andropogon sp._NE",
+   "label": "Andropogon sp. (NE)"
+  },
+  {
+   "name": "Andropogon tectorum_NE",
+   "label": "Andropogon tectorum (NE)"
+  },
+  {
+   "name": "Aningeria altissima_LC",
+   "label": "Aningeria altissima (LC)"
+  },
+  {
+   "name": "Anisophyllea laurina_LC",
+   "label": "Anisophyllea laurina (LC)"
+  },
+  {
+   "name": "Annona muricata_LC",
+   "label": "Annona muricata (LC)"
+  },
+  {
+   "name": "Annona senegalensis_LC",
+   "label": "Annona senegalensis (LC)"
+  },
+  {
+   "name": "Anthocleista nobilis_LC",
+   "label": "Anthocleista nobilis (LC)"
+  },
+  {
+   "name": "Anthocleista procera_LC",
+   "label": "Anthocleista procera (LC)"
+  },
+  {
+   "name": "Anthonotha crassifolia_LC",
+   "label": "Anthonotha crassifolia (LC)"
+  },
+  {
+   "name": "Anthonotha macrophylla_LC",
+   "label": "Anthonotha macrophylla (LC)"
+  },
+  {
+   "name": "Anthostema senegalense_LC",
+   "label": "Anthostema senegalense (LC)"
+  },
+  {
+   "name": "Anthostema sp._NE",
+   "label": "Anthostema sp. (NE)"
+  },
+  {
+   "name": "Antiaris toxicaria _LC",
+   "label": "Antiaris toxicaria  (LC)"
+  },
+  {
+   "name": "Anubias afzelii_NE",
+   "label": "Anubias afzelii (NE)"
+  },
+  {
+   "name": "Aristida adscensionis_NE",
+   "label": "Aristida adscensionis (NE)"
+  },
+  {
+   "name": "Aristida funiculata_NE",
+   "label": "Aristida funiculata (NE)"
+  },
+  {
+   "name": "Aristida mutabilis_NE",
+   "label": "Aristida mutabilis (NE)"
+  },
+  {
+   "name": "Aristida sieberiana_NE",
+   "label": "Aristida sieberiana (NE)"
+  },
+  {
+   "name": "Aristida stipoides_NE",
+   "label": "Aristida stipoides (NE)"
+  },
+  {
+   "name": "Asparagus sp._NE",
+   "label": "Asparagus sp. (NE)"
+  },
+  {
+   "name": "Aspilia africana_NE",
+   "label": "Aspilia africana (NE)"
+  },
+  {
+   "name": "Aspilia helianthoides_LC",
+   "label": "Aspilia helianthoides (LC)"
+  },
+  {
+   "name": "Asplenium sp._NE",
+   "label": "Asplenium sp. (NE)"
+  },
+  {
+   "name": "Aubrevillea platicarpa_LC",
+   "label": "Aubrevillea platicarpa (LC)"
+  },
+  {
+   "name": "Avicennia germinans_LC",
+   "label": "Avicennia germinans (LC)"
+  },
+  {
+   "name": "Bambusa vulgaris_NE",
+   "label": "Bambusa vulgaris (NE)"
+  },
+  {
+   "name": "Baphia polygalacea_NE",
+   "label": "Baphia polygalacea (NE)"
+  },
+  {
+   "name": "Belonophora coffeoides_LC",
+   "label": "Belonophora coffeoides (LC)"
+  },
+  {
+   "name": "Bersama abyssinica_LC",
+   "label": "Bersama abyssinica (LC)"
+  },
+  {
+   "name": "Bertiera racemosa_LC",
+   "label": "Bertiera racemosa (LC)"
+  },
+  {
+   "name": "Bertiera spicata_LC",
+   "label": "Bertiera spicata (LC)"
+  },
+  {
+   "name": "Blighia sapida_LC",
+   "label": "Blighia sapida (LC)"
+  },
+  {
+   "name": "Blighia unijugata_NE",
+   "label": "Blighia unijugata (NE)"
+  },
+  {
+   "name": "Bombax costatum_LC",
+   "label": "Bombax costatum (LC)"
+  },
+  {
+   "name": "Borreria scabra _NE",
+   "label": "Borreria scabra  (NE)"
+  },
+  {
+   "name": "Borreria verticillata _NE",
+   "label": "Borreria verticillata  (NE)"
+  },
+  {
+   "name": "Brachiaria lata_NE",
+   "label": "Brachiaria lata (NE)"
+  },
+  {
+   "name": "Brachiaria orthostachys_NE",
+   "label": "Brachiaria orthostachys (NE)"
+  },
+  {
+   "name": "Bridelia ferruginea_LC",
+   "label": "Bridelia ferruginea (LC)"
+  },
+  {
+   "name": "Bridelia micrantha_LC",
+   "label": "Bridelia micrantha (LC)"
+  },
+  {
+   "name": "Bryaspis lupulina_NE",
+   "label": "Bryaspis lupulina (NE)"
+  },
+  {
+   "name": "Bulbostylis sp._NE",
+   "label": "Bulbostylis sp. (NE)"
+  },
+  {
+   "name": "Burkea africana_LC",
+   "label": "Burkea africana (LC)"
+  },
+  {
+   "name": "Cajanus cajanifolius_NT",
+   "label": "Cajanus cajanifolius (NT)"
+  },
+  {
+   "name": "Callichilia subsessilis_NE",
+   "label": "Callichilia subsessilis (NE)"
+  },
+  {
+   "name": "Calopogonium mucunoides_NE",
+   "label": "Calopogonium mucunoides (NE)"
+  },
+  {
+   "name": "Canarium schweinfurthii_LC",
+   "label": "Canarium schweinfurthii (LC)"
+  },
+  {
+   "name": "Cantinoa americana_NE",
+   "label": "Cantinoa americana (NE)"
+  },
+  {
+   "name": "Capsicum frutescens_LC",
+   "label": "Capsicum frutescens (LC)"
+  },
+  {
+   "name": "Caralluma acutangula_NE",
+   "label": "Caralluma acutangula (NE)"
+  },
+  {
+   "name": "Caralluma adscendens_NE",
+   "label": "Caralluma adscendens (NE)"
+  },
+  {
+   "name": "Carapa procera_LC",
+   "label": "Carapa procera (LC)"
+  },
+  {
+   "name": "Cardiospermum grandiflorum_NE",
+   "label": "Cardiospermum grandiflorum (NE)"
+  },
+  {
+   "name": "Carpolobia lutea_LC",
+   "label": "Carpolobia lutea (LC)"
+  },
+  {
+   "name": "Cassia nigricans_NE",
+   "label": "Cassia nigricans (NE)"
+  },
+  {
+   "name": "Cassia sesamea_NE",
+   "label": "Cassia sesamea (NE)"
+  },
+  {
+   "name": "Cassia sieberiana_LC",
+   "label": "Cassia sieberiana (LC)"
+  },
+  {
+   "name": "Cassytha filiformis_NE",
+   "label": "Cassytha filiformis (NE)"
+  },
+  {
+   "name": "Cathormion altissimum_NE",
+   "label": "Cathormion altissimum (NE)"
+  },
+  {
+   "name": "Ceiba pentandra_LC",
+   "label": "Ceiba pentandra (LC)"
+  },
+  {
+   "name": "Cenchrus biflorus_NE",
+   "label": "Cenchrus biflorus (NE)"
+  },
+  {
+   "name": "Cenchrus pedicellatus_LC",
+   "label": "Cenchrus pedicellatus (LC)"
+  },
+  {
+   "name": "Cenchrus polystachios_LC",
+   "label": "Cenchrus polystachios (LC)"
+  },
+  {
+   "name": "Cenchrus purpureus_LC",
+   "label": "Cenchrus purpureus (LC)"
+  },
+  {
+   "name": "Centella asiatica_LC",
+   "label": "Centella asiatica (LC)"
+  },
+  {
+   "name": "Centrosema pubescens_NE",
+   "label": "Centrosema pubescens (NE)"
+  },
+  {
+   "name": "Ceratotheca sesamoides_NE",
+   "label": "Ceratotheca sesamoides (NE)"
+  },
+  {
+   "name": "Cercestis afzelii_NE",
+   "label": "Cercestis afzelii (NE)"
+  },
+  {
+   "name": "Chamaecrista mimosoides_LC",
+   "label": "Chamaecrista mimosoides (LC)"
+  },
+  {
+   "name": "Chlorophytum sp._NE",
+   "label": "Chlorophytum sp. (NE)"
+  },
+  {
+   "name": "Chromolaena odorata _NE",
+   "label": "Chromolaena odorata  (NE)"
+  },
+  {
+   "name": "Cienfuegosia digitata_NE",
+   "label": "Cienfuegosia digitata (NE)"
+  },
+  {
+   "name": "Cissus doeringii_LC",
+   "label": "Cissus doeringii (LC)"
+  },
+  {
+   "name": "Cissus quadragularis_NE",
+   "label": "Cissus quadragularis (NE)"
+  },
+  {
+   "name": "Citrus aurenthium_NE",
+   "label": "Citrus aurenthium (NE)"
+  },
+  {
+   "name": "Citrus lemon_NE",
+   "label": "Citrus lemon (NE)"
+  },
+  {
+   "name": "Citrus medica_LC",
+   "label": "Citrus medica (LC)"
+  },
+  {
+   "name": "Clappertonia ficifolia_NE",
+   "label": "Clappertonia ficifolia (NE)"
+  },
+  {
+   "name": "Clappertonia sp._NE",
+   "label": "Clappertonia sp. (NE)"
+  },
+  {
+   "name": "Cleistopholis patens_LC",
+   "label": "Cleistopholis patens (LC)"
+  },
+  {
+   "name": "Cleome scaposa_NE",
+   "label": "Cleome scaposa (NE)"
+  },
+  {
+   "name": "Cleome viscosa_NE",
+   "label": "Cleome viscosa (NE)"
+  },
+  {
+   "name": "Clerodendrum capitatum_LC",
+   "label": "Clerodendrum capitatum (LC)"
+  },
+  {
+   "name": "Clerodendrum formicarum_LC",
+   "label": "Clerodendrum formicarum (LC)"
+  },
+  {
+   "name": "Clerodendrum volubile_NE",
+   "label": "Clerodendrum volubile (NE)"
+  },
+  {
+   "name": "Cnestis corniculata_NE",
+   "label": "Cnestis corniculata (NE)"
+  },
+  {
+   "name": "Cnestis ferruginea_NE",
+   "label": "Cnestis ferruginea (NE)"
+  },
+  {
+   "name": "Cocos nucifera_NE",
+   "label": "Cocos nucifera (NE)"
+  },
+  {
+   "name": "Cola caricifolia_LC",
+   "label": "Cola caricifolia (LC)"
+  },
+  {
+   "name": "Cola cordifolia_LC",
+   "label": "Cola cordifolia (LC)"
+  },
+  {
+   "name": "Cola gigantea_LC",
+   "label": "Cola gigantea (LC)"
+  },
+  {
+   "name": "Cola lateritia_LC",
+   "label": "Cola lateritia (LC)"
+  },
+  {
+   "name": "Cola laurifolia_LC",
+   "label": "Cola laurifolia (LC)"
+  },
+  {
+   "name": "Cola nitida_LC",
+   "label": "Cola nitida (LC)"
+  },
+  {
+   "name": "Combretum fragrans_NE",
+   "label": "Combretum fragrans (NE)"
+  },
+  {
+   "name": "Combretum glutinosum_LC",
+   "label": "Combretum glutinosum (LC)"
+  },
+  {
+   "name": "Combretum grandiflorum_NE",
+   "label": "Combretum grandiflorum (NE)"
+  },
+  {
+   "name": "Combretum leacardii_NE",
+   "label": "Combretum leacardii (NE)"
+  },
+  {
+   "name": "Combretum micranthum_LC",
+   "label": "Combretum micranthum (LC)"
+  },
+  {
+   "name": "Combretum nigricans _LC",
+   "label": "Combretum nigricans  (LC)"
+  },
+  {
+   "name": "Combretum paniculatum_NE",
+   "label": "Combretum paniculatum (NE)"
+  },
+  {
+   "name": "Combretum racemosum_NE",
+   "label": "Combretum racemosum (NE)"
+  },
+  {
+   "name": "Combretum sp,_NE",
+   "label": "Combretum sp, (NE)"
+  },
+  {
+   "name": "Combretum thomentosum_NE",
+   "label": "Combretum thomentosum (NE)"
+  },
+  {
+   "name": "Commelina forskalae_NE",
+   "label": "Commelina forskalae (NE)"
+  },
+  {
+   "name": "Corchorus tridens_NE",
+   "label": "Corchorus tridens (NE)"
+  },
+  {
+   "name": "Costus afer_NE",
+   "label": "Costus afer (NE)"
+  },
+  {
+   "name": "Costus spectabilis_NE",
+   "label": "Costus spectabilis (NE)"
+  },
+  {
+   "name": "Craterispermum laurimum_NE",
+   "label": "Craterispermum laurimum (NE)"
+  },
+  {
+   "name": "Crossopteryx febrifuga_LC",
+   "label": "Crossopteryx febrifuga (LC)"
+  },
+  {
+   "name": "Crotalaria retusa_NE",
+   "label": "Crotalaria retusa (NE)"
+  },
+  {
+   "name": "Croton hirtus_NE",
+   "label": "Croton hirtus (NE)"
+  },
+  {
+   "name": "Croton sylvaticus_LC",
+   "label": "Croton sylvaticus (LC)"
+  },
+  {
+   "name": "Ctenium newtonii_NE",
+   "label": "Ctenium newtonii (NE)"
+  },
+  {
+   "name": "Culcasia afzelii_NE",
+   "label": "Culcasia afzelii (NE)"
+  },
+  {
+   "name": "Culcasia angolensis_NE",
+   "label": "Culcasia angolensis (NE)"
+  },
+  {
+   "name": "Culcasia scandens_LC",
+   "label": "Culcasia scandens (LC)"
+  },
+  {
+   "name": "Cussonia djalonensis_NE",
+   "label": "Cussonia djalonensis (NE)"
+  },
+  {
+   "name": "Cyanotis sp._NE",
+   "label": "Cyanotis sp. (NE)"
+  },
+  {
+   "name": "Cyathula prostrata_NE",
+   "label": "Cyathula prostrata (NE)"
+  },
+  {
+   "name": "Cyclosorus striatus_NE",
+   "label": "Cyclosorus striatus (NE)"
+  },
+  {
+   "name": "Cymbopogon schoenanthus_NE",
+   "label": "Cymbopogon schoenanthus (NE)"
+  },
+  {
+   "name": "Cynometra vogelii_LC",
+   "label": "Cynometra vogelii (LC)"
+  },
+  {
+   "name": "Cyperus hortensis_LC",
+   "label": "Cyperus hortensis (LC)"
+  },
+  {
+   "name": "Cyperus richardii_NE",
+   "label": "Cyperus richardii (NE)"
+  },
+  {
+   "name": "Cyperus sp._NE",
+   "label": "Cyperus sp. (NE)"
+  },
+  {
+   "name": "Dalbergia ecastaphyllum_LC",
+   "label": "Dalbergia ecastaphyllum (LC)"
+  },
+  {
+   "name": "Dalbergia sp._NE",
+   "label": "Dalbergia sp. (NE)"
+  },
+  {
+   "name": "Dalechampia scandens_LC",
+   "label": "Dalechampia scandens (LC)"
+  },
+  {
+   "name": "Daniellia oliveri_LC",
+   "label": "Daniellia oliveri (LC)"
+  },
+  {
+   "name": "Daniellia thurifera_LC",
+   "label": "Daniellia thurifera (LC)"
+  },
+  {
+   "name": "Desmodium adscendens_LC",
+   "label": "Desmodium adscendens (LC)"
+  },
+  {
+   "name": "Desmodium lineatum_NE",
+   "label": "Desmodium lineatum (NE)"
+  },
+  {
+   "name": "Desmodium ovalifolium_NE",
+   "label": "Desmodium ovalifolium (NE)"
+  },
+  {
+   "name": "Desmodium velutinum_NE",
+   "label": "Desmodium velutinum (NE)"
+  },
+  {
+   "name": "Detarium senegalense_LC",
+   "label": "Detarium senegalense (LC)"
+  },
+  {
+   "name": "Dialium dinklagei_LC",
+   "label": "Dialium dinklagei (LC)"
+  },
+  {
+   "name": "Dialium guineense_LC",
+   "label": "Dialium guineense (LC)"
+  },
+  {
+   "name": "Dichapetalum sp._NE",
+   "label": "Dichapetalum sp. (NE)"
+  },
+  {
+   "name": "Dichrostachys cinerea_LC",
+   "label": "Dichrostachys cinerea (LC)"
+  },
+  {
+   "name": "Dichrostachys glomerata_LC",
+   "label": "Dichrostachys glomerata (LC)"
+  },
+  {
+   "name": "Digitaria gayana_NE",
+   "label": "Digitaria gayana (NE)"
+  },
+  {
+   "name": "Diheteropogon hagerupii_NE",
+   "label": "Diheteropogon hagerupii (NE)"
+  },
+  {
+   "name": "Dioscorea bulbifera_NE",
+   "label": "Dioscorea bulbifera (NE)"
+  },
+  {
+   "name": "Dioscorea praehensilis _LC",
+   "label": "Dioscorea praehensilis  (LC)"
+  },
+  {
+   "name": "Dioscorea preussii_NE",
+   "label": "Dioscorea preussii (NE)"
+  },
+  {
+   "name": "Dioscorea sp._NE",
+   "label": "Dioscorea sp. (NE)"
+  },
+  {
+   "name": "Diospyros cooperi_LC",
+   "label": "Diospyros cooperi (LC)"
+  },
+  {
+   "name": "Diospyros heudelotii_LC",
+   "label": "Diospyros heudelotii (LC)"
+  },
+  {
+   "name": "Diospyros sp._NE",
+   "label": "Diospyros sp. (NE)"
+  },
+  {
+   "name": "Dissotis erecta_NE",
+   "label": "Dissotis erecta (NE)"
+  },
+  {
+   "name": "Dissotis sp._NE",
+   "label": "Dissotis sp. (NE)"
+  },
+  {
+   "name": "Dracaena arborea_LC",
+   "label": "Dracaena arborea (LC)"
+  },
+  {
+   "name": "Dracaena surculosa_NE",
+   "label": "Dracaena surculosa (NE)"
+  },
+  {
+   "name": "Droogmansia scaettaiana_NT",
+   "label": "Droogmansia scaettaiana (NT)"
+  },
+  {
+   "name": "Drosera indica_LC",
+   "label": "Drosera indica (LC)"
+  },
+  {
+   "name": "Elaeis guineensis_LC",
+   "label": "Elaeis guineensis (LC)"
+  },
+  {
+   "name": "Entada africana_LC",
+   "label": "Entada africana (LC)"
+  },
+  {
+   "name": "Entada gigas_NE",
+   "label": "Entada gigas (NE)"
+  },
+  {
+   "name": "Entandrophragma cylindricum_VU",
+   "label": "Entandrophragma cylindricum (VU)"
+  },
+  {
+   "name": "Entandrophragma utile_VU",
+   "label": "Entandrophragma utile (VU)"
+  },
+  {
+   "name": "Enteropogon prieurii_NE",
+   "label": "Enteropogon prieurii (NE)"
+  },
+  {
+   "name": "Eragrostis atrovirens_LC",
+   "label": "Eragrostis atrovirens (LC)"
+  },
+  {
+   "name": "Eragrostis pilosa_NE",
+   "label": "Eragrostis pilosa (NE)"
+  },
+  {
+   "name": "Eragrostis sp._NE",
+   "label": "Eragrostis sp. (NE)"
+  },
+  {
+   "name": "Erigeron floribundus_NE",
+   "label": "Erigeron floribundus (NE)"
+  },
+  {
+   "name": "Eriocaulon afzelianum_LC",
+   "label": "Eriocaulon afzelianum (LC)"
+  },
+  {
+   "name": "Eriocaulon plumale_NE",
+   "label": "Eriocaulon plumale (NE)"
+  },
+  {
+   "name": "Eriocaulon setaceum_LC",
+   "label": "Eriocaulon setaceum (LC)"
+  },
+  {
+   "name": "Eriosema collinum_NE",
+   "label": "Eriosema collinum (NE)"
+  },
+  {
+   "name": "Eriosema glomeratum_NE",
+   "label": "Eriosema glomeratum (NE)"
+  },
+  {
+   "name": "Erythrina senegalensis_LC",
+   "label": "Erythrina senegalensis (LC)"
+  },
+  {
+   "name": "Erythrophleum guineense_NE",
+   "label": "Erythrophleum guineense (NE)"
+  },
+  {
+   "name": "Erythrophleum suaveolens_LC",
+   "label": "Erythrophleum suaveolens (LC)"
+  },
+  {
+   "name": "Erythroxylum emarginatum_LC",
+   "label": "Erythroxylum emarginatum (LC)"
+  },
+  {
+   "name": "Euclinia longiflora_LC",
+   "label": "Euclinia longiflora (LC)"
+  },
+  {
+   "name": "Eugenia sp._NE",
+   "label": "Eugenia sp. (NE)"
+  },
+  {
+   "name": "Ficus capensis_NE",
+   "label": "Ficus capensis (NE)"
+  },
+  {
+   "name": "Ficus elastica_LC",
+   "label": "Ficus elastica (LC)"
+  },
+  {
+   "name": "Ficus exasperata_LC",
+   "label": "Ficus exasperata (LC)"
+  },
+  {
+   "name": "Ficus glumosa_LC",
+   "label": "Ficus glumosa (LC)"
+  },
+  {
+   "name": "Ficus mucuso_LC",
+   "label": "Ficus mucuso (LC)"
+  },
+  {
+   "name": "Ficus sp._NE",
+   "label": "Ficus sp. (NE)"
+  },
+  {
+   "name": "Ficus sur_LC",
+   "label": "Ficus sur (LC)"
+  },
+  {
+   "name": "Fimbristylis sp._NE",
+   "label": "Fimbristylis sp. (NE)"
+  },
+  {
+   "name": "Fuirena umbellata_LC",
+   "label": "Fuirena umbellata (LC)"
+  },
+  {
+   "name": "Funtumia africana_LC",
+   "label": "Funtumia africana (LC)"
+  },
+  {
+   "name": "Garcinia kola_VU",
+   "label": "Garcinia kola (VU)"
+  },
+  {
+   "name": "Garcinia smeathmanii_LC",
+   "label": "Garcinia smeathmanii (LC)"
+  },
+  {
+   "name": "Gardenia erubescens _LC",
+   "label": "Gardenia erubescens  (LC)"
+  },
+  {
+   "name": "Gardenia ternifolia_LC",
+   "label": "Gardenia ternifolia (LC)"
+  },
+  {
+   "name": "Geophila obvallata_NE",
+   "label": "Geophila obvallata (NE)"
+  },
+  {
+   "name": "Gmelina arborea_LC",
+   "label": "Gmelina arborea (LC)"
+  },
+  {
+   "name": "Gouania longipetala_NE",
+   "label": "Gouania longipetala (NE)"
+  },
+  {
+   "name": "Grewia sp._NE",
+   "label": "Grewia sp. (NE)"
+  },
+  {
+   "name": "Guiera senegalensis_LC",
+   "label": "Guiera senegalensis (LC)"
+  },
+  {
+   "name": "Gymnanthemum coloratum_LC",
+   "label": "Gymnanthemum coloratum (LC)"
+  },
+  {
+   "name": "Hannoa kaineana_NE",
+   "label": "Hannoa kaineana (NE)"
+  },
+  {
+   "name": "Harungana madagascariensis_LC",
+   "label": "Harungana madagascariensis (LC)"
+  },
+  {
+   "name": "Heterotis rotundifolia_LC",
+   "label": "Heterotis rotundifolia (LC)"
+  },
+  {
+   "name": "Hexalobus monopetalus_LC",
+   "label": "Hexalobus monopetalus (LC)"
+  },
+  {
+   "name": "Hibiscus asper_NE",
+   "label": "Hibiscus asper (NE)"
+  },
+  {
+   "name": "Hibiscus sterculiifolius_LC",
+   "label": "Hibiscus sterculiifolius (LC)"
+  },
+  {
+   "name": "Hippocratea africana _NE",
+   "label": "Hippocratea africana  (NE)"
+  },
+  {
+   "name": "Holarrhena floribunda _LC",
+   "label": "Holarrhena floribunda  (LC)"
+  },
+  {
+   "name": "Homalium africanum_LC",
+   "label": "Homalium africanum (LC)"
+  },
+  {
+   "name": "Hugonia rufipilis_NE",
+   "label": "Hugonia rufipilis (NE)"
+  },
+  {
+   "name": "Hydrolea macrosepala_LC",
+   "label": "Hydrolea macrosepala (LC)"
+  },
+  {
+   "name": "Hymenocardia acida_LC",
+   "label": "Hymenocardia acida (LC)"
+  },
+  {
+   "name": "Hymenocardia heudelotii_NE",
+   "label": "Hymenocardia heudelotii (NE)"
+  },
+  {
+   "name": "Hyparrhenia diplandra_NE",
+   "label": "Hyparrhenia diplandra (NE)"
+  },
+  {
+   "name": "Hyparrhenia rufa _NE",
+   "label": "Hyparrhenia rufa  (NE)"
+  },
+  {
+   "name": "Hyparrhenia sp ._NE",
+   "label": "Hyparrhenia sp . (NE)"
+  },
+  {
+   "name": "Hyptis suaveolens _NE",
+   "label": "Hyptis suaveolens  (NE)"
+  },
+  {
+   "name": "Icacina senegalensis _NE",
+   "label": "Icacina senegalensis  (NE)"
+  },
+  {
+   "name": "Imperata cylindrica _LC",
+   "label": "Imperata cylindrica  (LC)"
+  },
+  {
+   "name": "Indigofera dendroides_NE",
+   "label": "Indigofera dendroides (NE)"
+  },
+  {
+   "name": "Indigofera macrophylla_NE",
+   "label": "Indigofera macrophylla (NE)"
+  },
+  {
+   "name": "Indigofera senegalensis_NE",
+   "label": "Indigofera senegalensis (NE)"
+  },
+  {
+   "name": "Ipomoea batatas_DD",
+   "label": "Ipomoea batatas (DD)"
+  },
+  {
+   "name": "Ipomoea coscinosperma_NE",
+   "label": "Ipomoea coscinosperma (NE)"
+  },
+  {
+   "name": "Ipomoea quamoclit_NE",
+   "label": "Ipomoea quamoclit (NE)"
+  },
+  {
+   "name": "Irvingia gabonensis  _NT",
+   "label": "Irvingia gabonensis   (NT)"
+  },
+  {
+   "name": "Justicia sp._NE",
+   "label": "Justicia sp. (NE)"
+  },
+  {
+   "name": "Khaya senegalensis_VU",
+   "label": "Khaya senegalensis (VU)"
+  },
+  {
+   "name": "Klainedoxa gabonensis_LC",
+   "label": "Klainedoxa gabonensis (LC)"
+  },
+  {
+   "name": "Kyllinga sp._NE",
+   "label": "Kyllinga sp. (NE)"
+  },
+  {
+   "name": "Laguncularia racemosa_LC",
+   "label": "Laguncularia racemosa (LC)"
+  },
+  {
+   "name": "Landolphia dulcis_NE",
+   "label": "Landolphia dulcis (NE)"
+  },
+  {
+   "name": "Landolphia heudelotii_NE",
+   "label": "Landolphia heudelotii (NE)"
+  },
+  {
+   "name": "Landolphia hirsuta_NE",
+   "label": "Landolphia hirsuta (NE)"
+  },
+  {
+   "name": "Landolphia sp._NE",
+   "label": "Landolphia sp. (NE)"
+  },
+  {
+   "name": "Lannea acida_LC",
+   "label": "Lannea acida (LC)"
+  },
+  {
+   "name": "Lannea microcarpa_LC",
+   "label": "Lannea microcarpa (LC)"
+  },
+  {
+   "name": "Lannea velutina _LC",
+   "label": "Lannea velutina  (LC)"
+  },
+  {
+   "name": "Lannea welwitschii_LC",
+   "label": "Lannea welwitschii (LC)"
+  },
+  {
+   "name": "Lecaniodiscus cupanioides_LC",
+   "label": "Lecaniodiscus cupanioides (LC)"
+  },
+  {
+   "name": "Leea guineensis_NE",
+   "label": "Leea guineensis (NE)"
+  },
+  {
+   "name": "Leonotis nepetifolia _NE",
+   "label": "Leonotis nepetifolia  (NE)"
+  },
+  {
+   "name": "Lepidagathis fimbriata_NT",
+   "label": "Lepidagathis fimbriata (NT)"
+  },
+  {
+   "name": "Leptactina senegambica_NE",
+   "label": "Leptactina senegambica (NE)"
+  },
+  {
+   "name": "Leptoderris fasciculata_NE",
+   "label": "Leptoderris fasciculata (NE)"
+  },
+  {
+   "name": "Limeum viscosum_NE",
+   "label": "Limeum viscosum (NE)"
+  },
+  {
+   "name": "Lippia chevalieri_NE",
+   "label": "Lippia chevalieri (NE)"
+  },
+  {
+   "name": "Lonchocarpus cyanescens_NE",
+   "label": "Lonchocarpus cyanescens (NE)"
+  },
+  {
+   "name": "Lonchocarpus macrophyllus_LC",
+   "label": "Lonchocarpus macrophyllus (LC)"
+  },
+  {
+   "name": "Lophira lanceolata_LC",
+   "label": "Lophira lanceolata (LC)"
+  },
+  {
+   "name": "Loudetia phragmlitoides_LC",
+   "label": "Loudetia phragmlitoides (LC)"
+  },
+  {
+   "name": "Loudetia simplex _NE",
+   "label": "Loudetia simplex  (NE)"
+  },
+  {
+   "name": "Ludwigia abyssinica_LC",
+   "label": "Ludwigia abyssinica (LC)"
+  },
+  {
+   "name": "Ludwigia sp._NE",
+   "label": "Ludwigia sp. (NE)"
+  },
+  {
+   "name": "Ludwigia stolonifera_LC",
+   "label": "Ludwigia stolonifera (LC)"
+  },
+  {
+   "name": "Macaranga heterophylla_LC",
+   "label": "Macaranga heterophylla (LC)"
+  },
+  {
+   "name": "Macaranga heudelotii_LC",
+   "label": "Macaranga heudelotii (LC)"
+  },
+  {
+   "name": "Machaerium lunatum_LC",
+   "label": "Machaerium lunatum (LC)"
+  },
+  {
+   "name": "Mangifera indica_DD",
+   "label": "Mangifera indica (DD)"
+  },
+  {
+   "name": "Manihot tristis_NE",
+   "label": "Manihot tristis (NE)"
+  },
+  {
+   "name": "Manniophyton fulvum_NE",
+   "label": "Manniophyton fulvum (NE)"
+  },
+  {
+   "name": "Marantochloa leucantha_NE",
+   "label": "Marantochloa leucantha (NE)"
+  },
+  {
+   "name": "Mareya micrantha_LC",
+   "label": "Mareya micrantha (LC)"
+  },
+  {
+   "name": "Margaritaria discoidea_LC",
+   "label": "Margaritaria discoidea (LC)"
+  },
+  {
+   "name": "Mariscus cylindristacus_NE",
+   "label": "Mariscus cylindristacus (NE)"
+  },
+  {
+   "name": "Markhamia tomentosa_LC",
+   "label": "Markhamia tomentosa (LC)"
+  },
+  {
+   "name": "Megaphrynium macrostachyum_NE",
+   "label": "Megaphrynium macrostachyum (NE)"
+  },
+  {
+   "name": "Melastomastrum capitatum_NE",
+   "label": "Melastomastrum capitatum (NE)"
+  },
+  {
+   "name": "Melastomastrum sp._NE",
+   "label": "Melastomastrum sp. (NE)"
+  },
+  {
+   "name": "Memecylon afzelii_LC",
+   "label": "Memecylon afzelii (LC)"
+  },
+  {
+   "name": "Mezoneuron benthamianum_NE",
+   "label": "Mezoneuron benthamianum (NE)"
+  },
+  {
+   "name": "Microglossa pyrifolia_NE",
+   "label": "Microglossa pyrifolia (NE)"
+  },
+  {
+   "name": "Milicia excelsa_NT",
+   "label": "Milicia excelsa (NT)"
+  },
+  {
+   "name": "Milicia regia_VU",
+   "label": "Milicia regia (VU)"
+  },
+  {
+   "name": "Millettia rhodantha_LC",
+   "label": "Millettia rhodantha (LC)"
+  },
+  {
+   "name": "Millettia zechiana_LC",
+   "label": "Millettia zechiana (LC)"
+  },
+  {
+   "name": "Mitragyna stipulosa_NT",
+   "label": "Mitragyna stipulosa (NT)"
+  },
+  {
+   "name": "Monocymbium ceresiiforme_NE",
+   "label": "Monocymbium ceresiiforme (NE)"
+  },
+  {
+   "name": "Monodora tenuifolia_LC",
+   "label": "Monodora tenuifolia (LC)"
+  },
+  {
+   "name": "Morelia senegalensis_LC",
+   "label": "Morelia senegalensis (LC)"
+  },
+  {
+   "name": "Morinda geminata_NE",
+   "label": "Morinda geminata (NE)"
+  },
+  {
+   "name": "Morus mesozygia_NE",
+   "label": "Morus mesozygia (NE)"
+  },
+  {
+   "name": "Mucuna papuana_LC",
+   "label": "Mucuna papuana (LC)"
+  },
+  {
+   "name": "Mucuna pruriens_LC",
+   "label": "Mucuna pruriens (LC)"
+  },
+  {
+   "name": "Musa paradisiaca_NE",
+   "label": "Musa paradisiaca (NE)"
+  },
+  {
+   "name": "Musa sinensis_NE",
+   "label": "Musa sinensis (NE)"
+  },
+  {
+   "name": "Musanga cecropioides_LC",
+   "label": "Musanga cecropioides (LC)"
+  },
+  {
+   "name": "Mussaenda heterophylla_LC",
+   "label": "Mussaenda heterophylla (LC)"
+  },
+  {
+   "name": "Myrianthus arboreus_LC",
+   "label": "Myrianthus arboreus (LC)"
+  },
+  {
+   "name": "Myrianthus libericus_LC",
+   "label": "Myrianthus libericus (LC)"
+  },
+  {
+   "name": "Myrianthus serratus_LC",
+   "label": "Myrianthus serratus (LC)"
+  },
+  {
+   "name": "Napoleonaea leonensis_NE",
+   "label": "Napoleonaea leonensis (NE)"
+  },
+  {
+   "name": "Napoleonaea vogelii_LC",
+   "label": "Napoleonaea vogelii (LC)"
+  },
+  {
+   "name": "Nauclea latifolia_LC",
+   "label": "Nauclea latifolia (LC)"
+  },
+  {
+   "name": "Nauclea pobeguinii_NE",
+   "label": "Nauclea pobeguinii (NE)"
+  },
+  {
+   "name": "Newbouldia laevis _LC",
+   "label": "Newbouldia laevis  (LC)"
+  },
+  {
+   "name": "Nymphaea lotus_LC",
+   "label": "Nymphaea lotus (LC)"
+  },
+  {
+   "name": "Nymphoides guineensis_DD",
+   "label": "Nymphoides guineensis (DD)"
+  },
+  {
+   "name": "Ochna afzelii_LC",
+   "label": "Ochna afzelii (LC)"
+  },
+  {
+   "name": "Ochna schweinfurthiana_LC",
+   "label": "Ochna schweinfurthiana (LC)"
+  },
+  {
+   "name": "Ochna sp._NE",
+   "label": "Ochna sp. (NE)"
+  },
+  {
+   "name": "Olax subscorpioidea_LC",
+   "label": "Olax subscorpioidea (LC)"
+  },
+  {
+   "name": "Oldenlandia diffusa_LC",
+   "label": "Oldenlandia diffusa (LC)"
+  },
+  {
+   "name": "Olyra latifolia_NE",
+   "label": "Olyra latifolia (NE)"
+  },
+  {
+   "name": "Ongokea gore_LC",
+   "label": "Ongokea gore (LC)"
+  },
+  {
+   "name": "Opilia celtidifolia_NE",
+   "label": "Opilia celtidifolia (NE)"
+  },
+  {
+   "name": "Oplismenus burmanii _NE",
+   "label": "Oplismenus burmanii  (NE)"
+  },
+  {
+   "name": "Oplismenus hirtellus_NE",
+   "label": "Oplismenus hirtellus (NE)"
+  },
+  {
+   "name": "Oryza sativa_NE",
+   "label": "Oryza sativa (NE)"
+  },
+  {
+   "name": "Osmunda regalis_LC",
+   "label": "Osmunda regalis (LC)"
+  },
+  {
+   "name": "Oxyanthus speciosus_LC",
+   "label": "Oxyanthus speciosus (LC)"
+  },
+  {
+   "name": "Oxytenanthera abyssinica_NE",
+   "label": "Oxytenanthera abyssinica (NE)"
+  },
+  {
+   "name": "Palisota hirsuta_NE",
+   "label": "Palisota hirsuta (NE)"
+  },
+  {
+   "name": "Pancovia bijuga_LC",
+   "label": "Pancovia bijuga (LC)"
+  },
+  {
+   "name": "Pancratium sp._NE",
+   "label": "Pancratium sp. (NE)"
+  },
+  {
+   "name": "Panicum laetum_LC",
+   "label": "Panicum laetum (LC)"
+  },
+  {
+   "name": "Panicum maximum_NE",
+   "label": "Panicum maximum (NE)"
+  },
+  {
+   "name": "Panicum sp._NE",
+   "label": "Panicum sp. (NE)"
+  },
+  {
+   "name": "Paramacrolobium coeruleum_LC",
+   "label": "Paramacrolobium coeruleum (LC)"
+  },
+  {
+   "name": "Parinari excelsa_LC",
+   "label": "Parinari excelsa (LC)"
+  },
+  {
+   "name": "Parkia bicolor_LC",
+   "label": "Parkia bicolor (LC)"
+  },
+  {
+   "name": "Parkia biglobosa_LC",
+   "label": "Parkia biglobosa (LC)"
+  },
+  {
+   "name": "Paspalum sp._NE",
+   "label": "Paspalum sp. (NE)"
+  },
+  {
+   "name": "Paspalum vaginatum_LC",
+   "label": "Paspalum vaginatum (LC)"
+  },
+  {
+   "name": "Paullinia pinnata_NE",
+   "label": "Paullinia pinnata (NE)"
+  },
+  {
+   "name": "Pavetta oblongifolia   _NE",
+   "label": "Pavetta oblongifolia    (NE)"
+  },
+  {
+   "name": "Pavetta sp._NE",
+   "label": "Pavetta sp. (NE)"
+  },
+  {
+   "name": "Pennisetum sp._NE",
+   "label": "Pennisetum sp. (NE)"
+  },
+  {
+   "name": "Pentaclethra macrophylla_LC",
+   "label": "Pentaclethra macrophylla (LC)"
+  },
+  {
+   "name": "Pentadesma butyracea_LC",
+   "label": "Pentadesma butyracea (LC)"
+  },
+  {
+   "name": "Pergularia tomentosa_NE",
+   "label": "Pergularia tomentosa (NE)"
+  },
+  {
+   "name": "Pericopsis laxiflora_LC",
+   "label": "Pericopsis laxiflora (LC)"
+  },
+  {
+   "name": "Persea americana_LC",
+   "label": "Persea americana (LC)"
+  },
+  {
+   "name": "Phyllanthus maderaspatensis_LC",
+   "label": "Phyllanthus maderaspatensis (LC)"
+  },
+  {
+   "name": "Physalis angulata_LC",
+   "label": "Physalis angulata (LC)"
+  },
+  {
+   "name": "Piliostigma thonningii_NE",
+   "label": "Piliostigma thonningii (NE)"
+  },
+  {
+   "name": "Piptadeniastrum africanum_LC",
+   "label": "Piptadeniastrum africanum (LC)"
+  },
+  {
+   "name": "Piptostigma fasciculatum_LC",
+   "label": "Piptostigma fasciculatum (LC)"
+  },
+  {
+   "name": "Platysepalum hirsutum_NE",
+   "label": "Platysepalum hirsutum (NE)"
+  },
+  {
+   "name": "Pogoniulus chrysoconus_LC",
+   "label": "Pogoniulus chrysoconus (LC)"
+  },
+  {
+   "name": "Pollia condensata_NE",
+   "label": "Pollia condensata (NE)"
+  },
+  {
+   "name": "Polygala erioptera_NE",
+   "label": "Polygala erioptera (NE)"
+  },
+  {
+   "name": "Polygala fernandesiana_NE",
+   "label": "Polygala fernandesiana (NE)"
+  },
+  {
+   "name": "Portulaca oleracea_LC",
+   "label": "Portulaca oleracea (LC)"
+  },
+  {
+   "name": "Premna hispida_LC",
+   "label": "Premna hispida (LC)"
+  },
+  {
+   "name": "Prosopis africana_LC",
+   "label": "Prosopis africana (LC)"
+  },
+  {
+   "name": "Pseudospondias microcarpa_NE",
+   "label": "Pseudospondias microcarpa (NE)"
+  },
+  {
+   "name": "Psidium guajava_LC",
+   "label": "Psidium guajava (LC)"
+  },
+  {
+   "name": "Psorospermum senegalense_NE",
+   "label": "Psorospermum senegalense (NE)"
+  },
+  {
+   "name": "Psychotria peduncularis_LC",
+   "label": "Psychotria peduncularis (LC)"
+  },
+  {
+   "name": "Psychotria sp._NE",
+   "label": "Psychotria sp. (NE)"
+  },
+  {
+   "name": "Psydrax subcordata_NE",
+   "label": "Psydrax subcordata (NE)"
+  },
+  {
+   "name": "Pteridium pinetorum_LC",
+   "label": "Pteridium pinetorum (LC)"
+  },
+  {
+   "name": "Pterocarpus erinaceus_EN",
+   "label": "Pterocarpus erinaceus (EN)"
+  },
+  {
+   "name": "Pterocarpus santalinoides_LC",
+   "label": "Pterocarpus santalinoides (LC)"
+  },
+  {
+   "name": "Pupalia lappacea var. glabrescens_LC",
+   "label": "Pupalia lappacea var. glabrescens (LC)"
+  },
+  {
+   "name": "Pycnanthus angolensis_LC",
+   "label": "Pycnanthus angolensis (LC)"
+  },
+  {
+   "name": "Pycreus capillifolius_NE",
+   "label": "Pycreus capillifolius (NE)"
+  },
+  {
+   "name": "Raphia sudanica_NT",
+   "label": "Raphia sudanica (NT)"
+  },
+  {
+   "name": "Rauvolfia vomitoria_LC",
+   "label": "Rauvolfia vomitoria (LC)"
+  },
+  {
+   "name": "Rhinopomastus aterrimus _LC",
+   "label": "Rhinopomastus aterrimus  (LC)"
+  },
+  {
+   "name": "Rhizophora harrisonii_NE",
+   "label": "Rhizophora harrisonii (NE)"
+  },
+  {
+   "name": "Rhizophora mangle_LC",
+   "label": "Rhizophora mangle (LC)"
+  },
+  {
+   "name": "Rhizophora racemosa_LC",
+   "label": "Rhizophora racemosa (LC)"
+  },
+  {
+   "name": "Ricinodendron heudelotii_LC",
+   "label": "Ricinodendron heudelotii (LC)"
+  },
+  {
+   "name": "Rinorea sp._NE",
+   "label": "Rinorea sp. (NE)"
+  },
+  {
+   "name": "Rinorea subintegrifolia_NE",
+   "label": "Rinorea subintegrifolia (NE)"
+  },
+  {
+   "name": "Rogeria adenophylla_NE",
+   "label": "Rogeria adenophylla (NE)"
+  },
+  {
+   "name": "Rothmannia longiflora_LC",
+   "label": "Rothmannia longiflora (LC)"
+  },
+  {
+   "name": "Rothmannia whitfieldii_LC",
+   "label": "Rothmannia whitfieldii (LC)"
+  },
+  {
+   "name": "Rottboellia cochinchinensis_NE",
+   "label": "Rottboellia cochinchinensis (NE)"
+  },
+  {
+   "name": "Rottboellia exaltata_NE",
+   "label": "Rottboellia exaltata (NE)"
+  },
+  {
+   "name": "Rourea coccinea_LC",
+   "label": "Rourea coccinea (LC)"
+  },
+  {
+   "name": "Saba senegalensis_NE",
+   "label": "Saba senegalensis (NE)"
+  },
+  {
+   "name": "Sabicea sp._NE",
+   "label": "Sabicea sp. (NE)"
+  },
+  {
+   "name": "Salacia senegalensis _NE",
+   "label": "Salacia senegalensis  (NE)"
+  },
+  {
+   "name": "Samanea dinklagei _NE",
+   "label": "Samanea dinklagei  (NE)"
+  },
+  {
+   "name": "Sansevieria senegambica_NE",
+   "label": "Sansevieria senegambica (NE)"
+  },
+  {
+   "name": "Santiria trimera_LC",
+   "label": "Santiria trimera (LC)"
+  },
+  {
+   "name": "Sarcocephalus latifolius_NE",
+   "label": "Sarcocephalus latifolius (NE)"
+  },
+  {
+   "name": "Schizachyrium exile_NE",
+   "label": "Schizachyrium exile (NE)"
+  },
+  {
+   "name": "Schizachyrium pulchellum_NE",
+   "label": "Schizachyrium pulchellum (NE)"
+  },
+  {
+   "name": "Schizachyrium sp._NE",
+   "label": "Schizachyrium sp. (NE)"
+  },
+  {
+   "name": "Schrebera arborea_LC",
+   "label": "Schrebera arborea (LC)"
+  },
+  {
+   "name": "Scleria boivinii_LC",
+   "label": "Scleria boivinii (LC)"
+  },
+  {
+   "name": "Scleria scrobiculata_NE",
+   "label": "Scleria scrobiculata (NE)"
+  },
+  {
+   "name": "Scoparia dulcis_NE",
+   "label": "Scoparia dulcis (NE)"
+  },
+  {
+   "name": "Securidaca longepedunculata_LC",
+   "label": "Securidaca longepedunculata (LC)"
+  },
+  {
+   "name": "Selaginella myosorus_NE",
+   "label": "Selaginella myosorus (NE)"
+  },
+  {
+   "name": "Selaginella versicolor_NE",
+   "label": "Selaginella versicolor (NE)"
+  },
+  {
+   "name": "Senna alata_LC",
+   "label": "Senna alata (LC)"
+  },
+  {
+   "name": "Senna obtusifolia _LC",
+   "label": "Senna obtusifolia  (LC)"
+  },
+  {
+   "name": "Senna podocarpa_NE",
+   "label": "Senna podocarpa (NE)"
+  },
+  {
+   "name": "Senna siamea_LC",
+   "label": "Senna siamea (LC)"
+  },
+  {
+   "name": "Senna tora_NE",
+   "label": "Senna tora (NE)"
+  },
+  {
+   "name": "Sesamum alatum_NE",
+   "label": "Sesamum alatum (NE)"
+  },
+  {
+   "name": "Sesamum indicum_NE",
+   "label": "Sesamum indicum (NE)"
+  },
+  {
+   "name": "Sesamum radiatum_NE",
+   "label": "Sesamum radiatum (NE)"
+  },
+  {
+   "name": "Setaria megaphylla_NE",
+   "label": "Setaria megaphylla (NE)"
+  },
+  {
+   "name": "Shirakiopsis elliptica_LC",
+   "label": "Shirakiopsis elliptica (LC)"
+  },
+  {
+   "name": "Sida acuta_NE",
+   "label": "Sida acuta (NE)"
+  },
+  {
+   "name": "Sida rhombifolia_NE",
+   "label": "Sida rhombifolia (NE)"
+  },
+  {
+   "name": "Smeathmannia laevigata_LC",
+   "label": "Smeathmannia laevigata (LC)"
+  },
+  {
+   "name": "Smeathmannia pubescens_LC",
+   "label": "Smeathmannia pubescens (LC)"
+  },
+  {
+   "name": "Smilax kraussiana_NE",
+   "label": "Smilax kraussiana (NE)"
+  },
+  {
+   "name": "Solanum capense_LC",
+   "label": "Solanum capense (LC)"
+  },
+  {
+   "name": "Solanum incanum_LC",
+   "label": "Solanum incanum (LC)"
+  },
+  {
+   "name": "Solanum melongena_NE",
+   "label": "Solanum melongena (NE)"
+  },
+  {
+   "name": "Solanum torvum_NE",
+   "label": "Solanum torvum (NE)"
+  },
+  {
+   "name": "Sorindeia juglandifolia _LC",
+   "label": "Sorindeia juglandifolia  (LC)"
+  },
+  {
+   "name": "Spathodea campanulata_LC",
+   "label": "Spathodea campanulata (LC)"
+  },
+  {
+   "name": "Spermacoce chaetocephala_NE",
+   "label": "Spermacoce chaetocephala (NE)"
+  },
+  {
+   "name": "Spermacoce verticillata_NE",
+   "label": "Spermacoce verticillata (NE)"
+  },
+  {
+   "name": "Sphenoclea zeynalica_LC",
+   "label": "Sphenoclea zeynalica (LC)"
+  },
+  {
+   "name": "Spigelia anthelmia_NE",
+   "label": "Spigelia anthelmia (NE)"
+  },
+  {
+   "name": "Spondias mombin_LC",
+   "label": "Spondias mombin (LC)"
+  },
+  {
+   "name": "Sporobolus paniculata_NE",
+   "label": "Sporobolus paniculata (NE)"
+  },
+  {
+   "name": "Sporobolus pyramidalus_NE",
+   "label": "Sporobolus pyramidalus (NE)"
+  },
+  {
+   "name": "Sterculia tragacantha_LC",
+   "label": "Sterculia tragacantha (LC)"
+  },
+  {
+   "name": "Stereospermum acuminatissimum_LC",
+   "label": "Stereospermum acuminatissimum (LC)"
+  },
+  {
+   "name": "Striga asiatica_NE",
+   "label": "Striga asiatica (NE)"
+  },
+  {
+   "name": "Strophanthus hispidus_LC",
+   "label": "Strophanthus hispidus (LC)"
+  },
+  {
+   "name": "Strophanthus sarmentosus_NE",
+   "label": "Strophanthus sarmentosus (NE)"
+  },
+  {
+   "name": "Strophanthus sp._NE",
+   "label": "Strophanthus sp. (NE)"
+  },
+  {
+   "name": "Stylosanthes erecta_NE",
+   "label": "Stylosanthes erecta (NE)"
+  },
+  {
+   "name": "Synsepalum cerasiferum_LC",
+   "label": "Synsepalum cerasiferum (LC)"
+  },
+  {
+   "name": "Syzygium guineense_LC",
+   "label": "Syzygium guineense (LC)"
+  },
+  {
+   "name": "Tabernaemontana africana_LC",
+   "label": "Tabernaemontana africana (LC)"
+  },
+  {
+   "name": "Tacca leontopetaloides_LC",
+   "label": "Tacca leontopetaloides (LC)"
+  },
+  {
+   "name": "Tamarindus indica_LC",
+   "label": "Tamarindus indica (LC)"
+  },
+  {
+   "name": "Tapinanthus bangwensis_NE",
+   "label": "Tapinanthus bangwensis (NE)"
+  },
+  {
+   "name": "Tarenna sp._NE",
+   "label": "Tarenna sp. (NE)"
+  },
+  {
+   "name": "Tephrosia gracilipes_NE",
+   "label": "Tephrosia gracilipes (NE)"
+  },
+  {
+   "name": "Tephrosia uniflora_NE",
+   "label": "Tephrosia uniflora (NE)"
+  },
+  {
+   "name": "Terminalia albida_NE",
+   "label": "Terminalia albida (NE)"
+  },
+  {
+   "name": "Terminalia glaucescens_LC",
+   "label": "Terminalia glaucescens (LC)"
+  },
+  {
+   "name": "Terminalia ivorensis_VU",
+   "label": "Terminalia ivorensis (VU)"
+  },
+  {
+   "name": "Terminalia macroptera  _LC",
+   "label": "Terminalia macroptera   (LC)"
+  },
+  {
+   "name": "Terminalia scutifera  _NT",
+   "label": "Terminalia scutifera   (NT)"
+  },
+  {
+   "name": "Terminalia sp._NE",
+   "label": "Terminalia sp. (NE)"
+  },
+  {
+   "name": "Tetracera alnifolia _NE",
+   "label": "Tetracera alnifolia  (NE)"
+  },
+  {
+   "name": "Tetracera potatoria _NE",
+   "label": "Tetracera potatoria  (NE)"
+  },
+  {
+   "name": "Tetrapogon cenchriformis_NE",
+   "label": "Tetrapogon cenchriformis (NE)"
+  },
+  {
+   "name": "Tetrorchidium didymostemon _LC",
+   "label": "Tetrorchidium didymostemon  (LC)"
+  },
+  {
+   "name": "Thalia geniculata_LC",
+   "label": "Thalia geniculata (LC)"
+  },
+  {
+   "name": "Tragus racemosus_NE",
+   "label": "Tragus racemosus (NE)"
+  },
+  {
+   "name": "Treculia africana_LC",
+   "label": "Treculia africana (LC)"
+  },
+  {
+   "name": "Trema guineensis_NE",
+   "label": "Trema guineensis (NE)"
+  },
+  {
+   "name": "Trema orientale_LC",
+   "label": "Trema orientale (LC)"
+  },
+  {
+   "name": "Tribulus terrestris_LC",
+   "label": "Tribulus terrestris (LC)"
+  },
+  {
+   "name": "Tricalysia bracteata_NE",
+   "label": "Tricalysia bracteata (NE)"
+  },
+  {
+   "name": "Trichilia heudelotii_NE",
+   "label": "Trichilia heudelotii (NE)"
+  },
+  {
+   "name": "Trichilia prieuriana_LC",
+   "label": "Trichilia prieuriana (LC)"
+  },
+  {
+   "name": "Trilepisium madagascariensis_NE",
+   "label": "Trilepisium madagascariensis (NE)"
+  },
+  {
+   "name": "Triumfetta cordifolia_NE",
+   "label": "Triumfetta cordifolia (NE)"
+  },
+  {
+   "name": "Uapaca esculenta_NE",
+   "label": "Uapaca esculenta (NE)"
+  },
+  {
+   "name": "Uapaca guineensis_LC",
+   "label": "Uapaca guineensis (LC)"
+  },
+  {
+   "name": "Uapaca heudelotii_LC",
+   "label": "Uapaca heudelotii (LC)"
+  },
+  {
+   "name": "Urena lobata_LC",
+   "label": "Urena lobata (LC)"
+  },
+  {
+   "name": "Urochloa trichopus_NE",
+   "label": "Urochloa trichopus (NE)"
+  },
+  {
+   "name": "Usteria guineensis_NE",
+   "label": "Usteria guineensis (NE)"
+  },
+  {
+   "name": "Utricularia rigida_LC",
+   "label": "Utricularia rigida (LC)"
+  },
+  {
+   "name": "Uvaria chamae _LC",
+   "label": "Uvaria chamae  (LC)"
+  },
+  {
+   "name": "Vangueria sp._NE",
+   "label": "Vangueria sp. (NE)"
+  },
+  {
+   "name": "Vangueriella vanguerioides_LC",
+   "label": "Vangueriella vanguerioides (LC)"
+  },
+  {
+   "name": "Vangueriopsis discolor_NE",
+   "label": "Vangueriopsis discolor (NE)"
+  },
+  {
+   "name": "Vernonia ambigua_NE",
+   "label": "Vernonia ambigua (NE)"
+  },
+  {
+   "name": "Vismia guineensis _LC",
+   "label": "Vismia guineensis  (LC)"
+  },
+  {
+   "name": "Vitex bojeri_LC",
+   "label": "Vitex bojeri (LC)"
+  },
+  {
+   "name": "Vitex doniana_LC",
+   "label": "Vitex doniana (LC)"
+  },
+  {
+   "name": "Vitex madiensis_LC",
+   "label": "Vitex madiensis (LC)"
+  },
+  {
+   "name": "Voacanga africana_LC",
+   "label": "Voacanga africana (LC)"
+  },
+  {
+   "name": "Waltheria indica_LC",
+   "label": "Waltheria indica (LC)"
+  },
+  {
+   "name": "Ximenia americana_LC",
+   "label": "Ximenia americana (LC)"
+  },
+  {
+   "name": "Xylopia aethiopica_LC",
+   "label": "Xylopia aethiopica (LC)"
+  },
+  {
+   "name": "Xylopia villosa_LC",
+   "label": "Xylopia villosa (LC)"
+  },
+  {
+   "name": "Xyris anceps_NE",
+   "label": "Xyris anceps (NE)"
+  },
+  {
+   "name": "Zanthoxylum gilletii_LC",
+   "label": "Zanthoxylum gilletii (LC)"
+  },
+  {
+   "name": "Zanthoxylum macrophyllum_LC",
+   "label": "Zanthoxylum macrophyllum (LC)"
+  },
+  {
+   "name": "Zanthoxylum zanthoxyloides_LC",
+   "label": "Zanthoxylum zanthoxyloides (LC)"
+  },
+  {
+   "name": "Zea mays_LC",
+   "label": "Zea mays (LC)"
+  },
+  {
+   "name": "autre_flore",
+   "label": "Autre"
+  }
+ ],
+ "sv_biomep": [
+  {
+   "name": "fore_guineo_congolaise",
+   "label": "Forêt Guinéo Congolaise"
+  },
+  {
+   "name": "savane_soudano_guinneenne",
+   "label": "Savane Soudano Guinnéenne"
+  }
+ ],
+ "sv_typemig": [
+  {
+   "name": "migrateur_intra_africain",
+   "label": "Migrateur intra Africain"
+  },
+  {
+   "name": "migrateur_palearctique",
+   "label": "Migrateur paléarctique"
+  },
+  {
+   "name": "migrateur_partiel",
+   "label": "Migrateur partiel"
+  }
+ ],
+ "sv_typeend": [
+  {
+   "name": "reparation_restreinte",
+   "label": "Répartition restreinte"
+  },
+  {
+   "name": "endemique_afrique_ouest",
+   "label": "Endémique à l’Afrique de l’ouest"
+  },
+  {
+   "name": "endemique_guinee",
+   "label": "Endémique à la Guinée"
+  }
+ ],
+ "sv_oiseau": [
+  {
+   "name": "Apus_Pallidus_Lc",
+   "label": "Apus Pallidus (Lc)"
+  },
+  {
+   "name": "Accipiter_badius_LC",
+   "label": "Accipiter badius (LC)"
+  },
+  {
+   "name": "Accipiter_melanoleucus_LC",
+   "label": "Accipiter melanoleucus (LC)"
+  },
+  {
+   "name": "Accipiter_ovampensis_LC",
+   "label": "Accipiter ovampensis (LC)"
+  },
+  {
+   "name": "Accipiter_tachiro_LC",
+   "label": "Accipiter tachiro (LC)"
+  },
+  {
+   "name": "Acrocephalus_scirpaceus_LC",
+   "label": "Acrocephalus scirpaceus (LC)"
+  },
+  {
+   "name": "Actophilornis_africanus_LC",
+   "label": "Actophilornis africanus (LC)"
+  },
+  {
+   "name": "Agama_agama_LC",
+   "label": "Agama agama (LC)"
+  },
+  {
+   "name": "Alcedo_critata_LC",
+   "label": "Alcedo critata  (LC)"
+  },
+  {
+   "name": "Alcedo_quadribrachys__LC",
+   "label": "Alcedo quadribrachys  (LC)"
+  },
+  {
+   "name": "Alethe_diademata_LC",
+   "label": "Alethe diademata (LC)"
+  },
+  {
+   "name": "Anhinga_rufa_LC",
+   "label": "Anhinga rufa (LC)"
+  },
+  {
+   "name": "Anthreptes_longuemarei_LC",
+   "label": "Anthreptes longuemarei (LC)"
+  },
+  {
+   "name": "Anthus_leucophrys_LC",
+   "label": "Anthus leucophrys (LC)"
+  },
+  {
+   "name": "Anthus_similis_LC",
+   "label": "Anthus similis (LC)"
+  },
+  {
+   "name": "Anthus_trivialis_LC",
+   "label": "Anthus trivialis (LC)"
+  },
+  {
+   "name": "Apalis_flavida_LC",
+   "label": "Apalis flavida (LC)"
+  },
+  {
+   "name": "Apaloderma_narina_LC",
+   "label": "Apaloderma narina (LC)"
+  },
+  {
+   "name": "Apus_affinis_LC",
+   "label": "Apus affinis (LC)"
+  },
+  {
+   "name": "Apus_apus_LC",
+   "label": "Apus apus (LC)"
+  },
+  {
+   "name": "Aquila_rapax_VU",
+   "label": "Aquila rapax (VU)"
+  },
+  {
+   "name": "Aquila_spilogaster_LC",
+   "label": "Aquila spilogaster (LC)"
+  },
+  {
+   "name": "Ardea_alba_LC",
+   "label": "Ardea alba (LC)"
+  },
+  {
+   "name": "Ardea_cinerea_LC",
+   "label": "Ardea cinerea (LC)"
+  },
+  {
+   "name": "Ardea_herodias_LC",
+   "label": "Ardea herodias (LC)"
+  },
+  {
+   "name": "Ardea_intermedia_LC",
+   "label": "Ardea intermedia (LC)"
+  },
+  {
+   "name": "Ardea_melanocephala_LC",
+   "label": "Ardea melanocephala (LC)"
+  },
+  {
+   "name": "Ardea_purpurea_LC",
+   "label": "Ardea purpurea (LC)"
+  },
+  {
+   "name": "Ardeola_ralloides_LC",
+   "label": "Ardeola ralloides (LC)"
+  },
+  {
+   "name": "Atimastillas_flavicollis_LC",
+   "label": "Atimastillas flavicollis (LC)"
+  },
+  {
+   "name": "Aviceda_cuculoides_LC",
+   "label": "Aviceda cuculoides (LC)"
+  },
+  {
+   "name": "Batis_senegalensis_LC",
+   "label": "Batis senegalensis (LC)"
+  },
+  {
+   "name": "Bias_musicus_LC",
+   "label": "Bias musicus (LC)"
+  },
+  {
+   "name": "Bleda_canicapillus_LC",
+   "label": "Bleda canicapillus (LC)"
+  },
+  {
+   "name": "Bostrychia_hagedash_LC",
+   "label": "Bostrychia hagedash (LC)"
+  },
+  {
+   "name": "Bubalornis_albirostris_LC",
+   "label": "Bubalornis albirostris (LC)"
+  },
+  {
+   "name": "Bubo_cinerascens_LC",
+   "label": "Bubo cinerascens (LC)"
+  },
+  {
+   "name": "Bubulcus_ibis_LC",
+   "label": "Bubulcus ibis (LC)"
+  },
+  {
+   "name": "Burhinus_senegalensis_LC",
+   "label": "Burhinus senegalensis (LC)"
+  },
+  {
+   "name": "Burhinus_vermiculatus_LC",
+   "label": "Burhinus vermiculatus (LC)"
+  },
+  {
+   "name": "Butastur_rufipennis_LC",
+   "label": "Butastur rufipennis (LC)"
+  },
+  {
+   "name": "Buteo_auguralis_LC",
+   "label": "Buteo auguralis (LC)"
+  },
+  {
+   "name": "Butorides_striata_LC",
+   "label": "Butorides striata (LC)"
+  },
+  {
+   "name": "Bycanistes_cylindricus_VU",
+   "label": "Bycanistes cylindricus (VU)"
+  },
+  {
+   "name": "Bycanistes_fistulator_LC",
+   "label": "Bycanistes fistulator (LC)"
+  },
+  {
+   "name": "Calidris_canutus_LC",
+   "label": "Calidris canutus (LC)"
+  },
+  {
+   "name": "Camaroptera_brachyura_LC",
+   "label": "Camaroptera brachyura (LC)"
+  },
+  {
+   "name": "Camaroptera_brevicaudata_NE",
+   "label": "Camaroptera brevicaudata (NE)"
+  },
+  {
+   "name": "Camaroptera_chloronota_LC",
+   "label": "Camaroptera chloronota (LC)"
+  },
+  {
+   "name": "Campephaga_phoenicea_LC",
+   "label": "Campephaga phoenicea (LC)"
+  },
+  {
+   "name": "Campethera_maculosa_LC",
+   "label": "Campethera maculosa (LC)"
+  },
+  {
+   "name": "Campethera_punctuligera_LC",
+   "label": "Campethera punctuligera (LC)"
+  },
+  {
+   "name": "Caprimulgus_climacurus_LC",
+   "label": "Caprimulgus climacurus (LC)"
+  },
+  {
+   "name": "Caprimulgus_longipennis_LC",
+   "label": "Caprimulgus longipennis (LC)"
+  },
+  {
+   "name": "Ceblepyris_pectoralis_LC",
+   "label": "Ceblepyris pectoralis (LC)"
+  },
+  {
+   "name": "Cecropis_daurica_LC",
+   "label": "Cecropis daurica (LC)"
+  },
+  {
+   "name": "Cecropis_semirufa_LC",
+   "label": "Cecropis semirufa (LC)"
+  },
+  {
+   "name": "Cecropis_senegalensis_LC",
+   "label": "Cecropis senegalensis (LC)"
+  },
+  {
+   "name": "Centropus_leucogaster_LC",
+   "label": "Centropus leucogaster (LC)"
+  },
+  {
+   "name": "Centropus_senegalensis_LC",
+   "label": "Centropus senegalensis (LC)"
+  },
+  {
+   "name": "Ceratogymna_atrata_LC",
+   "label": "Ceratogymna atrata (LC)"
+  },
+  {
+   "name": "Ceratogymna_elata_VU",
+   "label": "Ceratogymna elata (VU)"
+  },
+  {
+   "name": "Ceryle_rudis_LC",
+   "label": "Ceryle rudis (LC)"
+  },
+  {
+   "name": "Ceuthmochares_aereus_LC",
+   "label": "Ceuthmochares aereus (LC)"
+  },
+  {
+   "name": "Chalcomitra_adelberti_LC",
+   "label": "Chalcomitra adelberti (LC)"
+  },
+  {
+   "name": "Chalcomitra_senegalensis_LC",
+   "label": "Chalcomitra senegalensis (LC)"
+  },
+  {
+   "name": "Charadrius_forbesi_LC",
+   "label": "Charadrius forbesi (LC)"
+  },
+  {
+   "name": "Charadrius_hiaticula_LC",
+   "label": "Charadrius hiaticula (LC)"
+  },
+  {
+   "name": "Chlorocichla_flavicollis_LC",
+   "label": "Chlorocichla flavicollis (LC)"
+  },
+  {
+   "name": "Chlorocichla_simplex_LC",
+   "label": "Chlorocichla simplex (LC)"
+  },
+  {
+   "name": "Chlorophoneus_sulfureopectus_LC",
+   "label": "Chlorophoneus sulfureopectus (LC)"
+  },
+  {
+   "name": "Chrysococcyx_caprius_LC",
+   "label": "Chrysococcyx caprius (LC)"
+  },
+  {
+   "name": "Chrysococcyx_cupreus_LC",
+   "label": "Chrysococcyx cupreus (LC)"
+  },
+  {
+   "name": "Chrysococcyx_klaas_LC",
+   "label": "Chrysococcyx klaas (LC)"
+  },
+  {
+   "name": "Ciconia_episcopus_NT",
+   "label": "Ciconia episcopus (NT)"
+  },
+  {
+   "name": "Cinnyricinclus_leucogaster_LC",
+   "label": "Cinnyricinclus leucogaster (LC)"
+  },
+  {
+   "name": "Cinnyris_chloropygius_LC",
+   "label": "Cinnyris chloropygius (LC)"
+  },
+  {
+   "name": "Cinnyris_coccinigastrus_LC",
+   "label": "Cinnyris coccinigastrus (LC)"
+  },
+  {
+   "name": "Cinnyris_cupreus_LC",
+   "label": "Cinnyris cupreus (LC)"
+  },
+  {
+   "name": "Cinnyris_venustus_LC",
+   "label": "Cinnyris venustus (LC)"
+  },
+  {
+   "name": "Circaetus_cinerascens_LC",
+   "label": "Circaetus cinerascens (LC)"
+  },
+  {
+   "name": "Circaetus_cinereus_LC",
+   "label": "Circaetus cinereus (LC)"
+  },
+  {
+   "name": "Circus_aeruginosus_LC",
+   "label": "Circus aeruginosus (LC)"
+  },
+  {
+   "name": "Cisticola_cantans_LC",
+   "label": "Cisticola cantans (LC)"
+  },
+  {
+   "name": "Cisticola_erythrops_LC",
+   "label": "Cisticola erythrops (LC)"
+  },
+  {
+   "name": "Cisticola_lateralis_LC",
+   "label": "Cisticola lateralis (LC)"
+  },
+  {
+   "name": "Clamator_glandarius_LC",
+   "label": "Clamator glandarius (LC)"
+  },
+  {
+   "name": "Clamator_jacobinus_LC",
+   "label": "Clamator jacobinus (LC)"
+  },
+  {
+   "name": "Clamator_levaillantii_LC",
+   "label": "Clamator levaillantii (LC)"
+  },
+  {
+   "name": "Coracias_abyssinicus_LC",
+   "label": "Coracias abyssinicus (LC)"
+  },
+  {
+   "name": "Coracias_cyanogaster_LC",
+   "label": "Coracias cyanogaster (LC)"
+  },
+  {
+   "name": "Coracias_naevius_LC",
+   "label": "Coracias naevius (LC)"
+  },
+  {
+   "name": "Corvinella_corvina_LC",
+   "label": "Corvinella corvina (LC)"
+  },
+  {
+   "name": "Corvus_albus_LC",
+   "label": "Corvus albus (LC)"
+  },
+  {
+   "name": "Corythornis_cristatus_LC",
+   "label": "Corythornis cristatus (LC)"
+  },
+  {
+   "name": "Cossypha_albicapillus_LC",
+   "label": "Cossypha albicapillus (LC)"
+  },
+  {
+   "name": "Cossypha_niveicapilla_LC",
+   "label": "Cossypha niveicapilla (LC)"
+  },
+  {
+   "name": "Crinifer_piscator_LC",
+   "label": "Crinifer piscator (LC)"
+  },
+  {
+   "name": "Crithagra_mozambica_LC",
+   "label": "Crithagra mozambica (LC)"
+  },
+  {
+   "name": "Cuculus_gularis_LC",
+   "label": "Cuculus gularis (LC)"
+  },
+  {
+   "name": "Cuculus_solitarius_LC",
+   "label": "Cuculus solitarius (LC)"
+  },
+  {
+   "name": "Cyanomitra_olivacea_LC",
+   "label": "Cyanomitra olivacea (LC)"
+  },
+  {
+   "name": "Cyanomitra_verticalis_LC",
+   "label": "Cyanomitra verticalis (LC)"
+  },
+  {
+   "name": "Cypsiurus_parvus_LC",
+   "label": "Cypsiurus parvus (LC)"
+  },
+  {
+   "name": "Delichon_urbicum_LC",
+   "label": "Delichon urbicum (LC)"
+  },
+  {
+   "name": "Dendrocygna_viduata_LC",
+   "label": "Dendrocygna viduata (LC)"
+  },
+  {
+   "name": "Dendropicos_fuscescens_LC",
+   "label": "Dendropicos fuscescens (LC)"
+  },
+  {
+   "name": "Dendropicos_goertae_LC",
+   "label": "Dendropicos goertae (LC)"
+  },
+  {
+   "name": "Dendropicos_obsoletus_LC",
+   "label": "Dendropicos obsoletus (LC)"
+  },
+  {
+   "name": "Dicrurus_adsimilis_LC",
+   "label": "Dicrurus adsimilis (LC)"
+  },
+  {
+   "name": "Dicrurus_divaricatus_NE",
+   "label": "Dicrurus divaricatus (NE)"
+  },
+  {
+   "name": "Dryoscopus_gambensis_LC",
+   "label": "Dryoscopus gambensis (LC)"
+  },
+  {
+   "name": "Egretta_ardesiaca_LC",
+   "label": "Egretta ardesiaca (LC)"
+  },
+  {
+   "name": "Egretta_garzetta_LC",
+   "label": "Egretta garzetta (LC)"
+  },
+  {
+   "name": "Egretta_gularis_LC",
+   "label": "Egretta gularis (LC)"
+  },
+  {
+   "name": "Egretta_intermedia_LC",
+   "label": "Egretta intermedia (LC)"
+  },
+  {
+   "name": "Elanus_caeruleus_LC",
+   "label": "Elanus caeruleus (LC)"
+  },
+  {
+   "name": "Elminia_longicauda_LC",
+   "label": "Elminia longicauda (LC)"
+  },
+  {
+   "name": "Emberiza_cabanizi_LC",
+   "label": "Emberiza cabanizi (LC)"
+  },
+  {
+   "name": "Emberiza_hortulana_LC",
+   "label": "Emberiza hortulana (LC)"
+  },
+  {
+   "name": "Emberiza_tahapisi_LC",
+   "label": "Emberiza tahapisi (LC)"
+  },
+  {
+   "name": "Emberiza_tahapiza_LC",
+   "label": "Emberiza tahapiza (LC)"
+  },
+  {
+   "name": "Emplectes_franciscanus_LC",
+   "label": "Emplectes franciscanus (LC)"
+  },
+  {
+   "name": "Eremomela_pusilla_LC",
+   "label": "Eremomela pusilla (LC)"
+  },
+  {
+   "name": "Erythrocercus_mccallii_LC",
+   "label": "Erythrocercus mccallii (LC)"
+  },
+  {
+   "name": "Estrilda_coerulescens_LC",
+   "label": "Estrilda coerulescens (LC)"
+  },
+  {
+   "name": "Estrilda_melpoda_LC",
+   "label": "Estrilda melpoda (LC)"
+  },
+  {
+   "name": "Euplectes_afer_LC",
+   "label": "Euplectes afer (LC)"
+  },
+  {
+   "name": "Euplectes_franciscanus_LC",
+   "label": "Euplectes franciscanus (LC)"
+  },
+  {
+   "name": "Euplectes_hordeaceus_Lc",
+   "label": "Euplectes hordeaceus (Lc)"
+  },
+  {
+   "name": "Euplectes_macroura_LC",
+   "label": "Euplectes macroura (LC)"
+  },
+  {
+   "name": "Euplectes_sp._NE",
+   "label": "Euplectes sp. (NE)"
+  },
+  {
+   "name": "Eurillas_gracilis_LC",
+   "label": "Eurillas gracilis (LC)"
+  },
+  {
+   "name": "Eurillas_latirostris_LC",
+   "label": "Eurillas latirostris (LC)"
+  },
+  {
+   "name": "Eurillas_virens_LC",
+   "label": "Eurillas virens (LC)"
+  },
+  {
+   "name": "Eurystomus_glaucurus_LC",
+   "label": "Eurystomus glaucurus (LC)"
+  },
+  {
+   "name": "Euschistospiza_dybowskii_LC",
+   "label": "Euschistospiza dybowskii (LC)"
+  },
+  {
+   "name": "Falco_ardosiaceus_LC",
+   "label": "Falco ardosiaceus (LC)"
+  },
+  {
+   "name": "Falco_biarmicus_LC",
+   "label": "Falco biarmicus (LC)"
+  },
+  {
+   "name": "Falco_subbuteo_LC",
+   "label": "Falco subbuteo (LC)"
+  },
+  {
+   "name": "Falco_tinnunculus_LC",
+   "label": "Falco tinnunculus (LC)"
+  },
+  {
+   "name": "Fraseria_plumbea_LC",
+   "label": "Fraseria plumbea (LC)"
+  },
+  {
+   "name": "Galerida_modesta_Lc",
+   "label": "Galerida modesta (Lc)"
+  },
+  {
+   "name": "Glaucestrilda_caerulescens_LC",
+   "label": "Glaucestrilda caerulescens (LC)"
+  },
+  {
+   "name": "Glaucidium_perlatum_LC",
+   "label": "Glaucidium perlatum (LC)"
+  },
+  {
+   "name": "Gymnoris_dentata_LC",
+   "label": "Gymnoris dentata (LC)"
+  },
+  {
+   "name": "Gypohierax_angolensis_LC",
+   "label": "Gypohierax angolensis (LC)"
+  },
+  {
+   "name": "Gyps_africanus_CR",
+   "label": "Gyps africanus (CR)"
+  },
+  {
+   "name": "Halcyon_chelicuti_LC",
+   "label": "Halcyon chelicuti (LC)"
+  },
+  {
+   "name": "Halcyon_leucocephala_LC",
+   "label": "Halcyon leucocephala (LC)"
+  },
+  {
+   "name": "Halcyon_malimbica_LC",
+   "label": "Halcyon malimbica (LC)"
+  },
+  {
+   "name": "Halcyon_senegalensis_LC",
+   "label": "Halcyon senegalensis (LC)"
+  },
+  {
+   "name": "Haliaeetus_vocifer_LC",
+   "label": "Haliaeetus vocifer (LC)"
+  },
+  {
+   "name": "Hedydipna_collaris_LC",
+   "label": "Hedydipna collaris (LC)"
+  },
+  {
+   "name": "Hirundo_leucosoma_LC",
+   "label": "Hirundo leucosoma (LC)"
+  },
+  {
+   "name": "Hirundo_lucida_LC",
+   "label": "Hirundo lucida (LC)"
+  },
+  {
+   "name": "Hirundo_rustica_LC",
+   "label": "Hirundo rustica (LC)"
+  },
+  {
+   "name": "Hydroprogne_caspia_LC",
+   "label": "Hydroprogne caspia (LC)"
+  },
+  {
+   "name": "Hylia_prasina_LC",
+   "label": "Hylia prasina (LC)"
+  },
+  {
+   "name": "Hypergerus_atriceps_LC",
+   "label": "Hypergerus atriceps (LC)"
+  },
+  {
+   "name": "Illadopsis_fulvescens_LC",
+   "label": "Illadopsis fulvescens (LC)"
+  },
+  {
+   "name": "Indicator_indicator_LC",
+   "label": "Indicator indicator (LC)"
+  },
+  {
+   "name": "Indicator_maculatus_LC",
+   "label": "Indicator maculatus (LC)"
+  },
+  {
+   "name": "Indicator_minor_LC",
+   "label": "Indicator minor (LC)"
+  },
+  {
+   "name": "Ispidina_picta_LC",
+   "label": "Ispidina picta (LC)"
+  },
+  {
+   "name": "Ixonotus_guttatus_LC",
+   "label": "Ixonotus guttatus (LC)"
+  },
+  {
+   "name": "Kaupifalco_monogrammicus_LC",
+   "label": "Kaupifalco monogrammicus (LC)"
+  },
+  {
+   "name": "Lagonosticta_larvata_LC",
+   "label": "Lagonosticta larvata (LC)"
+  },
+  {
+   "name": "Lagonosticta_rara_LC",
+   "label": "Lagonosticta rara (LC)"
+  },
+  {
+   "name": "Lagonosticta_rubricata_LC",
+   "label": "Lagonosticta rubricata (LC)"
+  },
+  {
+   "name": "Lagonosticta_rufopicta_LC",
+   "label": "Lagonosticta rufopicta (LC)"
+  },
+  {
+   "name": "Lagonosticta_senegala_LC",
+   "label": "Lagonosticta senegala (LC)"
+  },
+  {
+   "name": "Lamprotornis _caudatus_LC",
+   "label": "Lamprotornis  caudatus  (LC\n)"
+  },
+  {
+   "name": "Lamprotornis_caudatus_LC",
+   "label": "Lamprotornis caudatus (LC)"
+  },
+  {
+   "name": "Lamprotornis_chalcurus_LC",
+   "label": "Lamprotornis chalcurus (LC)"
+  },
+  {
+   "name": "Lamprotornis_purpureus_LC",
+   "label": "Lamprotornis purpureus (LC)"
+  },
+  {
+   "name": "Lamprotornis_splendidus_LC",
+   "label": "Lamprotornis splendidus (LC)"
+  },
+  {
+   "name": "Laniarius_aethiopicus_LC",
+   "label": "Laniarius aethiopicus (LC)"
+  },
+  {
+   "name": "Laniarius_barbarus_LC",
+   "label": "Laniarius barbarus (LC)"
+  },
+  {
+   "name": "Laniarius_turatii_LC",
+   "label": "Laniarius turatii (LC)"
+  },
+  {
+   "name": "Lophaetus_occipitalis_LC",
+   "label": "Lophaetus occipitalis (LC)"
+  },
+  {
+   "name": "Lophoceros_erythrorhynchus_LC",
+   "label": "Lophoceros erythrorhynchus (LC)"
+  },
+  {
+   "name": "Lophoceros_fasciatus_LC",
+   "label": "Lophoceros fasciatus (LC)"
+  },
+  {
+   "name": "Lophoceros_nasutus_LC",
+   "label": "Lophoceros nasutus (LC)"
+  },
+  {
+   "name": "Luscinia_svecica_LC",
+   "label": "Luscinia svecica (LC)"
+  },
+  {
+   "name": "Lybius_dubius_LC",
+   "label": "Lybius dubius (LC)"
+  },
+  {
+   "name": "Lybius_vieilloti_LC",
+   "label": "Lybius vieilloti (LC)"
+  },
+  {
+   "name": "Macronyx_croceus_LC",
+   "label": "Macronyx croceus (LC)"
+  },
+  {
+   "name": "Malaconotus_blanchoti_LC",
+   "label": "Malaconotus blanchoti (LC)"
+  },
+  {
+   "name": "Malimbus_nitens_LC",
+   "label": "Malimbus nitens (LC)"
+  },
+  {
+   "name": "Malimbus_rubricollis_LC",
+   "label": "Malimbus rubricollis (LC)"
+  },
+  {
+   "name": "Megabyas_flammulatus_LC",
+   "label": "Megabyas flammulatus (LC)"
+  },
+  {
+   "name": "Megaceryle_maxima_LC",
+   "label": "Megaceryle maxima (LC)"
+  },
+  {
+   "name": "Melaenornis_edolioides_LC",
+   "label": "Melaenornis edolioides (LC)"
+  },
+  {
+   "name": "Melaenornis_pallidus_LC",
+   "label": "Melaenornis pallidus (LC)"
+  },
+  {
+   "name": "Melierax_metabates_LC",
+   "label": "Melierax metabates (LC)"
+  },
+  {
+   "name": "Melocichla_mentalis_LC",
+   "label": "Melocichla mentalis (LC)"
+  },
+  {
+   "name": "Merops_albicollis_LC",
+   "label": "Merops albicollis (LC)"
+  },
+  {
+   "name": "Merops_apiaster_LC",
+   "label": "Merops apiaster (LC)"
+  },
+  {
+   "name": "Merops_bulocki_LC",
+   "label": "Merops bulocki (LC)"
+  },
+  {
+   "name": "Merops_hirundineus_LC",
+   "label": "Merops hirundineus (LC)"
+  },
+  {
+   "name": "Merops_nubicus_LC",
+   "label": "Merops nubicus (LC)"
+  },
+  {
+   "name": "Merops_persicus_LC",
+   "label": "Merops persicus (LC)"
+  },
+  {
+   "name": "Merops_pusillus_LC",
+   "label": "Merops pusillus (LC)"
+  },
+  {
+   "name": "Microcarbo_africanus_LC",
+   "label": "Microcarbo africanus (LC)"
+  },
+  {
+   "name": "Micronisus_gabar_LC",
+   "label": "Micronisus gabar (LC)"
+  },
+  {
+   "name": "Milvus_aegytius_LC",
+   "label": "Milvus aegytius (LC)"
+  },
+  {
+   "name": "Milvus_migrans_LC",
+   "label": "Milvus migrans (LC)"
+  },
+  {
+   "name": "Motacilla_flava_LC",
+   "label": "Motacilla flava (LC)"
+  },
+  {
+   "name": "Muscicapa_striata_LC",
+   "label": "Muscicapa striata (LC)"
+  },
+  {
+   "name": "Musophaga_violacea_LC",
+   "label": "Musophaga violacea (LC)"
+  },
+  {
+   "name": "Neafrapus_cassini_LC",
+   "label": "Neafrapus cassini (LC)"
+  },
+  {
+   "name": "Necrosyrtes_monachus_CR",
+   "label": "Necrosyrtes monachus (CR)"
+  },
+  {
+   "name": "Nicator_chloris_LC",
+   "label": "Nicator chloris (LC)"
+  },
+  {
+   "name": "Nigrita_bicolor_LC",
+   "label": "Nigrita bicolor (LC)"
+  },
+  {
+   "name": "Nilaus_afer_LC",
+   "label": "Nilaus afer (LC)"
+  },
+  {
+   "name": "Numenius_aquata_NE",
+   "label": "Numenius aquata (NE)"
+  },
+  {
+   "name": "Numenius_phaeopus_LC",
+   "label": "Numenius phaeopus (LC)"
+  },
+  {
+   "name": "Numida_meleagris_LC",
+   "label": "Numida meleagris (LC)"
+  },
+  {
+   "name": "Nycticorax_nycticorax_LC",
+   "label": "Nycticorax nycticorax (LC)"
+  },
+  {
+   "name": "Oriolus_auratus_LC",
+   "label": "Oriolus auratus (LC)"
+  },
+  {
+   "name": "Oriolus_brachyrhynchus_LC",
+   "label": "Oriolus brachyrhynchus (LC)"
+  },
+  {
+   "name": "Oriolus_nigripennis_LC",
+   "label": "Oriolus nigripennis (LC)"
+  },
+  {
+   "name": "Oriolus_oriolus_LC",
+   "label": "Oriolus oriolus (LC)"
+  },
+  {
+   "name": "Otus_senegalensis_LC",
+   "label": "Otus senegalensis (LC)"
+  },
+  {
+   "name": "Pardipicus_nivosus_LC",
+   "label": "Pardipicus nivosus (LC)"
+  },
+  {
+   "name": "Passer_griseus_LC",
+   "label": "Passer griseus (LC)"
+  },
+  {
+   "name": "Pelecanus_onocrotalus_LC",
+   "label": "Pelecanus onocrotalus (LC)"
+  },
+  {
+   "name": "Pelecanus_rufescens_LC",
+   "label": "Pelecanus rufescens (LC)"
+  },
+  {
+   "name": "Perdix_perdix_LC",
+   "label": "Perdix perdix (LC)"
+  },
+  {
+   "name": "Petronia_dentata_LC",
+   "label": "Petronia dentata (LC)"
+  },
+  {
+   "name": "Phoeniculus_purpureus_LC",
+   "label": "Phoeniculus purpureus (LC)"
+  },
+  {
+   "name": "Phyllastrephus_albigularis_LC",
+   "label": "Phyllastrephus albigularis (LC)"
+  },
+  {
+   "name": "Phyllastrephus_fulviventris_LC",
+   "label": "Phyllastrephus fulviventris (LC)"
+  },
+  {
+   "name": "Phylloscohus_collybita_LC",
+   "label": "Phylloscohus collybita (LC)"
+  },
+  {
+   "name": "Phylloscophus_trochillus_LC",
+   "label": "Phylloscophus trochillus (LC)"
+  },
+  {
+   "name": "Platalea_alba_LC",
+   "label": "Platalea alba (LC)"
+  },
+  {
+   "name": "Platysteira_cyanea_LC",
+   "label": "Platysteira cyanea (LC)"
+  },
+  {
+   "name": "Ploceus_cucullatus_LC",
+   "label": "Ploceus cucullatus (LC)"
+  },
+  {
+   "name": "Ploceus_melanocephalus_LC",
+   "label": "Ploceus melanocephalus (LC)"
+  },
+  {
+   "name": "Ploceus_nigricollis_LC",
+   "label": "Ploceus nigricollis (LC)"
+  },
+  {
+   "name": "Pogoniulus_bilineatus_LC",
+   "label": "Pogoniulus bilineatus (LC)"
+  },
+  {
+   "name": "Pogoniulus_chrysoconus_LC",
+   "label": "Pogoniulus chrysoconus (LC)"
+  },
+  {
+   "name": "Pogoniulus_scolopaceus_LC",
+   "label": "Pogoniulus scolopaceus (LC)"
+  },
+  {
+   "name": "Pogoniulus_subsulphureus_LC",
+   "label": "Pogoniulus subsulphureus (LC)"
+  },
+  {
+   "name": "Pogonornis_bidentatus_LC",
+   "label": "Pogonornis bidentatus (LC)"
+  },
+  {
+   "name": "Pogonornis_dubius_LC",
+   "label": "Pogonornis dubius (LC)"
+  },
+  {
+   "name": "Poicephalus_senegalus_LC",
+   "label": "Poicephalus senegalus (LC)"
+  },
+  {
+   "name": "Polyboroides_typus_LC",
+   "label": "Polyboroides typus (LC)"
+  },
+  {
+   "name": "Prinia_subflava_LC",
+   "label": "Prinia subflava (LC)"
+  },
+  {
+   "name": "Prionops_plumatus_LC",
+   "label": "Prionops plumatus (LC)"
+  },
+  {
+   "name": "Processus_vitellin_LC",
+   "label": "Processus vitellin (LC)"
+  },
+  {
+   "name": "Psalidoprocne_nitens_LC",
+   "label": "Psalidoprocne nitens (LC)"
+  },
+  {
+   "name": "Psalidoprocne_obscura_LC",
+   "label": "Psalidoprocne obscura (LC)"
+  },
+  {
+   "name": "Psittacula_krameri_Lc",
+   "label": "Psittacula krameri (Lc)"
+  },
+  {
+   "name": "Psittacus_krameri_LC",
+   "label": "Psittacus krameri (LC)"
+  },
+  {
+   "name": "Pternistis_ahantensis_LC",
+   "label": "Pternistis ahantensis (LC)"
+  },
+  {
+   "name": "Pternistis_bicalcaratus_LC",
+   "label": "Pternistis bicalcaratus (LC)"
+  },
+  {
+   "name": "Pterocles_quadricinctus_LC",
+   "label": "Pterocles quadricinctus (LC)"
+  },
+  {
+   "name": "Ptilopachus_petrosus_LC",
+   "label": "Ptilopachus petrosus (LC)"
+  },
+  {
+   "name": "Ptilopsis_leucotis_LC",
+   "label": "Ptilopsis leucotis (LC)"
+  },
+  {
+   "name": "Ptilostomus_afer_LC",
+   "label": "Ptilostomus afer (LC)"
+  },
+  {
+   "name": "Pycnonotus_barbatus_LC",
+   "label": "Pycnonotus barbatus (LC)"
+  },
+  {
+   "name": "Pyrrhurus_scandens_LC",
+   "label": "Pyrrhurus scandens (LC)"
+  },
+  {
+   "name": "Pytilia_phoenicoptera_LC",
+   "label": "Pytilia phoenicoptera (LC)"
+  },
+  {
+   "name": "Quelea_erythrops_LC",
+   "label": "Quelea erythrops (LC)"
+  },
+  {
+   "name": "Rhinopomastus_aterrimus_LC",
+   "label": "Rhinopomastus aterrimus (LC)"
+  },
+  {
+   "name": "Rhinopomastus_atterimus_LC",
+   "label": "Rhinopomastus atterimus (LC)"
+  },
+  {
+   "name": "Riparia_riparia_LC",
+   "label": "Riparia riparia (LC)"
+  },
+  {
+   "name": "Rostratula_benghalensis_LC",
+   "label": "Rostratula benghalensis (LC)"
+  },
+  {
+   "name": "Sarothrura_pulchra_LC",
+   "label": "Sarothrura pulchra (LC)"
+  },
+  {
+   "name": "Saxicola_rubetra_LC",
+   "label": "Saxicola rubetra (LC)"
+  },
+  {
+   "name": "Scopus_umbretta_LC",
+   "label": "Scopus umbretta (LC)"
+  },
+  {
+   "name": "Scopus_umbretta_Gmelin_LC",
+   "label": "Scopus umbretta Gmelin (LC)"
+  },
+  {
+   "name": "Scotopelia_peli_LC",
+   "label": "Scotopelia peli (LC)"
+  },
+  {
+   "name": "Serinus_mozambicus_LC",
+   "label": "Serinus mozambicus (LC)"
+  },
+  {
+   "name": "Smithornis_capensis_LC",
+   "label": "Smithornis capensis (LC)"
+  },
+  {
+   "name": "Spermestes_cucullata_LC",
+   "label": "Spermestes cucullata (LC)"
+  },
+  {
+   "name": "Spermophaga_haematina_LC",
+   "label": "Spermophaga haematina (LC)"
+  },
+  {
+   "name": "Spilopelia_senegalensis_LC",
+   "label": "Spilopelia senegalensis (LC)"
+  },
+  {
+   "name": "Stelgidillas_gracilirostris_LC",
+   "label": "Stelgidillas gracilirostris (LC)"
+  },
+  {
+   "name": "Streptopelia_capicola_LC",
+   "label": "Streptopelia capicola (LC)"
+  },
+  {
+   "name": "Streptopelia_semitorquata_LC",
+   "label": "Streptopelia semitorquata (LC)"
+  },
+  {
+   "name": "Streptopelia_vinacea_LC",
+   "label": "Streptopelia vinacea (LC)"
+  },
+  {
+   "name": "Strix_woodfordii_LC",
+   "label": "Strix woodfordii (LC)"
+  },
+  {
+   "name": "Sylvia_borin_LC",
+   "label": "Sylvia borin (LC)"
+  },
+  {
+   "name": "Sylvietta_brachyura_LC",
+   "label": "Sylvietta brachyura (LC)"
+  },
+  {
+   "name": "Sylvietta_virens_LC",
+   "label": "Sylvietta virens (LC)"
+  },
+  {
+   "name": "Tachybaptus_ruficolis_LC",
+   "label": "Tachybaptus ruficolis (LC)"
+  },
+  {
+   "name": "Tauraco_persa_LC",
+   "label": "Tauraco persa (LC)"
+  },
+  {
+   "name": "Tauraco_violacea_LC",
+   "label": "Tauraco violacea (LC)"
+  },
+  {
+   "name": "Tchagra_senegalus_LC",
+   "label": "Tchagra senegalus (LC)"
+  },
+  {
+   "name": "Terathopius_ecaudatus_EN",
+   "label": "Terathopius ecaudatus (EN)"
+  },
+  {
+   "name": "Terpsiphone_rufiventer_LC",
+   "label": "Terpsiphone rufiventer (LC)"
+  },
+  {
+   "name": "Terpsiphone_viridis_LC",
+   "label": "Terpsiphone viridis (LC)"
+  },
+  {
+   "name": "Thescelocichla_leucopleura_LC",
+   "label": "Thescelocichla leucopleura (LC)"
+  },
+  {
+   "name": "Threskiornis_aethiopicus_LC",
+   "label": "Threskiornis aethiopicus (LC)"
+  },
+  {
+   "name": "Tigriornis_leucolopha_LC",
+   "label": "Tigriornis leucolopha (LC)"
+  },
+  {
+   "name": "Tockus_erythrohynchus_Lc",
+   "label": "Tockus erythrohynchus (LC)"
+  },
+  {
+   "name": "Tockus_erythrorhynchus_LC",
+   "label": "Tockus erythrorhynchus (LC)"
+  },
+  {
+   "name": "Tockus_nasutus_LC",
+   "label": "Tockus nasutus (LC)"
+  },
+  {
+   "name": "Treon_waalia_Lc",
+   "label": "Treon waalia (Lc)"
+  },
+  {
+   "name": "Treron_calvus_LC",
+   "label": "Treron calvus (LC)"
+  },
+  {
+   "name": "Treron_waalia_LC",
+   "label": "Treron waalia (LC)"
+  },
+  {
+   "name": "Trigonoceps_occipitalis_CR",
+   "label": "Trigonoceps occipitalis (CR)"
+  },
+  {
+   "name": "Tringa_hypoleucos_LC",
+   "label": "Tringa hypoleucos (LC)"
+  },
+  {
+   "name": "Tringa_ochropus_LC",
+   "label": "Tringa ochropus (LC)"
+  },
+  {
+   "name": "Turdoides_plebejus_LC",
+   "label": "Turdoides plebejus (LC)"
+  },
+  {
+   "name": "Turdoides_reinwardtii_LC",
+   "label": "Turdoides reinwardtii (LC)"
+  },
+  {
+   "name": "Turdus_pelios_LC",
+   "label": "Turdus pelios (LC)"
+  },
+  {
+   "name": "Turtur_abyssinicus_LC",
+   "label": "Turtur abyssinicus (LC)"
+  },
+  {
+   "name": "Turtur_afer_LC",
+   "label": "Turtur afer (LC)"
+  },
+  {
+   "name": "Turtur_tympanistria_LC",
+   "label": "Turtur tympanistria (LC)"
+  },
+  {
+   "name": "Tyto_alba_LC",
+   "label": "Tyto alba (LC)"
+  },
+  {
+   "name": "Upupa_epops_LC",
+   "label": "Upupa epops (LC)"
+  },
+  {
+   "name": "Uraeginthus_bengalus_LC",
+   "label": "Uraeginthus bengalus (LC)"
+  },
+  {
+   "name": "Vanellus_senegallus_LC",
+   "label": "Vanellus senegallus (LC)"
+  },
+  {
+   "name": "Vanellus_spinosus_LC",
+   "label": "Vanellus spinosus (LC)"
+  },
+  {
+   "name": "Vanellus_tectus_LC",
+   "label": "Vanellus tectus (LC)"
+  },
+  {
+   "name": "Vidua_chalybeata_LC",
+   "label": "Vidua chalybeata (LC)"
+  },
+  {
+   "name": "Vidua_interjecta_LC",
+   "label": "Vidua interjecta (LC)"
+  },
+  {
+   "name": "Vidua_macroura_LC",
+   "label": "Vidua macroura (LC)"
+  },
+  {
+   "name": "Xema_sabini_LC",
+   "label": "Xema sabini (LC)"
+  },
+  {
+   "name": "Zapornia_flavirostra_LC",
+   "label": "Zapornia flavirostra (LC)"
+  },
+  {
+   "name": "autre_oiseau",
+   "label": "Autre"
+  }
+ ],
+ "sv_reptile": [
+  {
+   "name": "Afronatrix anoscopus_LC",
+   "label": "Afronatrix anoscopus (LC)"
+  },
+  {
+   "name": "Afrotyphlops lineolatus_LC",
+   "label": "Afrotyphlops lineolatus (LC)"
+  },
+  {
+   "name": "Afrotyphlops punctatus_LC",
+   "label": "Afrotyphlops punctatus (LC)"
+  },
+  {
+   "name": "Agama africana_LC",
+   "label": "Agama africana (LC)"
+  },
+  {
+   "name": "Agama agama_LC",
+   "label": "Agama agama (LC)"
+  },
+  {
+   "name": "Agama boensis_LC",
+   "label": "Agama boensis (LC)"
+  },
+  {
+   "name": "Agama sankaranica_LC",
+   "label": "Agama sankaranica (LC)"
+  },
+  {
+   "name": "Agama weidholzi_LC",
+   "label": "Agama weidholzi (LC)"
+  },
+  {
+   "name": "Bitis arietans_LC",
+   "label": "Bitis arietans (LC)"
+  },
+  {
+   "name": "Bitis nasicornis_VU",
+   "label": "Bitis nasicornis (VU)"
+  },
+  {
+   "name": "Bitis rhinoceros_LC",
+   "label": "Bitis rhinoceros (LC)"
+  },
+  {
+   "name": "Bitis sp._NE",
+   "label": "Bitis sp. (NE)"
+  },
+  {
+   "name": "Boaedon fuliginosus_LC",
+   "label": "Boaedon fuliginosus (LC)"
+  },
+  {
+   "name": "Boaedon lineatus_LC",
+   "label": "Boaedon lineatus (LC)"
+  },
+  {
+   "name": "Caretta caretta_VU",
+   "label": "Caretta caretta (VU)"
+  },
+  {
+   "name": "Causus maculatus_LC",
+   "label": "Causus maculatus (LC)"
+  },
+  {
+   "name": "Chalcides pulchellus_LC",
+   "label": "Chalcides pulchellus (LC)"
+  },
+  {
+   "name": "Chamaeleo gracilis_LC",
+   "label": "Chamaeleo gracilis (LC)"
+  },
+  {
+   "name": "Chamaeleo senegalensis_LC",
+   "label": "Chamaeleo senegalensis (LC)"
+  },
+  {
+   "name": "Cophoscincopus senegalensis_DD",
+   "label": "Cophoscincopus senegalensis (DD)"
+  },
+  {
+   "name": "Crocodylus niloticus_LC",
+   "label": "Crocodylus niloticus (LC)"
+  },
+  {
+   "name": "Crocodylus suchus_NE",
+   "label": "Crocodylus suchus (NE)"
+  },
+  {
+   "name": "Crotaphopeltis hippocrepis_LC",
+   "label": "Crotaphopeltis hippocrepis (LC)"
+  },
+  {
+   "name": "Crotaphopeltis hotamboeia_LC",
+   "label": "Crotaphopeltis hotamboeia (LC)"
+  },
+  {
+   "name": "Dendroaspis angusticeps_LC",
+   "label": "Dendroaspis angusticeps (LC)"
+  },
+  {
+   "name": "Dendroaspis polylepis_LC",
+   "label": "Dendroaspis polylepis (LC)"
+  },
+  {
+   "name": "Dendroaspis viridis_LC",
+   "label": "Dendroaspis viridis (LC)"
+  },
+  {
+   "name": "Dromophis lineatus_NE",
+   "label": "Dromophis lineatus (NE)"
+  },
+  {
+   "name": "Grayia smithi_NE",
+   "label": "Grayia smithi (NE)"
+  },
+  {
+   "name": "Hemidactylus albivertebralis_DD",
+   "label": "Hemidactylus albivertebralis (DD)"
+  },
+  {
+   "name": "Hemidactylus angulatus_LC",
+   "label": "Hemidactylus angulatus (LC)"
+  },
+  {
+   "name": "Hemidactylus kundaensis_CR",
+   "label": "Hemidactylus kundaensis (CR)"
+  },
+  {
+   "name": "Hemidactylus mabouia_LC",
+   "label": "Hemidactylus mabouia (LC)"
+  },
+  {
+   "name": "Hemidactylus sp._NE",
+   "label": "Hemidactylus sp. (NE)"
+  },
+  {
+   "name": "Hemitheconyx caudicinctus_LC",
+   "label": "Hemitheconyx caudicinctus (LC)"
+  },
+  {
+   "name": "Holaspis guentheri_LC",
+   "label": "Holaspis guentheri (LC)"
+  },
+  {
+   "name": "Kinixys belliana nogueyi_NE",
+   "label": "Kinixys belliana nogueyi (NE)"
+  },
+  {
+   "name": "Lacerta muralis_LC",
+   "label": "Lacerta muralis (LC)"
+  },
+  {
+   "name": "Lacerta Sp_LC",
+   "label": "Lacerta Sp (LC)"
+  },
+  {
+   "name": "Lygodactylus gutturalis_LC",
+   "label": "Lygodactylus gutturalis (LC)"
+  },
+  {
+   "name": "Naja melanoleuca_LC",
+   "label": "Naja melanoleuca (LC)"
+  },
+  {
+   "name": "Naja nigricollis_LC",
+   "label": "Naja nigricollis (LC)"
+  },
+  {
+   "name": "Natriciteres variegata_LC",
+   "label": "Natriciteres variegata (LC)"
+  },
+  {
+   "name": "Osteolaemus tetraspis_VU",
+   "label": "Osteolaemus tetraspis (VU)"
+  },
+  {
+   "name": "Panaspis tristaoi_LC",
+   "label": "Panaspis tristaoi (LC)"
+  },
+  {
+   "name": "Pelomedusa galeata_LC",
+   "label": "Pelomedusa galeata (LC)"
+  },
+  {
+   "name": "Pelomedusa subrufa olivacea_NE",
+   "label": "Pelomedusa subrufa olivacea (NE)"
+  },
+  {
+   "name": "Pelusios castaneus_NE",
+   "label": "Pelusios castaneus (NE)"
+  },
+  {
+   "name": "Philothamnus irregularis_LC",
+   "label": "Philothamnus irregularis (LC)"
+  },
+  {
+   "name": "Philothamnus semivariegatus_LC",
+   "label": "Philothamnus semivariegatus (LC)"
+  },
+  {
+   "name": "Psammophis elegans_LC",
+   "label": "Psammophis elegans (LC)"
+  },
+  {
+   "name": "Psammophis lineatus_LC",
+   "label": "Psammophis lineatus (LC)"
+  },
+  {
+   "name": "Psammophis phillipsii_LC",
+   "label": "Psammophis phillipsii (LC)"
+  },
+  {
+   "name": "Psammophis praeornatus_LC",
+   "label": "Psammophis praeornatus (LC)"
+  },
+  {
+   "name": "Psammophis sibilans_LC",
+   "label": "Psammophis sibilans (LC)"
+  },
+  {
+   "name": "Python regius_NT",
+   "label": "Python regius (NT)"
+  },
+  {
+   "name": "Python sebae_NT",
+   "label": "Python sebae (NT)"
+  },
+  {
+   "name": "Rhamphiophis oxyrhynchus_LC",
+   "label": "Rhamphiophis oxyrhynchus (LC)"
+  },
+  {
+   "name": "Thrasops occidentalis_LC",
+   "label": "Thrasops occidentalis (LC)"
+  },
+  {
+   "name": "Toxicodryas blandingii_LC",
+   "label": "Toxicodryas blandingii (LC)"
+  },
+  {
+   "name": "Trachylepis affinis_LC",
+   "label": "Trachylepis affinis (LC)"
+  },
+  {
+   "name": "Trachylepis aureogularis_LC",
+   "label": "Trachylepis aureogularis (LC)"
+  },
+  {
+   "name": "Trachylepis bensonii_LC",
+   "label": "Trachylepis bensonii (LC)"
+  },
+  {
+   "name": "Trachylepis paucisquamis_LC",
+   "label": "Trachylepis paucisquamis (LC)"
+  },
+  {
+   "name": "Trachylepis perrotetii_LC",
+   "label": "Trachylepis perrotetii (LC)"
+  },
+  {
+   "name": "Trionyx triunguis_VU",
+   "label": "Trionyx triunguis (VU)"
+  },
+  {
+   "name": "Varanus exanthematicus_LC",
+   "label": "Varanus exanthematicus (LC)"
+  },
+  {
+   "name": "Varanus niloticus_LC",
+   "label": "Varanus niloticus (LC)"
+  },
+  {
+   "name": "autre_reptile",
+   "label": "Autre"
+  }
+ ],
+ "sv_amphib": [
+  {
+   "name": "Amnirana albolabris_LC",
+   "label": "Amnirana albolabris (LC)"
+  },
+  {
+   "name": "Arthroleptis poecilonotus_LC",
+   "label": "Arthroleptis poecilonotus (LC)"
+  },
+  {
+   "name": "Bufo bufo_LC",
+   "label": "Bufo bufo (LC)"
+  },
+  {
+   "name": "Hoplobatrachus occipitalis _LC",
+   "label": "Hoplobatrachus occipitalis  (LC)"
+  },
+  {
+   "name": "Hyperolius lamottei_LC",
+   "label": "Hyperolius lamottei (LC)"
+  },
+  {
+   "name": "Hyperolius occidentalis_LC",
+   "label": "Hyperolius occidentalis (LC)"
+  },
+  {
+   "name": "Hyperolius picturatus_LC",
+   "label": "Hyperolius picturatus (LC)"
+  },
+  {
+   "name": "Hyperolius spatzi_LC",
+   "label": "Hyperolius spatzi (LC)"
+  },
+  {
+   "name": "Kassina fusca_LC",
+   "label": "Kassina fusca (LC)"
+  },
+  {
+   "name": "Kassina maculata_LC",
+   "label": "Kassina maculata (LC)"
+  },
+  {
+   "name": "Leptopelis bufonides_LC",
+   "label": "Leptopelis bufonides (LC)"
+  },
+  {
+   "name": "Leptopelis macrotis_NT",
+   "label": "Leptopelis macrotis (NT)"
+  },
+  {
+   "name": "Leptopelis sp._NE",
+   "label": "Leptopelis sp. (NE)"
+  },
+  {
+   "name": "Leptopelis spiritus nocti_LC",
+   "label": "Leptopelis spiritus nocti (LC)"
+  },
+  {
+   "name": "Leptopelis viridis_LC",
+   "label": "Leptopelis viridis (LC)"
+  },
+  {
+   "name": "Phrynobatrachus alleni_LC",
+   "label": "Phrynobatrachus alleni (LC)"
+  },
+  {
+   "name": "Phrynobatrachus calcaratus_LC",
+   "label": "Phrynobatrachus calcaratus (LC)"
+  },
+  {
+   "name": "Phrynobatrachus francisci_LC",
+   "label": "Phrynobatrachus francisci (LC)"
+  },
+  {
+   "name": "Phrynobatrachus gutturosus_LC",
+   "label": "Phrynobatrachus gutturosus (LC)"
+  },
+  {
+   "name": "Phrynobatrachus latifrons_LC",
+   "label": "Phrynobatrachus latifrons (LC)"
+  },
+  {
+   "name": "Phrynobatrachus natalensis_LC",
+   "label": "Phrynobatrachus natalensis (LC)"
+  },
+  {
+   "name": "Phrynobatrachus sp,_NE",
+   "label": "Phrynobatrachus sp, (NE)"
+  },
+  {
+   "name": "Phrynobatrachus tokba_LC",
+   "label": "Phrynobatrachus tokba (LC)"
+  },
+  {
+   "name": "Pseudhymenochirus merlini_LC",
+   "label": "Pseudhymenochirus merlini (LC)"
+  },
+  {
+   "name": "Ptychadena aequiplicata_LC",
+   "label": "Ptychadena aequiplicata (LC)"
+  },
+  {
+   "name": "Ptychadena arnei_DD",
+   "label": "Ptychadena arnei (DD)"
+  },
+  {
+   "name": "Ptychadena bibroni_LC",
+   "label": "Ptychadena bibroni (LC)"
+  },
+  {
+   "name": "Ptychadena longirostris_LC",
+   "label": "Ptychadena longirostris (LC)"
+  },
+  {
+   "name": "Ptychadena mascareniensis_LC",
+   "label": "Ptychadena mascareniensis (LC)"
+  },
+  {
+   "name": "Ptychadena oxyrhynchus_LC",
+   "label": "Ptychadena oxyrhynchus (LC)"
+  },
+  {
+   "name": "Ptychadena pumilio_LC",
+   "label": "Ptychadena pumilio (LC)"
+  },
+  {
+   "name": "Ptychadena retropunctata_LC",
+   "label": "Ptychadena retropunctata (LC)"
+  },
+  {
+   "name": "Ptychadena sp._NE",
+   "label": "Ptychadena sp. (NE)"
+  },
+  {
+   "name": "Ptychadena superciliaris_LC",
+   "label": "Ptychadena superciliaris (LC)"
+  },
+  {
+   "name": "Ptychadena tellinii_LC",
+   "label": "Ptychadena tellinii (LC)"
+  },
+  {
+   "name": "Ptychadena tournieri_LC",
+   "label": "Ptychadena tournieri (LC)"
+  },
+  {
+   "name": "Ptychadena trinodis_LC",
+   "label": "Ptychadena trinodis (LC)"
+  },
+  {
+   "name": "Rana esculenta_LC",
+   "label": "Rana esculenta (LC)"
+  },
+  {
+   "name": "Sclerophrys maculata_LC",
+   "label": "Sclerophrys maculata (LC)"
+  },
+  {
+   "name": "Sclerophrys regularis_LC",
+   "label": "Sclerophrys regularis (LC)"
+  },
+  {
+   "name": "autre_amphibien",
+   "label": "Autre"
+  }
+ ],
+ "sv_mamif": [
+  {
+   "name": "Acomys_cahirinus_LC",
+   "label": "Acomys cahirinus (LC)"
+  },
+  {
+   "name": "Aonyx_capensis_NT",
+   "label": "Aonyx capensis (NT)"
+  },
+  {
+   "name": "Atelerix_albiventris_LC",
+   "label": "Atelerix albiventris (LC)"
+  },
+  {
+   "name": "Atherurus_africanus_LC",
+   "label": "Atherurus africanus (LC)"
+  },
+  {
+   "name": "Atilax_paludinosus_LC",
+   "label": "Atilax paludinosus (LC)"
+  },
+  {
+   "name": "Bovidés_LC",
+   "label": "Bovidés (LC)"
+  },
+  {
+   "name": "Bovins_LC",
+   "label": "Bovins (LC)"
+  },
+  {
+   "name": "Canis_adustus_LC",
+   "label": "Canis adustus (LC)"
+  },
+  {
+   "name": "Caracal_aurata_VU",
+   "label": "Caracal aurata (VU)"
+  },
+  {
+   "name": "Cephalophus_dorsalis_NT",
+   "label": "Cephalophus dorsalis (NT)"
+  },
+  {
+   "name": "Cephalophus_jentinki_EN",
+   "label": "Cephalophus jentinki (EN)"
+  },
+  {
+   "name": "Cephalophus_niger_LC",
+   "label": "Cephalophus niger (LC)"
+  },
+  {
+   "name": "Cephalophus_rufilatus_LC",
+   "label": "Cephalophus rufilatus (LC)"
+  },
+  {
+   "name": "Cephalophus_silvicultor_NT",
+   "label": "Cephalophus silvicultor (NT)"
+  },
+  {
+   "name": "Cercocebus_atys_VU",
+   "label": "Cercocebus atys (VU)"
+  },
+  {
+   "name": "Cercopithecus_campbelli_NT",
+   "label": "Cercopithecus campbelli (NT)"
+  },
+  {
+   "name": "Cercopithecus_mona_NT",
+   "label": "Cercopithecus mona (NT)"
+  },
+  {
+   "name": "Cercopithecus_petaurista_NT",
+   "label": "Cercopithecus petaurista (NT)"
+  },
+  {
+   "name": "Cercopithecus_sabaeus_LC",
+   "label": "Cercopithecus sabaeus (LC)"
+  },
+  {
+   "name": "Chlorocebus_sabaeus_LC",
+   "label": "Chlorocebus sabaeus (LC)"
+  },
+  {
+   "name": "Choeropsis_liberiensis_EN",
+   "label": "Choeropsis liberiensis (EN)"
+  },
+  {
+   "name": "Civettictis_civetta__LC",
+   "label": "Civettictis civetta  (LC)"
+  },
+  {
+   "name": "Civettictus_civetta_LC",
+   "label": "Civettictus civetta (LC)"
+  },
+  {
+   "name": "Colobus_polykomos_EN",
+   "label": "Colobus polykomos (EN)"
+  },
+  {
+   "name": "Cricetomys_gambianus_LC",
+   "label": "Cricetomys gambianus (LC)"
+  },
+  {
+   "name": "Dendrohyrax_dorsalis_LC",
+   "label": "Dendrohyrax dorsalis (LC)"
+  },
+  {
+   "name": "Eidolon_helvum_NT",
+   "label": "Eidolon helvum (NT)"
+  },
+  {
+   "name": "Epixerus_ebii_LC",
+   "label": "Epixerus ebii (LC)"
+  },
+  {
+   "name": "Erythrocebus_patas_NT",
+   "label": "Erythrocebus patas (NT)"
+  },
+  {
+   "name": "Felis_silvestris_LC",
+   "label": "Felis silvestris (LC)"
+  },
+  {
+   "name": "Funisciurus_pyrropus_LC",
+   "label": "Funisciurus pyrropus (LC)"
+  },
+  {
+   "name": "Galago_senegalensis_LC",
+   "label": "Galago senegalensis (LC)"
+  },
+  {
+   "name": "Galagoides_demidoff_LC",
+   "label": "Galagoides demidoff (LC)"
+  },
+  {
+   "name": "Galagoides_thomasi_LC",
+   "label": "Galagoides thomasi (LC)"
+  },
+  {
+   "name": "Garage_senegalensis_LC",
+   "label": "Garage senegalensis (LC)"
+  },
+  {
+   "name": "Genetta_genetta_LC",
+   "label": "Genetta genetta (LC)"
+  },
+  {
+   "name": "Genetta_pardina_LC",
+   "label": "Genetta pardina (LC)"
+  },
+  {
+   "name": "Genetta_tigrina_LC",
+   "label": "Genetta tigrina (LC)"
+  },
+  {
+   "name": "Heliosciurus_gambianus_LC",
+   "label": "Heliosciurus gambianus (LC)"
+  },
+  {
+   "name": "Heliosciurus_rufobrachium_LC",
+   "label": "Heliosciurus rufobrachium (LC)"
+  },
+  {
+   "name": "Herpestes_sanguineus_LC",
+   "label": "Herpestes sanguineus (LC)"
+  },
+  {
+   "name": "Hippotragus_equinus_EN",
+   "label": "Hippotragus equinus (EN)"
+  },
+  {
+   "name": "Hippotragus_equinus_LC",
+   "label": "Hippotragus equinus (LC)"
+  },
+  {
+   "name": "Hydrictis_maculicollis_NT",
+   "label": "Hydrictis maculicollis (NT)"
+  },
+  {
+   "name": "Hylochoerus_meinertzhageni_LC",
+   "label": "Hylochoerus meinertzhageni (LC)"
+  },
+  {
+   "name": "Hystrix_cristata_LC",
+   "label": "Hystrix cristata (LC)"
+  },
+  {
+   "name": "Ichneumia_albicauda_LC",
+   "label": "Ichneumia albicauda (LC)"
+  },
+  {
+   "name": "Kobus_ellipsiprymnus_LC",
+   "label": "Kobus ellipsiprymnus (LC)"
+  },
+  {
+   "name": "Kobus_kob_LC",
+   "label": "Kobus kob (LC)"
+  },
+  {
+   "name": "Kobus_redunca_NE",
+   "label": "Kobus redunca (NE)"
+  },
+  {
+   "name": "L'épisode_capensis_LC",
+   "label": "L'épisode capensis (LC)"
+  },
+  {
+   "name": "Leptailurus_serval_LC",
+   "label": "Leptailurus serval (LC)"
+  },
+  {
+   "name": "Lepus_saxatilis_LC",
+   "label": "Lepus saxatilis (LC)"
+  },
+  {
+   "name": "Lepus_sp._NE",
+   "label": "Lepus sp. (NE)"
+  },
+  {
+   "name": "Lepus_uchiter_NE",
+   "label": "Lepus uchiter (NE)"
+  },
+  {
+   "name": "Lepus_victoriae_LC",
+   "label": "Lepus victoriae (LC)"
+  },
+  {
+   "name": "Lycaon_pictus_LC",
+   "label": "Lycaon pictus (LC)"
+  },
+  {
+   "name": "Mellivora_capensis_LC",
+   "label": "Mellivora capensis (LC)"
+  },
+  {
+   "name": "Micropterus_sp_LC",
+   "label": "Micropterus sp (LC)"
+  },
+  {
+   "name": "Mops_condylurus_LC",
+   "label": "Mops condylurus (LC)"
+  },
+  {
+   "name": "Mungos_gambianus_LC",
+   "label": "Mungos gambianus (LC)"
+  },
+  {
+   "name": "Mus_musculoides_LC",
+   "label": "Mus musculoides (LC)"
+  },
+  {
+   "name": "Myosciurus_pumilio_LC",
+   "label": "Myosciurus pumilio (LC)"
+  },
+  {
+   "name": "Nandinia_binotata_LC",
+   "label": "Nandinia binotata (LC)"
+  },
+  {
+   "name": "Orycteropus_afer_LC",
+   "label": "Orycteropus afer (LC)"
+  },
+  {
+   "name": "Oryctolagus_cuniculus_EN",
+   "label": "Oryctolagus cuniculus (EN)"
+  },
+  {
+   "name": "Pan_troglodytes_verus_CR",
+   "label": "Pan troglodytes verus (CR)"
+  },
+  {
+   "name": "Panthera_pardus_VU",
+   "label": "Panthera pardus (VU)"
+  },
+  {
+   "name": "Papio_anubis_EN",
+   "label": "Papio anubis (EN)"
+  },
+  {
+   "name": "Papio_cynocephalus_LC",
+   "label": "Papio cynocephalus (LC)"
+  },
+  {
+   "name": "Perodicticus_potto_NT",
+   "label": "Perodicticus potto (NT)"
+  },
+  {
+   "name": "Phacochoerus_aethiopicus_LC",
+   "label": "Phacochoerus aethiopicus (LC)"
+  },
+  {
+   "name": "Phacochoerus_africanus_LC",
+   "label": "Phacochoerus africanus (LC)"
+  },
+  {
+   "name": "Phataginus_tetradactyla_VU",
+   "label": "Phataginus tetradactyla (VU)"
+  },
+  {
+   "name": "Phataginus_tricuspis_EN",
+   "label": "Phataginus tricuspis (EN)"
+  },
+  {
+   "name": "Philantomba_maxwellii_LC",
+   "label": "Philantomba maxwellii (LC)"
+  },
+  {
+   "name": "Piliocolobus_badius_temminckii_EN",
+   "label": "Piliocolobus badius temminckii (EN)"
+  },
+  {
+   "name": "Plantigrade_LC",
+   "label": "Plantigrade (LC)"
+  },
+  {
+   "name": "Potamochoerus_africanus_NE",
+   "label": "Potamochoerus africanus (NE)"
+  },
+  {
+   "name": "Potamochoerus_porcus_LC",
+   "label": "Potamochoerus porcus (LC)"
+  },
+  {
+   "name": "Procavia_capensis_LC",
+   "label": "Procavia capensis (LC)"
+  },
+  {
+   "name": "Sylvicapra_grimmia_LC",
+   "label": "Sylvicapra grimmia (LC)"
+  },
+  {
+   "name": "Syncerus_caffer_NT",
+   "label": "Syncerus caffer (NT)"
+  },
+  {
+   "name": "Thryonomys_gregorianus_LC",
+   "label": "Thryonomys gregorianus (LC)"
+  },
+  {
+   "name": "Thryonomys_swinderianus_LC",
+   "label": "Thryonomys swinderianus (LC)"
+  },
+  {
+   "name": "Tragelaphus_scriptus_LC",
+   "label": "Tragelaphus scriptus (LC)"
+  },
+  {
+   "name": "Tragelaphus_spekii_LC",
+   "label": "Tragelaphus spekii (LC)"
+  },
+  {
+   "name": "Treron_australis_LC",
+   "label": "Treron australis (LC)"
+  },
+  {
+   "name": "Trichechus_senegalensis_VU",
+   "label": "Trichechus senegalensis (VU)"
+  },
+  {
+   "name": "Xerus_erythropus_LC",
+   "label": "Xerus erythropus (LC)"
+  },
+  {
+   "name": "Xerus_rutilus_LC",
+   "label": "Xerus rutilus (LC)"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_etat": [
+  {
+   "name": "bon_etat",
+   "label": "Bon état"
+  },
+  {
+   "name": "en_construction",
+   "label": "En construction"
+  },
+  {
+   "name": "mauvais_etat",
+   "label": "Mauvais état"
+  }
+ ],
+ "sv_type": [
+  {
+   "name": "Écoles",
+   "label": "Écoles"
+  },
+  {
+   "name": "Centres de santé",
+   "label": "Centres de santé"
+  },
+  {
+   "name": "Cimetières",
+   "label": "Cimetières"
+  },
+  {
+   "name": "Commissariats de police",
+   "label": "Commissariats de police"
+  },
+  {
+   "name": "Dépôt d’ordure",
+   "label": "Dépôt d’ordure"
+  },
+  {
+   "name": "Forages",
+   "label": "Forages"
+  },
+  {
+   "name": "Maison des jeunes",
+   "label": "Maison des jeunes"
+  },
+  {
+   "name": "Marché",
+   "label": "Marché"
+  },
+  {
+   "name": "Mosquées",
+   "label": "Mosquées"
+  },
+  {
+   "name": "Poste de santé",
+   "label": "Poste de santé"
+  },
+  {
+   "name": "Puits amélioré",
+   "label": "Puits amélioré"
+  },
+  {
+   "name": "Puits traditionnel",
+   "label": "Puits traditionnel"
+  },
+  {
+   "name": "Réseaux électriques",
+   "label": "Réseaux électriques"
+  },
+  {
+   "name": "Réseaux routiers et autres itinéraires",
+   "label": "Réseaux routiers et autres itinéraires"
+  },
+  {
+   "name": "Sylviculture",
+   "label": "Sylviculture"
+  },
+  {
+   "name": "Terrain de football",
+   "label": "Terrain de football"
+  },
+  {
+   "name": "Traverses et ponts",
+   "label": "Traverses et ponts"
+  },
+  {
+   "name": "Vestibule des sages",
+   "label": "Vestibule des sages"
+  },
+  {
+   "name": "Autre",
+   "label": "Autres"
+  }
+ ],
+ "sv_equipe_enquete": [
+  {
+   "name": "1",
+   "label": "E1"
+  },
+  {
+   "name": "2",
+   "label": "E2"
+  },
+  {
+   "name": "3",
+   "label": "E3"
+  },
+  {
+   "name": "4",
+   "label": "E4"
+  },
+  {
+   "name": "5",
+   "label": "E5"
+  },
+  {
+   "name": "6",
+   "label": "E6"
+  },
+  {
+   "name": "7",
+   "label": "E7"
+  },
+  {
+   "name": "8",
+   "label": "E8"
+  },
+  {
+   "name": "9",
+   "label": "E9"
+  },
+  {
+   "name": "10",
+   "label": "E10"
+  },
+  {
+   "name": "11",
+   "label": "E11"
+  },
+  {
+   "name": "12",
+   "label": "E12"
+  },
+  {
+   "name": "13",
+   "label": "E13"
+  },
+  {
+   "name": "14",
+   "label": "E14"
+  },
+  {
+   "name": "15",
+   "label": "E15"
+  },
+  {
+   "name": "16",
+   "label": "E16"
+  },
+  {
+   "name": "17",
+   "label": "E17"
+  },
+  {
+   "name": "18",
+   "label": "E18"
+  },
+  {
+   "name": "19",
+   "label": "E19"
+  },
+  {
+   "name": "20",
+   "label": "E20"
+  }
+ ],
+ "sv_sexe": [
+  {
+   "name": "Masculin",
+   "label": "Masculin"
+  },
+  {
+   "name": "Feminin",
+   "label": "Feminin"
+  }
+ ],
+ "sv_deg_importance": [
+  {
+   "name": "Faible",
+   "label": "Faible"
+  },
+  {
+   "name": "Elevé",
+   "label": "Elevé"
+  },
+  {
+   "name": "Moyen",
+   "label": "Moyen"
+  }
+ ],
+ "sv_types_site": [
+  {
+   "name": "Initiation",
+   "label": "Initiation"
+  },
+  {
+   "name": "Lieu de résidence de génie(s)",
+   "label": "Lieu de résidence de génie(s)"
+  },
+  {
+   "name": "Lieu de fétiche(s)",
+   "label": "Lieu de fétiche(s)"
+  },
+  {
+   "name": "Lieu de rituel(s)",
+   "label": "Lieu de rituel(s)"
+  },
+  {
+   "name": "Réligieux",
+   "label": "Réligieux"
+  },
+  {
+   "name": "Historique Ancien",
+   "label": "Historique Ancien"
+  }
+ ],
+ "sv_sous_types_site": [
+  {
+   "name": "Femme",
+   "label": "Femme"
+  },
+  {
+   "name": "Homme",
+   "label": "Homme"
+  },
+  {
+   "name": "Donso (chasseurs)",
+   "label": "Donso (chasseurs)"
+  },
+  {
+   "name": "Autre initiation",
+   "label": "Autre"
+  },
+  {
+   "name": "Lieu de résidence de génie(s) avec rituels",
+   "label": "Avec rituels"
+  },
+  {
+   "name": "Lieu de résidence de génie(s) sans rituel",
+   "label": "Sans rituel"
+  },
+  {
+   "name": "Autre lieu de résidence de génie(s)",
+   "label": "Autre"
+  },
+  {
+   "name": "Lieu de fétiche(s) avec rituels",
+   "label": "Avec rituels"
+  },
+  {
+   "name": "Lieu de fétiche(s) sans rituel",
+   "label": "Sans rituel"
+  },
+  {
+   "name": "Autre lieu de fétiche(s)",
+   "label": "Autre"
+  },
+  {
+   "name": "rituel(s)",
+   "label": "Lieu de rituel(s)"
+  },
+  {
+   "name": "Cimetière",
+   "label": "Cimetière"
+  },
+  {
+   "name": "Ancien cimetière du village",
+   "label": "Ancien cimetière du village"
+  },
+  {
+   "name": "Lieu de prières (religieuses)",
+   "label": "Lieu de prières (religieuses)"
+  },
+  {
+   "name": "Tombe(s) isolée(s)",
+   "label": "Tombe(s) isolée(s)"
+  },
+  {
+   "name": "Autre réligieux",
+   "label": "Autre"
+  },
+  {
+   "name": "Ancien cimetière d'un ancien village",
+   "label": "Ancien cimetière d'un ancien village"
+  },
+  {
+   "name": "Autre historique Ancien",
+   "label": "Autre"
+  }
+ ],
+ "sv_impacts_site": [
+  {
+   "name": "Raffinerie",
+   "label": "Raffinerie d'alumine"
+  },
+  {
+   "name": "Hors Zone Portuaire > 2 km",
+   "label": "Hors Zone Portuaire > 2 km"
+  },
+  {
+   "name": "Centrale",
+   "label": "Centrale électrique"
+  },
+  {
+   "name": "Hors Corridor Chemin de fer > 2 km",
+   "label": "Hors Corridor Chemin de fer > 2 km"
+  },
+  {
+   "name": "Parc",
+   "label": "Parc à boues rouges"
+  },
+  {
+   "name": "Chemin de fer",
+   "label": "Chemin de fer"
+  },
+  {
+   "name": "Réservoir",
+   "label": "Réservoir"
+  },
+  {
+   "name": "Port de bauxite",
+   "label": "Port de bauxite"
+  },
+  {
+   "name": "Zone_demprunt",
+   "label": "Zone d'emprunt"
+  },
+  {
+   "name": "Route d'accès 1",
+   "label": "Route d'accès 1"
+  },
+  {
+   "name": "Route d'accès 2",
+   "label": "Route d'accès 2"
+  }
+ ],
+ "sv_usages_site": [
+  {
+   "name": "Oui usage",
+   "label": "Oui"
+  },
+  {
+   "name": "Abandon",
+   "label": "Abandon"
+  },
+  {
+   "name": "Evité",
+   "label": "Evité"
+  },
+  {
+   "name": "Autre usage",
+   "label": "Autre"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_relation2": [
+  {
+   "name": "Chef de concéssion",
+   "label": "Chef de concéssion"
+  },
+  {
+   "name": "Chef de ménage",
+   "label": "Chef de ménage"
+  },
+  {
+   "name": "Épouse",
+   "label": "Épouse"
+  },
+  {
+   "name": "Fils ou fille",
+   "label": "Fils ou fille"
+  },
+  {
+   "name": "Petit enfant",
+   "label": "Petit enfant"
+  },
+  {
+   "name": "Frère ou Sœur",
+   "label": "Frère ou Sœur"
+  },
+  {
+   "name": "Parent",
+   "label": "Parent"
+  },
+  {
+   "name": "Grand parent",
+   "label": "Grand parent"
+  },
+  {
+   "name": "Nièce ou Neveu",
+   "label": "Nièce ou Neveu"
+  },
+  {
+   "name": "Oncle ou Tante",
+   "label": "Oncle ou Tante"
+  },
+  {
+   "name": "Cousin ou Cousine",
+   "label": "Cousin ou Cousine"
+  },
+  {
+   "name": "Beau Fils ou Belle Fille",
+   "label": "Beau Fils ou Belle Fille"
+  },
+  {
+   "name": "Beau Frère ou Belle sœur",
+   "label": "Beau Frère ou Belle sœur"
+  },
+  {
+   "name": "Père ou mère",
+   "label": "Père ou mère"
+  },
+  {
+   "name": "Employe",
+   "label": "Employe"
+  },
+  {
+   "name": "Non Parenté",
+   "label": "Non Parenté"
+  }
+ ],
+ "sv_relation3": [
+  {
+   "name": "Voisin",
+   "label": "Voisin"
+  }
+ ],
+ "sv_relation4": [
+  {
+   "name": "Ami",
+   "label": "Ami"
+  }
+ ],
+ "sv_instruction": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Primaire",
+   "label": "Primaire"
+  },
+  {
+   "name": "Secondaire partiel",
+   "label": "Secondaire partiel"
+  },
+  {
+   "name": "Secondaire complet",
+   "label": "Secondaire complet"
+  },
+  {
+   "name": "Supérieure partielle",
+   "label": "Supérieure partielle"
+  },
+  {
+   "name": "Supérieure complète",
+   "label": "Supérieure complète"
+  },
+  {
+   "name": "Alphabétisé",
+   "label": "Alphabétisé"
+  },
+  {
+   "name": "Coranique",
+   "label": "Coranique"
+  },
+  {
+   "name": "Sans objet",
+   "label": "Sans objet"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_assiduite": [
+  {
+   "name": "Très assidu",
+   "label": "Très assidu (absence très rare)"
+  },
+  {
+   "name": "Moyennement assidu",
+   "label": "Moyennement assidu (moyenne de 3 ou 4 jours par semaine)"
+  },
+  {
+   "name": "Peu assidu",
+   "label": "Peu assidu (moyenne de moins de 3 jours par semaine)"
+  }
+ ],
+ "sv_difficulte_assiduite": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Manque de moyens",
+   "label": "Manque de moyens pour les frais scolaires"
+  },
+  {
+   "name": "Travail dans l Pêche",
+   "label": "Travail dans l Pêche"
+  },
+  {
+   "name": "Travail dans les champs",
+   "label": "Travail dans les champs"
+  },
+  {
+   "name": "Mariage précoce",
+   "label": "Mariage précoce"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_niveau_langue": [
+  {
+   "name": "Bon",
+   "label": "Bon"
+  },
+  {
+   "name": "Moyen",
+   "label": "Moyen"
+  },
+  {
+   "name": "Mauvais",
+   "label": "Mauvais"
+  },
+  {
+   "name": "Nul",
+   "label": "Nul"
+  }
+ ],
+ "sv_activite_artisan": [
+  {
+   "name": "Maçon",
+   "label": "Maçon"
+  },
+  {
+   "name": "Electricien",
+   "label": "Electricien"
+  },
+  {
+   "name": "Soudeur/ferronnier",
+   "label": "Soudeur/ferronnier"
+  },
+  {
+   "name": "Plombier",
+   "label": "Plombier"
+  },
+  {
+   "name": "Briquetier",
+   "label": "Briquetier"
+  },
+  {
+   "name": "Menuisier",
+   "label": "Menuisier"
+  },
+  {
+   "name": "Boucher",
+   "label": "Boucher"
+  },
+  {
+   "name": "Restauration",
+   "label": "Restauration/petite restauration"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_type_piece": [
+  {
+   "name": "Pas de document",
+   "label": "Pas de document"
+  },
+  {
+   "name": "Carte didentite nationale",
+   "label": "Carte didentite nationale"
+  },
+  {
+   "name": "Passeport",
+   "label": "Passeport"
+  },
+  {
+   "name": "Acte de naissance",
+   "label": "Extrait de naissance"
+  },
+  {
+   "name": "Carte consulaire",
+   "label": "Carte consulaire"
+  },
+  {
+   "name": "Carte étudiant",
+   "label": "Carte étudiant"
+  },
+  {
+   "name": "Carte scolaire",
+   "label": "Carte scolaire"
+  },
+  {
+   "name": "Permis de Conduire",
+   "label": "Permis de Conduire"
+  }
+ ],
+ "sv_niveau_instruction": [
+  {
+   "name": "Sans niveau",
+   "label": "Sans niveau"
+  },
+  {
+   "name": "Alphabetisé",
+   "label": "Alphabetisé"
+  },
+  {
+   "name": "Primaire",
+   "label": "Primaire"
+  },
+  {
+   "name": "Secondaire",
+   "label": "Secondaire"
+  },
+  {
+   "name": "Technique",
+   "label": "Technique"
+  },
+  {
+   "name": "Supérieur",
+   "label": "Supérieur"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_situation_logement": [
+  {
+   "name": "il m'appartient",
+   "label": "il m'appartient"
+  },
+  {
+   "name": "Je suis locataire",
+   "label": "Je suis locataire"
+  },
+  {
+   "name": "Aucune réponse",
+   "label": "Aucune réponse"
+  }
+ ],
+ "sv_type_logement": [
+  {
+   "name": "Maison en dure (ciment)",
+   "label": "Maison en dure (ciment)"
+  },
+  {
+   "name": "Maison en brique cuite",
+   "label": "Maison en brique cuite"
+  },
+  {
+   "name": "Maison en terre battu",
+   "label": "Maison en terre battu"
+  },
+  {
+   "name": "Case ronde en terre battu",
+   "label": "Case ronde en terre battu"
+  },
+  {
+   "name": "Case ronde en brique cuite",
+   "label": "Case ronde en brique cuite"
+  }
+ ],
+ "sv_type_latrine": [
+  {
+   "name": "Latrine à fosse avec dalle et sans vatilation",
+   "label": "Latrine à fosse avec dalle et sans vatilation"
+  },
+  {
+   "name": "Sans vatilation",
+   "label": "Sans vatilation"
+  },
+  {
+   "name": "Défécation à l'air libre",
+   "label": "Défécation à l'air libre"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_period": [
+  {
+   "name": "Toute l'année",
+   "label": "Toute l'année"
+  },
+  {
+   "name": "Moins de 6 mois",
+   "label": "Moins de 6 mois"
+  },
+  {
+   "name": "Plus de 6 mois",
+   "label": "Plus de 6 mois"
+  }
+ ],
+ "sv_religion": [
+  {
+   "name": "Musulman",
+   "label": "Musulman"
+  },
+  {
+   "name": "Catholique",
+   "label": "Catholique"
+  },
+  {
+   "name": "Protestant",
+   "label": "Protestant"
+  },
+  {
+   "name": "Animiste",
+   "label": "Animiste"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_situation_matrimoniale": [
+  {
+   "name": "Marié monogame",
+   "label": "Marié monogame"
+  },
+  {
+   "name": "Marié polygame",
+   "label": "Marié polygame"
+  },
+  {
+   "name": "Célibataire",
+   "label": "Célibataire"
+  },
+  {
+   "name": "Séparé",
+   "label": "Séparé"
+  },
+  {
+   "name": "Divorcé",
+   "label": "Divorcé"
+  },
+  {
+   "name": "Veuf/veuve",
+   "label": "Veuf/veuve"
+  }
+ ],
+ "sv_langue": [
+  {
+   "name": "Malinké",
+   "label": "Malinké"
+  },
+  {
+   "name": "Konianké",
+   "label": "Konianké"
+  },
+  {
+   "name": "Peulh",
+   "label": "Peulh"
+  },
+  {
+   "name": "Soussou",
+   "label": "Soussou"
+  },
+  {
+   "name": "Baga",
+   "label": "Baga"
+  },
+  {
+   "name": "Français",
+   "label": "Français"
+  },
+  {
+   "name": "Kissi",
+   "label": "Kissi"
+  },
+  {
+   "name": "Kpelè",
+   "label": "Kpelè"
+  },
+  {
+   "name": "Anglais",
+   "label": "Anglais"
+  },
+  {
+   "name": "Kono",
+   "label": "Kono"
+  },
+  {
+   "name": "Toma",
+   "label": "Toma"
+  },
+  {
+   "name": "Kouranko",
+   "label": "Kouranko"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_ethnie": [
+  {
+   "name": "Malinké",
+   "label": "Malinké"
+  },
+  {
+   "name": "Koniankés",
+   "label": "Koniankés"
+  },
+  {
+   "name": "Peuls",
+   "label": "Peuls"
+  },
+  {
+   "name": "Soussous",
+   "label": "Soussous"
+  },
+  {
+   "name": "Kissi",
+   "label": "Kissi"
+  },
+  {
+   "name": "Kpelè",
+   "label": "Kpelè"
+  },
+  {
+   "name": "Malien",
+   "label": "Malien"
+  },
+  {
+   "name": "Kono",
+   "label": "Kono"
+  },
+  {
+   "name": "Toma",
+   "label": "Toma"
+  },
+  {
+   "name": "Kouranko",
+   "label": "Kouranko"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_raison_immigration": [
+  {
+   "name": "Economiques",
+   "label": "Économiques"
+  },
+  {
+   "name": "Non_services_sociaux_de_base",
+   "label": "Non-accès aux services sociaux de base"
+  },
+  {
+   "name": "Mariage",
+   "label": "Mariage"
+  },
+  {
+   "name": "Maladie",
+   "label": "Maladie"
+  },
+  {
+   "name": "Facteurs_environnementaux",
+   "label": "Facteurs environnementaux"
+  },
+  {
+   "name": "Apres_evenement",
+   "label": "Renter chez elles après un événément/déplacement"
+  },
+  {
+   "name": "Affaires_familiales",
+   "label": "Affaires familiales"
+  },
+  {
+   "name": "Droit_liberte",
+   "label": "Droit et liberté"
+  },
+  {
+   "name": "Possiblite_education",
+   "label": "Possiblité d’éducation"
+  },
+  {
+   "name": "Possiblite_emploi",
+   "label": "Possiblité d’emploi"
+  },
+  {
+   "name": "Mauvaise_condition",
+   "label": "Mauvaise condition de vie"
+  },
+  {
+   "name": "dDfficultes_faire_affaires",
+   "label": "Difficultés à faire des affaires"
+  },
+  {
+   "name": "Manque_terre",
+   "label": "Manque de terre cultivables"
+  },
+  {
+   "name": "Raisons_personnelles",
+   "label": "Raisons personnelles"
+  },
+  {
+   "name": "Fonder_menage",
+   "label": "Fonder son propre ménage"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_activite": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Agriculteur",
+   "label": "Agriculteur"
+  },
+  {
+   "name": "Artisan",
+   "label": "Artisan"
+  },
+  {
+   "name": "Autre Employé Salarié",
+   "label": "Autre Employé Salarié"
+  },
+  {
+   "name": "Chasseur",
+   "label": "Chasseur"
+  },
+  {
+   "name": "Commerçant",
+   "label": "Commerçant"
+  },
+  {
+   "name": "Ecole coranique",
+   "label": "Ecole coranique"
+  },
+  {
+   "name": "Eleveur",
+   "label": "Eleveur"
+  },
+  {
+   "name": "Employé Mine",
+   "label": "Employé Mine"
+  },
+  {
+   "name": "Etudiant/écolier",
+   "label": "Etudiant/écolier"
+  },
+  {
+   "name": "Femme au foyer",
+   "label": "Femme au foyer - prend soin de la maison/enfants"
+  },
+  {
+   "name": "Fonctionnaire",
+   "label": "Fonctionnaire"
+  },
+  {
+   "name": "Inactif ou malade",
+   "label": "Inactif ou malade"
+  },
+  {
+   "name": "Mendicité",
+   "label": "Mendicité"
+  },
+  {
+   "name": "Orpailleur",
+   "label": "Orpailleur"
+  },
+  {
+   "name": "Pecheur",
+   "label": "Pecheur"
+  },
+  {
+   "name": "Retraité",
+   "label": "Retraité"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_period_activite": [
+  {
+   "name": "Moins de 3 mois",
+   "label": "Moins de 3 mois"
+  },
+  {
+   "name": "3 à 6 mois",
+   "label": "3 à 6 mois"
+  },
+  {
+   "name": "6 à 9 Mois",
+   "label": "6 à 9 mois"
+  },
+  {
+   "name": "Toute l'année",
+   "label": "Toute l'année"
+  }
+ ],
+ "sv_frequence": [
+  {
+   "name": "Jour",
+   "label": "Jour"
+  },
+  {
+   "name": "Mois",
+   "label": "Mois"
+  },
+  {
+   "name": "Année",
+   "label": "Année"
+  }
+ ],
+ "sv_pecheur": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Chef de port/débarcadeur",
+   "label": "Chef de port/débarcadeur"
+  },
+  {
+   "name": "Cheffe fumeuse",
+   "label": "Cheffe fumeuse"
+  },
+  {
+   "name": "Porpriétaire unité de pêche",
+   "label": "Porpriétaire unité de pêche"
+  },
+  {
+   "name": "Cheffe unité de pêche",
+   "label": "Cheffe unité de pêche"
+  },
+  {
+   "name": "Pêcheur",
+   "label": "Pêcheur"
+  },
+  {
+   "name": "Broyage",
+   "label": "Broyage"
+  },
+  {
+   "name": "Lavage",
+   "label": "Lavage"
+  },
+  {
+   "name": "Traitement cyanure",
+   "label": "Traitement cyanure"
+  },
+  {
+   "name": "Propriétaire de trou",
+   "label": "Propriétaire de trou"
+  },
+  {
+   "name": "Achat or",
+   "label": "Achat or"
+  },
+  {
+   "name": "Transport du minerai",
+   "label": "Transport du minerai"
+  },
+  {
+   "name": "Financement d’un trou",
+   "label": "Financement d’un trou"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_par_qui": [
+  {
+   "name": "Membre du ménage",
+   "label": "Membre du ménage"
+  },
+  {
+   "name": "Employé agricole",
+   "label": "Employé agricole"
+  },
+  {
+   "name": "Collectivement par le ménage",
+   "label": "Collectivement par le ménage"
+  }
+ ],
+ "sv_uml": [
+  {
+   "name": "Sac de 50kg",
+   "label": "Sac de 50kg"
+  },
+  {
+   "name": "Sac de 25kg",
+   "label": "Sac de 25kg"
+  }
+ ],
+ "sv_par_qui_collecte": [
+  {
+   "name": "Chef_de_menage",
+   "label": "Chef de ménage"
+  },
+  {
+   "name": "Femmes",
+   "label": "Femmes"
+  },
+  {
+   "name": "Enfants",
+   "label": "Enfants"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_competence": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Chauffeur",
+   "label": "Chauffeur"
+  },
+  {
+   "name": "Mécanicien",
+   "label": "Mécanicien"
+  },
+  {
+   "name": "Maçon",
+   "label": "Maçon"
+  },
+  {
+   "name": "Cuisinier",
+   "label": "Cuisinier"
+  },
+  {
+   "name": "Menuisier",
+   "label": "Menuisier"
+  },
+  {
+   "name": "Soudeur",
+   "label": "Soudeur"
+  },
+  {
+   "name": "Electricien",
+   "label": "Electricien"
+  },
+  {
+   "name": "Plombier",
+   "label": "Plombier"
+  },
+  {
+   "name": "Peintre",
+   "label": "Peintre"
+  },
+  {
+   "name": "couturier",
+   "label": "couturier"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_raison_pas_agriculture": [
+  {
+   "name": "Jamais pratiqué l agriculture",
+   "label": "Jamais pratiqué l agriculture"
+  },
+  {
+   "name": "Pêche",
+   "label": "Pêche"
+  },
+  {
+   "name": "Pas de main d’œuvre disponible",
+   "label": "Pas de main d’œuvre disponible"
+  },
+  {
+   "name": "Pas de terres disponibles",
+   "label": "Pas de terres disponibles"
+  },
+  {
+   "name": "Autres travail rémunéré",
+   "label": "Autres travail rémunéré"
+  },
+  {
+   "name": "Maladie ou vieillesse",
+   "label": "Maladie ou vieillesse"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_speculation": [
+  {
+   "name": "Anacardier",
+   "label": "Anacardier"
+  },
+  {
+   "name": "Ananas",
+   "label": "Ananas"
+  },
+  {
+   "name": "Arachide",
+   "label": "Arachide"
+  },
+  {
+   "name": "Avocatier",
+   "label": "Avocatier"
+  },
+  {
+   "name": "Bananier plantain",
+   "label": "Bananier plantain"
+  },
+  {
+   "name": "Bissap feuille",
+   "label": "Bissap feuille"
+  },
+  {
+   "name": "Bissap fleur",
+   "label": "Bissap fleur"
+  },
+  {
+   "name": "Calebasse",
+   "label": "Calebasse"
+  },
+  {
+   "name": "Canne à sucre",
+   "label": "Canne à sucre"
+  },
+  {
+   "name": "Citronier",
+   "label": "Citronier"
+  },
+  {
+   "name": "Chou",
+   "label": "Chou"
+  },
+  {
+   "name": "Cocotier",
+   "label": "Cocotier"
+  },
+  {
+   "name": "Coton",
+   "label": "Coton"
+  },
+  {
+   "name": "Courge",
+   "label": "Courge"
+  },
+  {
+   "name": "Djabaring",
+   "label": "Djabaring"
+  },
+  {
+   "name": "Fonio",
+   "label": "Fonio"
+  },
+  {
+   "name": "Gingembre",
+   "label": "Gingembre"
+  },
+  {
+   "name": "Gombo",
+   "label": "Gombo"
+  },
+  {
+   "name": "Goyavier",
+   "label": "Goyavier"
+  },
+  {
+   "name": "Karité",
+   "label": "Karité"
+  },
+  {
+   "name": "Mais",
+   "label": "Mais"
+  },
+  {
+   "name": "Manioc",
+   "label": "Manioc"
+  },
+  {
+   "name": "Manguier",
+   "label": "Manguier"
+  },
+  {
+   "name": "Mil",
+   "label": "Mil"
+  },
+  {
+   "name": "Niébé",
+   "label": "Niébé"
+  },
+  {
+   "name": "Néré",
+   "label": "Néré"
+  },
+  {
+   "name": "Obergine long",
+   "label": "Obergine long"
+  },
+  {
+   "name": "Obergine rond",
+   "label": "Obergine rond"
+  },
+  {
+   "name": "Oranger",
+   "label": "Oranger"
+  },
+  {
+   "name": "palmier à huile",
+   "label": "palmier à huile"
+  },
+  {
+   "name": "Papayer",
+   "label": "Papayer"
+  },
+  {
+   "name": "Pastèque",
+   "label": "Pastèque"
+  },
+  {
+   "name": "Patate douce",
+   "label": "Patate douce"
+  },
+  {
+   "name": "Piment",
+   "label": "Piment"
+  },
+  {
+   "name": "Riz",
+   "label": "Riz"
+  },
+  {
+   "name": "Sésame",
+   "label": "Sésame"
+  },
+  {
+   "name": "Soja",
+   "label": "Soja"
+  },
+  {
+   "name": "Sorgho",
+   "label": "Sorgho"
+  },
+  {
+   "name": "Tomate",
+   "label": "Tomate"
+  },
+  {
+   "name": "Wousso",
+   "label": "Wousso"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_quantite": [
+  {
+   "name": "Tout",
+   "label": "Tout"
+  },
+  {
+   "name": "Majorité",
+   "label": "Majorité"
+  },
+  {
+   "name": "Minorité",
+   "label": "Minorité"
+  },
+  {
+   "name": "Rien",
+   "label": "Rien"
+  }
+ ],
+ "sv_intrants": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Semences_ameliorees",
+   "label": "Semences améliorées"
+  },
+  {
+   "name": "Engrais_chimique",
+   "label": "Engrais chimique"
+  },
+  {
+   "name": "Herbicides",
+   "label": "Herbicides"
+  },
+  {
+   "name": "Engrais_naturel",
+   "label": "Engrais naturel"
+  },
+  {
+   "name": "Tracteur",
+   "label": "Tracteur"
+  },
+  {
+   "name": "Charrue",
+   "label": "Charrue"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_acces_services": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Non",
+   "label": "Non"
+  },
+  {
+   "name": "Moulin",
+   "label": "Moulin"
+  },
+  {
+   "name": "Decortiqueuse_arachide",
+   "label": "Décortiqueuse arachide"
+  },
+  {
+   "name": "Decortiqueuse_mais",
+   "label": "Décortiqueuse maïs"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_probleme_acces": [
+  {
+   "name": "Distance",
+   "label": "Distance"
+  },
+  {
+   "name": "Qualite_de_la_terre",
+   "label": "Qualité de la terre"
+  },
+  {
+   "name": "Disponibilite_de_la_terre",
+   "label": "Disponibilité de la terre"
+  },
+  {
+   "name": "Paiement_dune_taxe",
+   "label": "Paiement d’une taxe au chef de Village pour pouvoir cultiver"
+  },
+  {
+   "name": "Manque_de_main_doeuvre_pour_cultiver",
+   "label": "Manque de main d’œuvre pour cultiver"
+  },
+  {
+   "name": "Manque_deau",
+   "label": "Manque d’eau"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_prise_en_charge": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "etat",
+   "label": "L'Etat (l'administration publique)"
+  },
+  {
+   "name": "Assurance",
+   "label": "Assurance"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  },
+  {
+   "name": "IPM",
+   "label": "IPM"
+  }
+ ],
+ "sv_acquisition_terre": [
+  {
+   "name": "Achat vente",
+   "label": "Achat vente"
+  },
+  {
+   "name": "Héritage",
+   "label": "Héritage"
+  },
+  {
+   "name": "Prêt",
+   "label": "Prêt"
+  },
+  {
+   "name": "Location",
+   "label": "Location"
+  },
+  {
+   "name": "Meteyage",
+   "label": "Meteyage"
+  },
+  {
+   "name": "Mariage",
+   "label": "Mariage"
+  }
+ ],
+ "sv_situation_terre": [
+  {
+   "name": "Cultivable",
+   "label": "Cultivable"
+  },
+  {
+   "name": "Non cultivable",
+   "label": "Non cultivable"
+  }
+ ],
+ "sv_statut_terre": [
+  {
+   "name": "Lignage",
+   "label": "Lignage"
+  },
+  {
+   "name": "Privée",
+   "label": "Privée"
+  }
+ ],
+ "sv_maintien_terre": [
+  {
+   "name": "Propriété foncière par héritage",
+   "label": "Propriété foncière par héritage"
+  },
+  {
+   "name": "Mariage",
+   "label": "Mariage"
+  },
+  {
+   "name": "Proximité de la famille",
+   "label": "Proximité de la famille"
+  },
+  {
+   "name": "Opportunuité d'emploi",
+   "label": "Opportunuité d'emploi"
+  },
+  {
+   "name": "Exploitation minière artisanale",
+   "label": "Exploitation minière artisanale"
+  },
+  {
+   "name": "Proximité des sites commerciaux",
+   "label": "Proximité des sites commerciaux"
+  }
+ ],
+ "sv_moyen_nouriture": [
+  {
+   "name": "Vente_de_betail",
+   "label": "Vente de bétail"
+  },
+  {
+   "name": "Vente_autres_biens",
+   "label": "Vente autres biens"
+  },
+  {
+   "name": "Emprunts",
+   "label": "Emprunts"
+  },
+  {
+   "name": "Aide_de_la_famille",
+   "label": "Aide de la famille"
+  },
+  {
+   "name": "Migration_temporaire",
+   "label": "Migration temporaire"
+  },
+  {
+   "name": "Epargne",
+   "label": "Epargne"
+  },
+  {
+   "name": "Reduire_les_depenses_de_sante_education",
+   "label": "Réduire les dépenses de santé et éducation"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_limit_production": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Mauvaise_recolte",
+   "label": "Mauvaise récolte"
+  },
+  {
+   "name": "Pas_de_bonnes_terres_agricoles_disponibles",
+   "label": "Pas de bonnes terres agricoles disponibles"
+  },
+  {
+   "name": "Manque_de_main_doeuvre_pour_cultiver",
+   "label": "Manque de main d’œuvre pour cultiver de plus grands champs"
+  },
+  {
+   "name": "Depenses_imprevues",
+   "label": "Dépenses imprévues"
+  },
+  {
+   "name": "Manque_dequipements_ou_dintrants",
+   "label": "Manque d’équipements ou d’intrants (semences, engrais)"
+  },
+  {
+   "name": "Maladie_ou_mortalite",
+   "label": "Maladie ou mortalité"
+  },
+  {
+   "name": "Pluviometrie",
+   "label": "Pluviométrie"
+  },
+  {
+   "name": "Attaques_insectes",
+   "label": "Attaques insectes"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_animaux": [
+  {
+   "name": "Bœufs",
+   "label": "Bœufs"
+  },
+  {
+   "name": "Moutons",
+   "label": "Moutons"
+  },
+  {
+   "name": "Chèvres",
+   "label": "Chèvres"
+  },
+  {
+   "name": "Volailles",
+   "label": "Volailles"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_paturage": [
+  {
+   "name": "Pres_de_la_maison",
+   "label": "Près de la maison"
+  },
+  {
+   "name": "Aux_champs",
+   "label": "Aux champs"
+  },
+  {
+   "name": "Zone_designee_de_paturage",
+   "label": "Zone désignée de paturage"
+  },
+  {
+   "name": "Transhumance",
+   "label": "Transhumance"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_source_revenu": [
+  {
+   "name": "Achat/vente biens divers",
+   "label": "Achat/vente biens divers"
+  },
+  {
+   "name": "Achat/vente denrées agricoles",
+   "label": "Achat/vente denrées agricoles"
+  },
+  {
+   "name": "Activité salarié IAMGOLD",
+   "label": "Activité salarié IAMGOLD"
+  },
+  {
+   "name": "activités traditionnelle",
+   "label": "activités traditionnelles (tradipraticien, rites, etc.)"
+  },
+  {
+   "name": "Aide des parents",
+   "label": "Aide des parents, proches, autres"
+  },
+  {
+   "name": "Apiculture",
+   "label": "Apiculture"
+  },
+  {
+   "name": "Chasse et peche",
+   "label": "Chasse et pêche"
+  },
+  {
+   "name": "Commerce/Magasin",
+   "label": "Commerce/Magasin"
+  },
+  {
+   "name": "Fabrication de briques",
+   "label": "Fabrication de briques"
+  },
+  {
+   "name": "Fonction publique",
+   "label": "Fonction publique"
+  },
+  {
+   "name": "Loyers maisons",
+   "label": "Loyers maisons"
+  },
+  {
+   "name": "Métiers du batiment",
+   "label": "Métiers du bâtiment"
+  },
+  {
+   "name": "Pension retraite",
+   "label": "Pension retraite"
+  },
+  {
+   "name": "Salariée privée",
+   "label": "Salariée privée"
+  },
+  {
+   "name": "Travail de manœuvre",
+   "label": "Travail de manœuvre"
+  },
+  {
+   "name": "type_equipement",
+   "label": "Loyers terre"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_energie_cuisine": [
+  {
+   "name": "Gaz",
+   "label": "Gaz"
+  },
+  {
+   "name": "Pétrole",
+   "label": "Pétrole"
+  },
+  {
+   "name": "Bois de Chauffe",
+   "label": "Bois de Chauffe"
+  },
+  {
+   "name": "attentes_reinstallation",
+   "label": "Charbon de Bois"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_energie_electricite": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Générateur",
+   "label": "Générateur"
+  },
+  {
+   "name": "Gaz",
+   "label": "Gaz"
+  },
+  {
+   "name": "Pétrole",
+   "label": "Pétrole"
+  },
+  {
+   "name": "Lampe chinoise/Pile",
+   "label": "Lampe chinoise/Pile"
+  },
+  {
+   "name": "Bougie",
+   "label": "Bougie"
+  },
+  {
+   "name": "Torche",
+   "label": "Torche"
+  },
+  {
+   "name": "Panneaux solaires",
+   "label": "Panneaux solaires"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_lieu_soins": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Case_de_sante",
+   "label": "Case de santé"
+  },
+  {
+   "name": "Poste_de_sante",
+   "label": "Poste de santé"
+  },
+  {
+   "name": "Tradipraticien",
+   "label": "Tradipraticien"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_limit_acces_soins": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Distance",
+   "label": "Distance"
+  },
+  {
+   "name": "Culturel_religieux",
+   "label": "Culturel/religieux"
+  },
+  {
+   "name": "Cout",
+   "label": "Coût"
+  },
+  {
+   "name": "Barriere_linguistique",
+   "label": "Barrière linguistique"
+  },
+  {
+   "name": "Automedication",
+   "label": "Automédication"
+  },
+  {
+   "name": "Preference_personnelle",
+   "label": "Préférence personnelle"
+  },
+  {
+   "name": "Sans_objet",
+   "label": "Sans objet"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_accouchement": [
+  {
+   "name": "Matrone",
+   "label": "Matrone"
+  },
+  {
+   "name": "Sage-femme",
+   "label": "Sage-femme"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_maladie": [
+  {
+   "name": "Paludisme",
+   "label": "Paludisme"
+  },
+  {
+   "name": "Grippe",
+   "label": "Grippe"
+  },
+  {
+   "name": "Diarrhee",
+   "label": "Diarrhée"
+  },
+  {
+   "name": "Fievre_jaune",
+   "label": "Fièvre jaune"
+  },
+  {
+   "name": "Coronavirus",
+   "label": "Coronavirus"
+  },
+  {
+   "name": "Maladie_de_la_peau_gale",
+   "label": "Maladie de la peau (gale)"
+  },
+  {
+   "name": "Maladie_cardiaque",
+   "label": "Maladie cardiaque"
+  },
+  {
+   "name": "Tuberculose",
+   "label": "Tuberculose"
+  },
+  {
+   "name": "Anemie",
+   "label": "Anémie"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_vaccin": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Polio",
+   "label": "Polio"
+  },
+  {
+   "name": "Tetanos",
+   "label": "Tétanos"
+  },
+  {
+   "name": "Rougeole",
+   "label": "Rougeole"
+  },
+  {
+   "name": "Fievre_jaune",
+   "label": "Fièvre jaune"
+  },
+  {
+   "name": "Meningite",
+   "label": "Méningite"
+  },
+  {
+   "name": "Hepatite",
+   "label": "Hépatite"
+  },
+  {
+   "name": "Diphterie",
+   "label": "Diphtérie"
+  },
+  {
+   "name": "Coqueluche",
+   "label": "Coqueluche"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_appro_eau": [
+  {
+   "name": "Forage_du_village",
+   "label": "Forage du village"
+  },
+  {
+   "name": "Forage_dans_un_autre_village",
+   "label": "Forage dans un autre village"
+  },
+  {
+   "name": "Eau_de_marigot",
+   "label": "Eau de marigot"
+  },
+  {
+   "name": "Puits",
+   "label": "Puits"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_depenses": [
+  {
+   "name": "Achat d’équipements ou intrants pour les travaux des champs",
+   "label": "Achat d’équipements ou intrants pour les travaux des champs"
+  },
+  {
+   "name": "Achat d’équipements pour les travaux Pêche",
+   "label": "Achat d’équipements pour les travaux Pêche"
+  },
+  {
+   "name": "Achat d’essence pour la moto ou groupe ou voiture",
+   "label": "Achat d’essence pour la moto ou groupe ou voiture"
+  },
+  {
+   "name": "Achat de bétail",
+   "label": "Achat de bétail"
+  },
+  {
+   "name": "Achat de crédits pour le téléphone",
+   "label": "Achat de crédits pour le téléphone"
+  },
+  {
+   "name": "Achat de médicaments, soins de santé",
+   "label": "Achat de médicaments, soins de santé"
+  },
+  {
+   "name": "Achat de nourriture",
+   "label": "Achat de nourriture"
+  },
+  {
+   "name": "Achat de vêtements et autres biens essentiels",
+   "label": "Achat de vêtements et autres biens essentiels"
+  },
+  {
+   "name": "Don d’argent pour la famille ou les amis qui sont dans le besoin",
+   "label": "Don d’argent pour la famille ou les amis qui sont dans le besoin"
+  },
+  {
+   "name": "Frais de construction ou rénovation de la maison",
+   "label": "Frais de construction ou rénovation de la maison"
+  },
+  {
+   "name": "Frais de déplacement",
+   "label": "Frais de déplacement"
+  },
+  {
+   "name": "Frais de voyage",
+   "label": "Frais de voyage"
+  },
+  {
+   "name": "Frais pour les évènements sociaux (mariage, baptême etc.)",
+   "label": "Frais pour les évènements sociaux (mariage, baptême etc.)"
+  },
+  {
+   "name": "Frais scolaires pour les enfants",
+   "label": "Frais scolaires pour les enfants"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_periode_credi": [
+  {
+   "name": "Pour la préparation de la prochaine campagne agricole",
+   "label": "Pour la préparation de la prochaine campagne agricole"
+  },
+  {
+   "name": "Durant la période de soudure",
+   "label": "Durant la période de soudure"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_type_credi": [
+  {
+   "name": "Argent",
+   "label": "Argent"
+  },
+  {
+   "name": "Nourriture",
+   "label": "Nourriture"
+  },
+  {
+   "name": "Intrants",
+   "label": "Intrants"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_epargne": [
+  {
+   "name": "Mutuelle",
+   "label": "Mutuelle"
+  },
+  {
+   "name": "Domicile",
+   "label": "Domicile"
+  },
+  {
+   "name": "Boutique",
+   "label": "Boutique"
+  },
+  {
+   "name": "Tontine",
+   "label": "Tontine"
+  },
+  {
+   "name": "Individu",
+   "label": "Individu"
+  }
+ ],
+ "sv_limit_argent": [
+  {
+   "name": "Pas_opportunite_de_travail",
+   "label": "Pas d opportunité de travail"
+  },
+  {
+   "name": "Vieillesse",
+   "label": "Vieillesse"
+  },
+  {
+   "name": "Maladie",
+   "label": "Maladie"
+  },
+  {
+   "name": "Pas_acces_aux_AGR",
+   "label": "Pas d’opportunités d’accès à des activités génératrices de revenus"
+  },
+  {
+   "name": "Pas_d_acces_a_l_Pêche",
+   "label": "Pas d accès à l Pêche"
+  },
+  {
+   "name": "Pas_d_acces_a_l_agriculture",
+   "label": "Pas d accès à l agriculture"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_equippements": [
+  {
+   "name": "Antenne satellite",
+   "label": "Antenne satellite"
+  },
+  {
+   "name": "Charrue manuelle",
+   "label": "Charrue manuelle"
+  },
+  {
+   "name": "Charrue traction animale",
+   "label": "Charrue traction animale"
+  },
+  {
+   "name": "Congélateur / frigidaire",
+   "label": "Congélateur / frigidaire"
+  },
+  {
+   "name": "Daba",
+   "label": "Daba"
+  },
+  {
+   "name": "Fusil de chasse",
+   "label": "Fusil de chasse"
+  },
+  {
+   "name": "Groupe électrogène",
+   "label": "Groupe électrogène"
+  },
+  {
+   "name": "Marteau piqueur",
+   "label": "Marteau piqueur"
+  },
+  {
+   "name": "Moto",
+   "label": "Moto"
+  },
+  {
+   "name": "Panneaux solaires",
+   "label": "Panneaux solaires"
+  },
+  {
+   "name": "Radio qui fonctionne",
+   "label": "Radio qui fonctionne"
+  },
+  {
+   "name": "Téléphone mobile",
+   "label": "Téléphone mobile (portable)"
+  },
+  {
+   "name": "Télévision",
+   "label": "Télévision"
+  },
+  {
+   "name": "Tracteur",
+   "label": "Tracteur"
+  },
+  {
+   "name": "Tricycle",
+   "label": "Tricycle (taf taf)"
+  },
+  {
+   "name": "Vélo",
+   "label": "Vélo"
+  },
+  {
+   "name": "Voiture ou camion",
+   "label": "Voiture ou camion"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_appreciation": [
+  {
+   "name": "Bonne",
+   "label": "Bonne"
+  },
+  {
+   "name": "Moyenne",
+   "label": "Moyenne"
+  },
+  {
+   "name": "Mauvaise",
+   "label": "Mauvaise"
+  }
+ ],
+ "sv_gestion_dechets": [
+  {
+   "name": "PME",
+   "label": "PME"
+  },
+  {
+   "name": "Incineration",
+   "label": "Incinération"
+  },
+  {
+   "name": "Enfouissement",
+   "label": "Enfouissement"
+  },
+  {
+   "name": "Aire_libre",
+   "label": "Aire libre"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_penurie_alimentaire": [
+  {
+   "name": "Manque_argent",
+   "label": "Manque d'argent"
+  },
+  {
+   "name": "Nourriture_trop_chere",
+   "label": "Nourriture trop chère"
+  },
+  {
+   "name": "Mauvaise_recolte",
+   "label": "Mauvaise récolte"
+  },
+  {
+   "name": "Calamite_naturelles",
+   "label": "Calamité naturelles (feux de brousse, maladies, ravageurs)"
+  },
+  {
+   "name": "Production_insuffisamment_de_nourriture",
+   "label": "Impossibilité de produire suffisamment de la nourriture à partir des activités ou de l'emploi"
+  },
+  {
+   "name": "Perte_de_terre",
+   "label": "Perte de terre"
+  },
+  {
+   "name": "Remboursement_prets",
+   "label": "J'ai dû rembourser des prêts pour l'agriculture"
+  },
+  {
+   "name": "Non_repondu",
+   "label": "non répondu"
+  },
+  {
+   "name": "Pas_applicable",
+   "label": "N'est pas applicable"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_subsistance_arbres": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Avocat",
+   "label": "Avocat"
+  },
+  {
+   "name": "Anacard",
+   "label": "Anacard"
+  },
+  {
+   "name": "Noie_de_coco",
+   "label": "Noie de coco"
+  },
+  {
+   "name": "Goyave",
+   "label": "Goyave"
+  },
+  {
+   "name": "Mangue",
+   "label": "Mangue"
+  },
+  {
+   "name": "Noie_de_palm",
+   "label": "Noie de palm (Huile rouge)"
+  },
+  {
+   "name": "Orange",
+   "label": "Orange"
+  },
+  {
+   "name": "Papayer",
+   "label": "Papayer"
+  },
+  {
+   "name": "Ananas",
+   "label": "Ananas"
+  },
+  {
+   "name": "Karite",
+   "label": "Karité"
+  },
+  {
+   "name": "Nere",
+   "label": "Néré"
+  },
+  {
+   "name": "Citron",
+   "label": "Citron"
+  },
+  {
+   "name": "Bananie_plantain",
+   "label": "Bananie plantain"
+  },
+  {
+   "name": "Non_repondu",
+   "label": "Non répondu"
+  },
+  {
+   "name": "Pas_applicable",
+   "label": "N'est pas applicable"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_subsistance_cultures": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Mais",
+   "label": "Maïs"
+  },
+  {
+   "name": "Mil",
+   "label": "Mil"
+  },
+  {
+   "name": "Arachide",
+   "label": "Arachide"
+  },
+  {
+   "name": "Riz_de_montagne",
+   "label": "Riz de montagne"
+  },
+  {
+   "name": "Riz_de_plaine",
+   "label": "Riz de plaine"
+  },
+  {
+   "name": "Gombo",
+   "label": "Gombo"
+  },
+  {
+   "name": "Fonio",
+   "label": "Fonio"
+  },
+  {
+   "name": "Coton",
+   "label": "Coton"
+  },
+  {
+   "name": "Miel",
+   "label": "Miel"
+  },
+  {
+   "name": "Manioc",
+   "label": "Manioc"
+  },
+  {
+   "name": "Canne_a_sucre",
+   "label": "Canne à sucre"
+  },
+  {
+   "name": "Niebe",
+   "label": "Niébé"
+  },
+  {
+   "name": "Sorgho",
+   "label": "Sorgho"
+  },
+  {
+   "name": "Patate_douce",
+   "label": "Patate douce"
+  },
+  {
+   "name": "Bissap_feuille",
+   "label": "Bissap feuille"
+  },
+  {
+   "name": "Aubergine_rond",
+   "label": "Aubergine rond"
+  },
+  {
+   "name": "Aubergine_long",
+   "label": "Aubergine long"
+  },
+  {
+   "name": "Tomate",
+   "label": "Tomate"
+  },
+  {
+   "name": "Piment",
+   "label": "Piment"
+  },
+  {
+   "name": "Chou",
+   "label": "Chou"
+  },
+  {
+   "name": "Bissap_fleur",
+   "label": "Bissap fleur"
+  },
+  {
+   "name": "Courge",
+   "label": "Courge"
+  },
+  {
+   "name": "Pasteque",
+   "label": "Pastèque"
+  },
+  {
+   "name": "Calebasse",
+   "label": "Calebasse"
+  },
+  {
+   "name": "Soja",
+   "label": "Soja"
+  },
+  {
+   "name": "Igname",
+   "label": "Igname"
+  },
+  {
+   "name": "Oignons",
+   "label": "Oignons"
+  },
+  {
+   "name": "Gingembre",
+   "label": "Gingembre"
+  },
+  {
+   "name": "Sesame",
+   "label": "Sésame"
+  },
+  {
+   "name": "Taro",
+   "label": "Taro"
+  },
+  {
+   "name": "Haricots",
+   "label": "Haricots"
+  },
+  {
+   "name": "Non_repondu",
+   "label": "Non répondu"
+  },
+  {
+   "name": "Pas_applicable",
+   "label": "N'est pas applicable"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_subsistance_elevage": [
+  {
+   "name": "Aucun",
+   "label": "Aucun"
+  },
+  {
+   "name": "Bœufs",
+   "label": "Bœufs"
+  },
+  {
+   "name": "Moutons",
+   "label": "Moutons"
+  },
+  {
+   "name": "Chevres",
+   "label": "Chèvres"
+  },
+  {
+   "name": "Volailles",
+   "label": "Volailles"
+  },
+  {
+   "name": "Canards",
+   "label": "Canards"
+  },
+  {
+   "name": "Non_repondu",
+   "label": "Non répondu"
+  },
+  {
+   "name": "Pas_applicable",
+   "label": "N'est pas applicable"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_collecte": [
+  {
+   "name": "Poisson",
+   "label": "Poisson"
+  },
+  {
+   "name": "Animaux sauvages",
+   "label": "Animaux sauvages"
+  },
+  {
+   "name": "Herbes / plantes médicinales",
+   "label": "Herbes / plantes médicinales"
+  },
+  {
+   "name": "Fruits sauvages",
+   "label": "Fruits sauvages"
+  },
+  {
+   "name": "Bois de chauffe",
+   "label": "Bois de chauffe"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_priorite_qualite_vie": [
+  {
+   "name": "Plus_de_nourriture",
+   "label": "Avoir plus de nourriture"
+  },
+  {
+   "name": "Construire_une_bonne_maison",
+   "label": "Construire une bonne maison (en dure)"
+  },
+  {
+   "name": "Plus_d_argent_pour_menage",
+   "label": "Avoir plus d'argent pour subvenir aux besoins du ménage"
+  },
+  {
+   "name": "Plus_de_terres",
+   "label": "Avoir plus de terres cultivables"
+  },
+  {
+   "name": "Meilleures_education",
+   "label": "Meilleures éducation pour nos enfants"
+  },
+  {
+   "name": "Enfants_en_bonne_sante",
+   "label": "Gardez les enfants en bonne santé"
+  },
+  {
+   "name": "Projet_entreprise",
+   "label": "Mettre en place mon projet d'entreprise"
+  },
+  {
+   "name": "Avoir_un_emploi",
+   "label": "Avoir un emploi"
+  },
+  {
+   "name": "Ne_pas_attraper_de_maladie",
+   "label": "Veiller à ce que nous n'attrapons pas le VIH/SIDA, la tuberculose, le palludisme, etc,"
+  },
+  {
+   "name": "Améliorer_nos_toilettes",
+   "label": "Améliorer nos toilettes"
+  },
+  {
+   "name": "Avoir_plus_d_argent_pour_la_famille",
+   "label": "Avoir plus d'argent pour aider les membre de la famille"
+  },
+  {
+   "name": "Ameliorer_acces_eau",
+   "label": "Améliorer l'accès à l'eau potable"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_attentes": [
+  {
+   "name": "Emploi",
+   "label": "Emploi"
+  },
+  {
+   "name": "Opportunites_pour_les_entreprises_locales",
+   "label": "Opportunités pour les entreprises locales"
+  },
+  {
+   "name": "Des_projets_pour_donner_l_acces_a_l_eau",
+   "label": "Des projets pour donner l accès à l eau"
+  },
+  {
+   "name": "Projets_de_developpement_economique",
+   "label": "Projets de développement économique"
+  },
+  {
+   "name": "Cela_aidera_a_construire_des_ecoles_des_installations_communautaires",
+   "label": "Cela aidera à construire des écoles, des installations communautaires"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ],
+ "sv_craintes": [
+  {
+   "name": "Les_gens_seront_deplaces_de_leurs_terres_sans_compensation",
+   "label": "Les gens seront déplacés de leurs terres sans compensation"
+  },
+  {
+   "name": "Des_emplois_seront_attribues_a_des_etrangers",
+   "label": "Des emplois seront attribués à des étrangers"
+  },
+  {
+   "name": "Perte_des_valeurs_traditionnelles",
+   "label": "Perte des valeurs traditionnelles"
+  },
+  {
+   "name": "Cela_aura_un_impact_sur_les_ressources_en_eau",
+   "label": "Cela aura un impact sur les ressources en eau"
+  },
+  {
+   "name": "Environnement_sera_pollue",
+   "label": "Environnement sera pollué"
+  },
+  {
+   "name": "Autre",
+   "label": "Autre"
+  }
+ ]
+}

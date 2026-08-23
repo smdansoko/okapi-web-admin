@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import '../models/menage.dart';
 import '../models/enquete_champ.dart';
 import '../models/structure.dart';
+import '../models/survey_record.dart';
 
 /// Local persistence layer using Hive boxes storing raw Maps
 /// (avoids needing generated TypeAdapters, keeps models simple and portable).
@@ -12,10 +13,14 @@ class StorageService {
   static const String boxMenages = 'menages';
   static const String boxChamps = 'enquetes_champs';
   static const String boxStructures = 'enquetes_structures';
+  // Single generic box for all 11 BIODIVERSITE/SOCIAL survey forms, keyed
+  // by 'formKey:recordId' so all forms can share one box without collisions.
+  static const String boxSurveyRecords = 'survey_records';
 
   late Box _menagesBox;
   late Box _champsBox;
   late Box _structuresBox;
+  late Box _surveyRecordsBox;
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
@@ -26,6 +31,7 @@ class StorageService {
     _menagesBox = await Hive.openBox(boxMenages);
     _champsBox = await Hive.openBox(boxChamps);
     _structuresBox = await Hive.openBox(boxStructures);
+    _surveyRecordsBox = await Hive.openBox(boxSurveyRecords);
     _initialized = true;
   }
 
@@ -100,11 +106,53 @@ class StorageService {
     await _structuresBox.delete(id);
   }
 
+  // ---------------- Survey records (BIODIVERSITE / SOCIAL, generic) ----------------
+  String _surveyKey(String formKey, String id) => '$formKey:$id';
+
+  List<SurveyRecord> getAllSurveyRecords(String formKey) {
+    final prefix = '$formKey:';
+    return _surveyRecordsBox.keys
+        .where((k) => k.toString().startsWith(prefix))
+        .map(
+          (k) => SurveyRecord.fromMap(
+            Map<String, dynamic>.from(_surveyRecordsBox.get(k) as Map),
+          ),
+        )
+        .toList()
+      ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+  }
+
+  SurveyRecord? getSurveyRecord(String formKey, String id) {
+    final raw = _surveyRecordsBox.get(_surveyKey(formKey, id));
+    if (raw == null) return null;
+    return SurveyRecord.fromMap(Map<String, dynamic>.from(raw as Map));
+  }
+
+  Future<void> saveSurveyRecord(SurveyRecord record) async {
+    record.updatedAt = DateTime.now();
+    await _surveyRecordsBox.put(
+      _surveyKey(record.formKey, record.id),
+      record.toMap(),
+    );
+  }
+
+  Future<void> deleteSurveyRecord(String formKey, String id) async {
+    await _surveyRecordsBox.delete(_surveyKey(formKey, id));
+  }
+
+  int surveyRecordsCount(String formKey) {
+    final prefix = '$formKey:';
+    return _surveyRecordsBox.keys
+        .where((k) => k.toString().startsWith(prefix))
+        .length;
+  }
+
   // ---------------- Utility / Seed ----------------
   Future<void> clearAll() async {
     await _menagesBox.clear();
     await _champsBox.clear();
     await _structuresBox.clear();
+    await _surveyRecordsBox.clear();
   }
 
   int get menagesCount => _menagesBox.length;

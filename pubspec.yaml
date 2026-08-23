@@ -100,6 +100,8 @@ flutter:
     - lib/data/price_matrix.json
     - lib/data/choices.json
     - lib/data/guinea_admin.json
+    - lib/data/survey_schema.json
+    - lib/data/survey_choices.json
     - assets/images/
     - assets/fonts/
     - assets/logo/
