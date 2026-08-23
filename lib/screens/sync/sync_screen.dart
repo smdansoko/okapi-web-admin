@@ -23,10 +23,12 @@ class _SyncScreenState extends State<SyncScreen> {
 
   bool _loadingPrefs = true;
   bool _syncing = false;
+  bool _pulling = false;
   bool _testingConnection = false;
   bool? _connectionOk;
   DateTime? _lastSyncAt;
   SyncResult? _lastResult;
+  PullResult? _lastPullResult;
 
   @override
   void initState() {
@@ -106,6 +108,60 @@ class _SyncScreenState extends State<SyncScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Synchronisation réussie ✔'),
+          backgroundColor: OkapiColors.secondary,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.message),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+    }
+  }
+
+  /// "Actualiser" action: pulls ALL ménages/enquêtes currently stored on
+  /// the OKAPI Web Admin server — including households registered on
+  /// ANOTHER tablet and pushed there via their own "Synchroniser" action —
+  /// and merges them into this device's local data, so they immediately
+  /// appear in the Champs/Structures survey forms (ménage & propriétaire
+  /// pickers).
+  Future<void> _actualiser() async {
+    await _saveServerSettings();
+    if (!mounted) return;
+    final data = context.read<AppDataProvider>();
+
+    setState(() {
+      _pulling = true;
+      _lastPullResult = null;
+    });
+
+    final result = await SyncService.instance.pullFromServer();
+
+    if (result.success) {
+      await data.mergeFromServer(
+        menages: result.menages,
+        champs: result.champs,
+        structures: result.structures,
+      );
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _pulling = false;
+      _lastPullResult = result;
+      if (result.success) _lastSyncAt = DateTime.now();
+    });
+
+    if (result.success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Actualisation réussie ✔ — Ménages: ${result.menages.length} · '
+            'Champs: ${result.champs.length} · '
+            'Structures: ${result.structures.length}',
+          ),
           backgroundColor: OkapiColors.secondary,
         ),
       );
@@ -483,6 +539,103 @@ class _SyncScreenState extends State<SyncScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 12),
+
+                // ---- Actualiser (pull-sync croisé entre tablettes) ----
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _pulling ? null : _actualiser,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: OkapiColors.primary,
+                      side: const BorderSide(color: OkapiColors.primary),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    icon: _pulling
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.cloud_download_rounded),
+                    label: Text(
+                      _pulling ? 'Actualisation en cours…' : 'Actualiser',
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: OkapiColors.textLight,
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'Récupère les ménages, enquêtes champs et structures enregistrés '
+                        'sur les AUTRES tablettes et les rend immédiatement disponibles '
+                        'ici (listes déroulantes Ménage / Propriétaire).',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_lastPullResult != null) ...[
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: _lastPullResult!.success
+                          ? OkapiColors.secondary.withValues(alpha: 0.08)
+                          : Colors.red.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: _lastPullResult!.success
+                            ? OkapiColors.secondary.withValues(alpha: 0.3)
+                            : Colors.red.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _lastPullResult!.success
+                              ? 'Actualisation réussie'
+                              : 'Échec de l\'actualisation',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: _lastPullResult!.success
+                                ? OkapiColors.secondary
+                                : Colors.red.shade700,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          _lastPullResult!.message,
+                          style: const TextStyle(fontSize: 12.5),
+                        ),
+                        if (_lastPullResult!.success) ...[
+                          const SizedBox(height: 6),
+                          Text(
+                            'Reçu du serveur — Ménages: ${_lastPullResult!.menages.length} · '
+                            'Champs: ${_lastPullResult!.champs.length} · '
+                            'Structures: ${_lastPullResult!.structures.length}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 24),
               ],
             ),

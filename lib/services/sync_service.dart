@@ -24,6 +24,28 @@ class SyncResult {
   }) : timestamp = timestamp ?? DateTime.now();
 }
 
+/// Result of a pull-sync attempt (fetching data FROM the server, e.g. to
+/// bring in ménages/enquêtes registered on ANOTHER tablet).
+class PullResult {
+  final bool success;
+  final String message;
+  final List<Menage> menages;
+  final List<EnqueteChamp> champs;
+  final List<EnqueteStructure> structures;
+  final Map<String, dynamic>? serverTotals;
+  final DateTime timestamp;
+
+  PullResult({
+    required this.success,
+    required this.message,
+    this.menages = const [],
+    this.champs = const [],
+    this.structures = const [],
+    this.serverTotals,
+    DateTime? timestamp,
+  }) : timestamp = timestamp ?? DateTime.now();
+}
+
 /// Handles sending locally-saved data (Ménages, Enquêtes Champs, Enquêtes
 /// Structures) from the OKAPI Survey mobile app to the separate OKAPI Web
 /// Admin server (Flask app), via a simple JSON POST to /api/sync.
@@ -163,6 +185,81 @@ class SyncService {
       }
     } catch (e) {
       return SyncResult(
+        success: false,
+        message:
+            'Connexion impossible au serveur. Vérifiez votre connexion internet/réseau et l\'adresse configurée.\n\nDétail : $e',
+      );
+    }
+  }
+
+  /// Fetches ALL Ménages, Enquêtes Champs and Enquêtes Structures currently
+  /// stored on the OKAPI Web Admin server (including data pushed there by
+  /// OTHER tablets) via GET /api/pull. Used by the "Actualiser" button so
+  /// that a household registered on one tablet immediately becomes
+  /// available in this tablet's own Champs/Structures survey forms.
+  Future<PullResult> pullFromServer() async {
+    final url = await serverUrl;
+    if (url.isEmpty) {
+      return PullResult(
+        success: false,
+        message:
+            'Aucune adresse de serveur configurée. Veuillez renseigner l\'URL du serveur Web Admin OKAPI.',
+      );
+    }
+
+    final endpoint = Uri.parse('$url/api/pull');
+    try {
+      final response = await http
+          .get(endpoint)
+          .timeout(const Duration(seconds: 45));
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final body =
+            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+
+        final menagesJson = (body['menages'] as List? ?? []);
+        final champsJson = (body['champs'] as List? ?? []);
+        final structuresJson = (body['structures'] as List? ?? []);
+
+        final menages = <Menage>[];
+        for (final m in menagesJson) {
+          try {
+            menages.add(Menage.fromMap(m as Map));
+          } catch (_) {
+            // Skip malformed records rather than aborting the whole pull.
+          }
+        }
+        final champs = <EnqueteChamp>[];
+        for (final c in champsJson) {
+          try {
+            champs.add(EnqueteChamp.fromMap(c as Map));
+          } catch (_) {}
+        }
+        final structures = <EnqueteStructure>[];
+        for (final s in structuresJson) {
+          try {
+            structures.add(EnqueteStructure.fromMap(s as Map));
+          } catch (_) {}
+        }
+
+        await _setLastSyncAt(DateTime.now());
+        return PullResult(
+          success: true,
+          message: 'Actualisation réussie.',
+          menages: menages,
+          champs: champs,
+          structures: structures,
+          serverTotals: body['totals'] as Map<String, dynamic>?,
+        );
+      } else {
+        return PullResult(
+          success: false,
+          message:
+              'Erreur du serveur (code ${response.statusCode}). Vérifiez l\'adresse ou réessayez plus tard.',
+        );
+      }
+    } catch (e) {
+      return PullResult(
         success: false,
         message:
             'Connexion impossible au serveur. Vérifiez votre connexion internet/réseau et l\'adresse configurée.\n\nDétail : $e',
