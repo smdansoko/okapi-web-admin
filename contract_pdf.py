@@ -144,15 +144,38 @@ TEMOINS_LABEL = {
     "communautaire": "Témoins (Autres membres adultes de la Communauté Affectée présents, représentants des autorités coutumières ou locales, personnes de confiance)",
 }
 
+# ---------------------------------------------------------------------------
+# Multi-project branding (Phase 3: SIMANDOU / BWCS SA support)
+# ---------------------------------------------------------------------------
+# Each project has its own operating company, legal identity paragraph, oral
+# translation language used during the census/consent process, and preamble
+# narrative (concession decree for SIMANDOU vs. refinery construction for
+# WCAG). WCAG behaviour is kept 100% unchanged (all WCAG-specific text
+# remains inline in the _*_wcag functions below, exactly as before) - only
+# NEW SIMANDOU-specific branches are added, dispatched on d["project"].
+BRAND = {
+    "wcag": {
+        "short": "WCAG",
+        "oral_lang": "soussou",
+    },
+    "simandou": {
+        "short": "BWCS SA",
+        "oral_lang": "malinké",
+    },
+}
+
 
 def has_identity_document(type_de_piece):
     return bool(type_de_piece) and type_de_piece != "Pas de document"
 
 
-def build_contract_data(menage=None, champ=None, individu=None, contract_type="proprietaire"):
+def build_contract_data(menage=None, champ=None, individu=None, contract_type="proprietaire", project="wcag"):
     """Builds a normalized dict of contract fields, mirroring ContractData.
     Either pass `menage` (Propriétaire contract, chef de ménage) or pass
     `champ` + `individu` (Lignage/Communautaire contract, owner of the champ).
+
+    `project` selects which operating company / legal branding is used to
+    render the contract ("wcag" or "simandou" / BWCS SA) - see BRAND above.
     """
     if menage is not None:
         individus = menage.get("individus", [])
@@ -166,6 +189,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
         chef = chef or {}
         return {
             "type": "proprietaire",
+            "project": project,
             "numeroLot": menage.get("codeMenage", ""),
             "region": menage.get("region", ""),
             "prefecture": menage.get("prefecture", ""),
@@ -195,6 +219,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
         proprietaire = individu or {}
         return {
             "type": contract_type,
+            "project": project,
             "numeroLot": champ.get("numBatch") or champ.get("codeMenage", ""),
             "region": champ.get("region", ""),
             "prefecture": champ.get("prefecture", ""),
@@ -420,9 +445,11 @@ def _annex_table_grouped(row0_labels, row0_spans, row1_labels, rows, total_row, 
 
 
 def _page1(d, styles):
+    project = d.get("project", "wcag")
+    company = BRAND.get(project, BRAND["wcag"])["short"]
     story = []
     story.append(Paragraph(
-        f"ACCORD DE COMPENSATION CONCLU ENTRE WCAG ET {TITLE_SUFFIX[d['type']]}",
+        f"ACCORD DE COMPENSATION CONCLU ENTRE {company} ET {TITLE_SUFFIX[d['type']]}",
         styles["title"],
     ))
     story.append(Spacer(1, 4))
@@ -501,14 +528,25 @@ def _page1(d, styles):
     chef_name = d["nomPrenom"] or "..........................."
     is_communautaire = d["type"] == "communautaire"
 
-    story.append(Paragraph(
-        "LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen enregistrée au Registre de "
-        "commerce sous le numéro RCCM/GN-KAL/2018.B.086411/2018 dont le siège social se situe à Camayenne, Corniche "
-        "Nord, BP : 435, C/Dixinnn, Conakry, République de Guinée, représentée par son Directeur Général M. WU QIONG, "
-        "dûment habilité aux fins des présentes,",
-        styles["para"],
-    ))
-    story.append(Paragraph("Ci-après dénommée «WCAG».", styles["para"]))
+    if project == "simandou":
+        story.append(Paragraph(
+            "La société Baowu Winning Consortium Simandou SA (BWCS SA), au capital de 2 031 046 700 000 GNF, "
+            "immatriculée au Registre du Commerce et du Crédit Mobilier sous le numéro RCCM/GN-TCC.2019.B.05570, "
+            "dont le siège social est situé à Camayenne Corniche Nord, BP 4357, Commune de Dixinn, Conakry "
+            "(République de Guinée), représentée par Monsieur Wang Lingsong, en sa qualité de Directeur Général, "
+            "dûment habilité aux fins des présentes,",
+            styles["para"],
+        ))
+        story.append(Paragraph("Ci-après dénommée «BWCS SA».", styles["para"]))
+    else:
+        story.append(Paragraph(
+            "LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen enregistrée au Registre de "
+            "commerce sous le numéro RCCM/GN-KAL/2018.B.086411/2018 dont le siège social se situe à Camayenne, Corniche "
+            "Nord, BP : 435, C/Dixinnn, Conakry, République de Guinée, représentée par son Directeur Général M. WU QIONG, "
+            "dûment habilité aux fins des présentes,",
+            styles["para"],
+        ))
+        story.append(Paragraph("Ci-après dénommée «WCAG».", styles["para"]))
     story.append(Paragraph("Et", styles["para"]))
     if is_communautaire:
         story.append(Paragraph(
@@ -536,6 +574,8 @@ def _page1(d, styles):
 
 def _page2(d, styles):
     t = d["type"]
+    project = d.get("project", "wcag")
+    company = BRAND.get(project, BRAND["wcag"])["short"]
     is_communautaire = t == "communautaire"
     party = PARTY_LABEL[t]  # "Ménage affecté" / "Lignage affecté" / "Communauté affectée"
     party_lower = party[0].lower() + party[1:]
@@ -551,24 +591,53 @@ def _page2(d, styles):
     }[t]
     art = "le" if not is_communautaire else "la"
 
-    # "AMC" only ever appears in the Collectif reference contract; per client
-    # request every such occurrence in that specific type is replaced by
-    # "WCAG" here (the other two types already use WCAG throughout).
+    if project == "simandou":
+        # SIMANDOU/BWCS SA preamble bullets: mining concession decree +
+        # geographic description of the project area (Blocs 1 & 2, 4
+        # communes) instead of WCAG's refinery-construction bullet.
+        preamble_bullets = [
+            Paragraph(
+                "- Aux termes du Décret No D/2020/143/PRG/SGG du 3 juillet 2020, une concession minière a été "
+                "accordée à BWCS SA afin de procéder aux travaux d'exploration et d'exploitation d'un gisement de "
+                "fer dans la Préfecture de Kérouané. Le Projet d'exploitation est dénommé « Simandou ». Cette "
+                "concession est régie par la Convention de Base dûment révisée et ratifiée par l'Assemblée "
+                "Nationale en date du 26 juin 2020 ;",
+                styles["para"],
+            ),
+            Paragraph(
+                "- Le projet d'exploitation du minerai de fer dans les Blocs 1 et 2 de Simandou se situe à l'est de "
+                "la ville de Kérouané sur la chaîne montagneuse de Simandou, ce qui forme une crête pratiquement "
+                "orientée nord-sud qui s'élève brusquement de 300 à 900 m au-dessus de la plaine. Ils sont à cheval "
+                "sur les Communes rurales de Konsankoro, Damaro, Linko et Kérouané ;",
+                styles["para"],
+            ),
+            Paragraph(
+                f"- En vue de la construction et de l'exploitation de la mine de Simandou par {company}, un "
+                "recensement des ayants droit et un inventaire de l'ensemble de leurs biens affectés ont été "
+                "entrepris du 12/05/2022 au 27/06/2022, dans l'emprise concernée du Projet ;",
+                styles["para"],
+            ),
+        ]
+    else:
+        preamble_bullets = [
+            Paragraph(
+                f"- En vue de la construction et de l'exploitation de la raffinerie d'alumine par {company}, un "
+                "recensement des ayants droit et un inventaire de l'ensemble de leurs biens affectés ont été "
+                "entrepris depuis le 21/11/2025, dans l'emprise concernée du Projet ;",
+                styles["para"],
+            ),
+        ]
+
     story = [
         Paragraph(f"Ci-après dénommé{'e' if is_communautaire else ''} « {party} ».", styles["para"]),
         Paragraph(
-            f"WCAG et {'la' if is_communautaire else 'le'} {party_lower} étant également désignés ci-après "
+            f"{company} et {'la' if is_communautaire else 'le'} {party_lower} étant également désignés ci-après "
             "collectivement « les Parties » et individuellement « la Partie ».",
             styles["para"],
         ),
         Spacer(1, 6),
         Paragraph("APRÈS AVOIR PRÉALABLEMENT RAPPELÉ QUE :", styles["small_bold"]),
-        Paragraph(
-            "- En vue de la construction et de l'exploitation de la raffinerie d'alumine par WCAG, un recensement des "
-            "ayants droit et un inventaire de l'ensemble de leurs biens affectés ont été entrepris depuis le "
-            "21/11/2025, dans l'emprise concernée du Projet ;",
-            styles["para"],
-        ),
+        *preamble_bullets,
         Paragraph(
             f"- De ces études, il ressort que {art} {party_lower} détient des droits dans la zone visée par le Projet. "
             f"Ces droits, dûment énumérés dans une fiche récapitulative signée par le {chef_designe}, sont "
@@ -576,21 +645,22 @@ def _page2(d, styles):
             styles["para"],
         ),
         Paragraph(
-            "- Conformément à ses principes et à ses engagements vis-à-vis de l'État guinéen, WCAG a élaboré un Plan "
-            "d'action de Réinstallation et de Compensation (PARC) afin d'assurer la compensation de tous les ayants "
-            "droits affectés par le Projet. Le PARC prévoit la compensation pour une occupation permanente.",
+            f"- Conformément à ses principes et à ses engagements vis-à-vis de l'État guinéen, {company} a élaboré "
+            "un Plan d'action de Réinstallation et de Compensation (PARC) afin d'assurer la compensation de tous "
+            "les ayants droits affectés par le Projet. Le PARC prévoit la compensation pour une occupation "
+            "permanente.",
             styles["para"],
         ),
         Paragraph(
-            f"- En application du PARC, une proposition de compensation personnalisée a été développée par WCAG, et "
-            f"communiquée, présentée et expliquée {'à la' if is_communautaire else 'au'} {party_lower} et aux "
-            "personnes le composant ;",
+            f"- En application du PARC, une proposition de compensation personnalisée a été développée par "
+            f"{company}, et communiquée, présentée et expliquée {'à la' if is_communautaire else 'au'} {party_lower} "
+            "et aux personnes le composant ;",
             styles["para"],
         ),
         Paragraph(
             f"- Après avoir pris le temps nécessaire à la réflexion et à la consultation de l'ensemble des personnes "
             f"le constituant, le {chef_of} consent librement et en toute connaissance de cause à l'offre de "
-            "compensation proposée par WCAG telle que décrite en Annexe 2 ;",
+            f"compensation proposée par {company} telle que décrite en Annexe 2 ;",
             styles["para"],
         ),
         Paragraph(
@@ -617,6 +687,9 @@ def _page2(d, styles):
 
 def _page3(d, styles):
     t = d["type"]
+    project = d.get("project", "wcag")
+    company = BRAND.get(project, BRAND["wcag"])["short"]
+    oral_lang = BRAND.get(project, BRAND["wcag"])["oral_lang"]
     is_communautaire = t == "communautaire"
     party = PARTY_LABEL[t]
     party_lower = party[0].lower() + party[1:]
@@ -627,7 +700,7 @@ def _page3(d, styles):
     return [
         Paragraph("Article 2 – Principe de non-contestation", styles["article"]),
         Paragraph(
-            f"{'La' if is_communautaire else 'Le'} {party_lower} déclare expressément renoncer à réclamer à WCAG, "
+            f"{'La' if is_communautaire else 'Le'} {party_lower} déclare expressément renoncer à réclamer à {company}, "
             "ainsi qu'à ses sous-traitants intervenant dans le cadre de la mise en œuvre du Projet, une quelconque "
             "indemnisation supplémentaire, de quelque nature que ce soit, à raison des faits cités en préambule et "
             "autres que les indemnisations prévues dans le cadre du présent Accord.",
@@ -674,7 +747,7 @@ def _page3(d, styles):
             styles["para"],
         ),
         Paragraph(
-            "- Que l'Accord a fait l'objet d'une traduction orale en soussou, langue parlée par la Communauté "
+            f"- Que l'Accord a fait l'objet d'une traduction orale en {oral_lang}, langue parlée par la Communauté "
             "affectée ;",
             styles["para"],
         ),
@@ -769,13 +842,16 @@ def _page4(d, summary, styles):
 
 
 def _page5(d, summary, styles):
+    project = d.get("project", "wcag")
+    company = BRAND.get(project, BRAND["wcag"])["short"]
+    oral_lang = BRAND.get(project, BRAND["wcag"])["oral_lang"]
     chef_name = d["nomPrenom"] or "..........................."
     party = PARTY_LABEL[d["type"]]
     consent = (
         f"Je, soussigné, {'Monsieur ' if d['type'] != 'communautaire' else ''}{chef_name}, en ma qualité de "
         f"{CHEF_LABEL[d['type']]}, certifie, en plein accord avec les membres du{'e' if d['type']=='communautaire' else ''} "
         f"{party.split()[0]}, donner mon consentement à l'ensemble des termes et conditions du présent Accord qui m'ont "
-        "été traduits oralement du français en sousou, et ce, en présence d'un représentant des autorités locales dont "
+        f"été traduits oralement du français en {oral_lang}, et ce, en présence d'un représentant des autorités locales dont "
         "la fonction est ............................................................................"
     )
     dt = fmt_date(d.get("dateEnquete")) or ""
@@ -824,7 +900,7 @@ def _page5(d, summary, styles):
     _half_mm = (FULL_WIDTH_MM - 2) / 2.0
 
     wcag_box = Table(
-        [[Paragraph("<b>WCAG</b>", styles["small_bold"])]] + [[l] for l in sig_lines("Nom", "Fonction", "Signature")],
+        [[Paragraph(f"<b>{company}</b>", styles["small_bold"])]] + [[l] for l in sig_lines("Nom", "Fonction", "Signature")],
         colWidths=[_half_mm * mm],
     )
     wcag_box.setStyle(TableStyle([("BOX", (0, 0), (-1, -1), 0.75, GREY_BORDER), ("TOPPADDING", (0, 0), (-1, -1), 2), ("BOTTOMPADDING", (0, 0), (-1, -1), 2)]))
@@ -1067,6 +1143,319 @@ def _annexe1(d, summary: CompensationSummary, styles):
 
 
 def _annexe2(d, summary, styles):
+    if d.get("project") == "simandou":
+        return _annexe2_simandou(d, summary, styles)
+    return _annexe2_wcag(d, summary, styles)
+
+
+def _annexe2_simandou(d, summary, styles):
+    """SIMANDOU/BWCS SA Annexe 2, following the 3 reference PDFs exactly:
+      - proprietaire (Ménage): single cash-only section (like WCAG's
+        default), branded BWCS SA / malinké.
+      - lignage: TWO sub-annexes - "2A" (collective-project compensation
+        mechanism, 5 numbered sub-sections) followed by a page break and
+        "A2" (parallel cash-based compensation) - unlike WCAG, where
+        lignage only ever gets the simple cash annex.
+      - communautaire: collective-project mechanism only (5 numbered
+        sub-sections), no separate cash sub-annex - matching WCAG's own
+        communautaire behaviour but with BWCS SA branding/addressees.
+    """
+    t = d["type"]
+    party = PARTY_LABEL[t]  # "Ménage affecté" / "Lignage affecté" / "Communauté affectée"
+    is_communautaire = t == "communautaire"
+    commune = d.get("sousPrefecture") or d.get("district") or ""
+
+    def _collective_project_sections(header_title, party_repr, addressee_html):
+        """Builds the shared 5-section collective-project compensation body
+        (§1..§5) used by both the lignage (as 2A) and communautaire (as the
+        sole Annexe 2) variants. `party_repr` describes how the party is
+        represented in §2 (differs between Lignage and Communauté), and
+        `addressee_html` is the §5 quarterly-report addressee clause."""
+        return [
+            Paragraph(header_title, styles["section"]),
+            Paragraph(
+                f"Le {party}, signataire de l'Accord, accepte de quitter la ou les parcelles dont la liste figure "
+                "en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il appartient "
+                f"donc au {party} de prendre toutes les dispositions utiles afin de retirer les éléments meubles et "
+                "immeubles qui s'y trouvent avant cette échéance.",
+                styles["para"],
+            ) if not is_communautaire else Paragraph(
+                f"La {party}, signataire de l'Accord, accepte de quitter la ou les parcelles dont la liste figure "
+                "en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il appartient "
+                f"donc à la {party} de prendre toutes les dispositions utiles afin de retirer les éléments meubles et "
+                "immeubles qui s'y trouvent avant cette échéance.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"En contrepartie, BWCS SA s'engage, conformément au PARC, à indemniser {'la' if is_communautaire else 'le'} "
+                f"{party} des conséquences du Projet sur ses conditions de vie, y compris tous les dommages et "
+                "pertes subis par lui du fait de ce Projet, de la manière et dans les conditions décrites ci-après :",
+                styles["para"],
+            ),
+            Paragraph("1. CONSTITUTION D'UN BUDGET PROJET", styles["article"]),
+            Paragraph(
+                f"Conformément aux modalités d'indemnisation prévues dans le PARC, les biens détenus par {'la' if is_communautaire else 'le'} "
+                f"{party} seront compensés par le biais d'un ou plusieurs projets d'intérêt général"
+                f"{', ci-après désigné « Projets collectifs »,' if not is_communautaire else ''} réalisés au profit "
+                f"{'de la' if is_communautaire else 'du'} {party}.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Le budget dévolu à ce ou ces projets est fonction de la superficie totale des parcelles impactées "
+                "par le projet et des biens qui s'y trouvent, tel qu'énumérés en Annexe 1.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"{'La' if is_communautaire else 'Le'} {party} considère ce budget comme étant suffisant, "
+                "satisfaisant et de nature à compenser intégralement les pertes occasionnées par le Projet.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"Sur cette base, le budget total disponible s'élève ainsi à {fmt_gnf(summary.total)}.",
+                styles["para"],
+            ),
+            Paragraph("2. IDENTIFICATION DES PROJETS COLLECTIFS", styles["article"]),
+            Paragraph(
+                f"Conformément aux dispositions du PARC, les projets {'communautaires' if is_communautaire else 'collectifs'} "
+                "seront identifiés conjointement par :",
+                styles["para"],
+            ),
+            Paragraph(
+                f"- {party_repr} ; et<br/>"
+                "- BWCS SA ou son représentant désigné,",
+                styles["para"],
+            ),
+            Paragraph(
+                "L'appui des Services Techniques Déconcentrés compétents en la matière sera également sollicité, et "
+                "une cohérence recherchée avec le Plan de Développement Local et le Plan Annuel d'Investissement de "
+                f"la Commune {('de ' + commune) if commune else 'concernée'}.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les Parties s'engagent à prendre toutes les mesures requises afin que le ou les projets soient "
+                "identifiés et démarrés dans un délai maximum de trois (3) mois à compter de la signature du présent "
+                "Accord.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les projets seront sélectionnés parmi la liste de projets-types proposés ci-dessous :",
+                styles["para"],
+            ),
+            Paragraph(
+                (
+                    "- Aménagement agricole collectif ;<br/>"
+                    "- Puits (pastoral, maraîcher, ou domestique) ;<br/>"
+                    "- Marché (amélioration d'une structure existante) ;<br/>"
+                    "- École, centre de santé (amélioration et équipement d'une structure existante) ;<br/>"
+                    "- Voies d'accès à partir de la voie nouvellement créée ou en direction des axes principaux "
+                    "existants (cette création ne pourra pas donner lieu à de nouvelle compensation et leur tracé "
+                    "doit donc faire l'objet d'un consentement mutuel avec les parties concernées) ;<br/>"
+                    "- Autre projet identifié par la communauté et dans les limites du budget disponible."
+                    if is_communautaire else
+                    "- Aménagement agricole collectif ;<br/>"
+                    "- Puits (pastoral, maraîcher, ou domestique) ;<br/>"
+                    f"- Autre projet identifié par le {party} et dans les limites du budget disponible."
+                ),
+                styles["para"],
+            ),
+            Paragraph(
+                f"À l'issue de ce processus de concertation, une fiche d'identification sommaire sera corédigée par "
+                f"BWCS SA et le comité établi par {'la' if is_communautaire else 'le'} {party} en vue de leur mise "
+                "en œuvre. La fiche comprendra la sélection des projets à mettre en œuvre (plusieurs peuvent être "
+                "prévus), et une estimation budgétaire par composante ainsi que le montant total.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Seuls les projets pouvant être exécutés intégralement dans les limites du budget défini au point 1 "
+                "ci-dessus pourront être entrepris dans le cadre du présent Accord.",
+                styles["para"],
+            ),
+            Paragraph("3. MISE EN ŒUVRE DES PROJETS", styles["article"]),
+            *(
+                [
+                    Paragraph(
+                        "Conformément aux dispositions du PARC, les projets seront mis en œuvre par des prestataires "
+                        "sélectionnés par appel d'offres ou directement par leur soin (cas des voies d'accès "
+                        "notamment), selon leurs capacités techniques, leurs expériences et les prix proposés. À "
+                        "qualité et à prix comparables, la préférence sera accordée aux prestataires installés dans "
+                        "la préfecture d'implantation du projet.",
+                        styles["para"],
+                    ),
+                    Paragraph("À cet effet :", styles["para"]),
+                    Paragraph(
+                        "- Un dossier d'appel d'offres sera développé par le maître d'œuvre, sur base de la fiche "
+                        "d'identification sommaire ;<br/>"
+                        "- Les offres seront ouvertes à l'occasion d'une réunion convoquée par le maître d'œuvre, en "
+                        "présence du comité constitué par la Communauté Affectée.",
+                        styles["para"],
+                    ),
+                    Paragraph(
+                        "Les marchés seront attribués par BWCS SA, qui reste seule responsable de la sélection "
+                        "finale du ou des prestataires, sur base des critères énoncés dans le dossier d'appel "
+                        "d'offres, puis de la réalisation des travaux.",
+                        styles["para"],
+                    ),
+                    Paragraph(
+                        "Les travaux seront réalisés sous la supervision du maître d'œuvre et du comité constitué "
+                        "par la Communauté Affectée. La réception provisoire du projet sera accordée à l'achèvement "
+                        "des travaux, moyennant l'accord du maître d'œuvre et dudit comité.",
+                        styles["para"],
+                    ),
+                ]
+                if is_communautaire else
+                [
+                    Paragraph(
+                        f"Conformément aux dispositions du PARC, les projets seront mis en œuvre par des "
+                        f"prestataires choisis par le {party} et ayant les compétences techniques et les "
+                        "expériences nécessaires requises pour la réalisation de ces projets.",
+                        styles["para"],
+                    ),
+                    Paragraph(
+                        f"Les travaux seront réalisés sous la supervision de BWCS SA et des membres du {party}. La "
+                        "réception provisoire du projet sera accordée à l'achèvement des travaux, moyennant "
+                        f"l'accord de BWCS SA et du Représentant du {party}.",
+                        styles["para"],
+                    ),
+                ]
+            ),
+            Paragraph("4. RÉTROCESSION DES PROJETS", styles["article"]),
+            Paragraph(
+                f"À la suite de la réception provisoire des projets, il sera procédé à leur rétrocession formelle "
+                f"{'à la' if is_communautaire else 'au'} {party}. À cet effet, un acte de rétrocession sera dressé "
+                f"dans lequel {'la' if is_communautaire else 'le'} {party} s'engage à utiliser le projet selon sa "
+                "destination convenue jusqu'à l'achèvement de la période de garantie et le versement, par BWCS SA, "
+                "de la retenue de garantie.",
+                styles["para"],
+            ),
+            Paragraph(
+                "La signature de l'acte de rétrocession marque également la fin du processus de compensation.",
+                styles["para"],
+            ),
+            Paragraph("5. GESTION DES FONDS", styles["article"]),
+            Paragraph(
+                "Le budget défini au point 1 ci-dessus sera provisionné sur les livres de BWCS SA en vue de son "
+                "décaissement progressif, au bénéfice des prestataires désignés pour assurer l'exécution des "
+                "projets.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"Une situation financière détaillée sera dressée par BWCS SA à la fin de chaque trimestre et "
+                f"transmise {addressee_html}, afin qu'à tout moment, {'la' if is_communautaire else 'le'} {party} "
+                "dispose d'une information complète quant à la gestion des fonds.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"Conformément au PARC, les reliquats éventuels seront soit mis à la disposition {'de la' if is_communautaire else 'du'} "
+                f"{party}, soit engagés sur un nouveau projet au bénéfice {'de la' if is_communautaire else 'du'} "
+                f"{party}, selon leur montant. Dans tous les cas, ces reliquats éventuels restent acquis "
+                f"{'à la' if is_communautaire else 'au'} {party}.",
+                styles["para"],
+            ),
+        ]
+
+    def _cash_section(header_title, payee_clause, extra_id_clause=""):
+        """Builds the shared cash-compensation body (§1 INDEMNISATION
+        FINANCIÈRE + §2 MODALITÉS DE PAIEMENT), used by both the ménage
+        (as the sole Annexe 2) and lignage (as "A2") variants."""
+        return [
+            Paragraph(header_title, styles["section"]),
+            Paragraph(
+                f"Le {party}, signataire de l'Accord, accepte de quitter définitivement et irrévocablement la ou "
+                "les parcelles dont la liste figure sur sa fiche d'indemnisation, au plus tard sept (7) jours après "
+                f"la mise en œuvre des dispositions décrites ci-dessous. Il appartient donc au {party} de prendre "
+                "toutes les dispositions utiles afin de retirer les éléments meubles et immeubles qui s'y trouvent "
+                "avant cette échéance.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"En contrepartie, BWCS SA s'engage, conformément au PARC, à indemniser le {party} des consé"
+                "quences du Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par lui "
+                "du fait du Projet, de la manière et dans les conditions décrites ci-après :",
+                styles["para"],
+            ),
+            Paragraph("1. INDEMNISATION FINANCIÈRE", styles["article"]),
+            Paragraph(
+                "Conformément aux modalités d'indemnisation prévues dans le PARC, les Parties conviennent que le "
+                f"montant total des indemnisations financières devant être payées au {party} {payee_clause}, soit "
+                f"{fmt_gnf(summary.total)}. Le {party} considère le montant total de l'indemnisation comme étant "
+                "suffisant, satisfaisant et de nature à compenser intégralement ses pertes du fait du Projet.",
+                styles["para"],
+            ),
+            Paragraph("2. MODALITÉS DE PAIEMENT", styles["article"]),
+            *(
+                [
+                    Paragraph(
+                        f"BWCS SA portera assistance au {party} pour l'ouverture d'un compte bancaire afin de "
+                        "recevoir les paiements dus par BWCS SA au titre de l'indemnisation financière.",
+                        styles["para"],
+                    ),
+                    Paragraph(
+                        "En cas de retard toutefois dans l'ouverture de ce compte bancaire, le paiement de "
+                        "l'indemnisation financière pourra s'effectuer selon les modalités suivantes :",
+                        styles["para"],
+                    ),
+                ]
+                if not extra_id_clause else []
+            ),
+            Paragraph(
+                "- Tous les montants seront réglés par chèque, établi en francs guinéens à l'ordre de la PAP."
+                if not extra_id_clause else
+                "- Tous les montants seront réglés par chèque, établi en francs guinéens à l'ordre Représentant "
+                f"mandaté du {party}.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Dans tous les cas, les paiements seront effectués dans un délai maximal de vingt (20) jours après "
+                "la signature du présent Accord.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Le paiement, selon les modalités prévues ici, des sommes indiquées ci-dessus libère BWCS SA de "
+                "toute obligation au titre du paiement de l'indemnisation.",
+                styles["para"],
+            ),
+        ] + (
+            [
+                Paragraph(
+                    f"Pour faire valoir ses droits et être payé, le {party} devra obligatoirement se munir de "
+                    "l'Annexe 1 (montant et désignation du bénéficiaire) signée et validée par toutes les parties "
+                    "et de la carte d'identité nationale à son nom renseignée sur l'accord de compensation.",
+                    styles["para"],
+                )
+            ]
+            if not extra_id_clause else []
+        )
+
+    if t == "proprietaire":
+        return _cash_section(
+            "ANNEXE 2 : MODALITÉS D'INDEMNISATION EN NUMÉRAIRE",
+            payee_clause="sera celui indiqué sur la fiche individuelle de compensation qui a été remise au Chef de Ménage",
+        )
+
+    if t == "lignage":
+        story = _collective_project_sections(
+            "ANNEXE 2 : MODALITÉS D'INDEMNISATION EN NUMÉRAIRE<br/>ANNEXE 2A – INDEMNISATION PAR LE BIAIS DE PROJET(S) COLLECTIF",
+            party_repr="Le Lignage affecté, représenté par le Chef du Lignage et la moitié au moins de ses membres ayant atteint l'âge de la majorité civile",
+            addressee_html="au Représentant du Lignage affecté, avec copie au Président du District et au Maire de la Commune Rurale",
+        )
+        story.append(PageBreak())
+        story += _cash_section(
+            "ANNEXE A2 – INDEMNISATION FINANCIÈRE",
+            payee_clause=f"s'élève à {fmt_gnf(summary.total)}",
+            extra_id_clause="lignage",
+        )
+        return story
+
+    # communautaire: collective-project mechanism only, no separate cash
+    # sub-annex (matches the reference PDF exactly).
+    return _collective_project_sections(
+        "ANNEXE 2 : MODALITÉS D'INDEMNISATION",
+        party_repr="La Communauté Affectée, représentée par un comité constitué à cet effet",
+        addressee_html="au comité constitué par la Communauté Affectée, avec copie au Préfet",
+    )
+
+
+def _annexe2_wcag(d, summary, styles):
     if d["type"] == "communautaire":
         return [
             Paragraph("ANNEXE 2 : MODALITÉS D'INDEMNISATION", styles["section"]),
@@ -1306,7 +1695,19 @@ def _header_footer(canvas, doc, d):
     canvas.line(32, 40, w - 32, 40)
     canvas.setFont("DejaVu", 7)
     canvas.setFillColor(colors.HexColor("#555555"))
-    canvas.drawString(32, 30, f"Winning Consortium Alumina Guinea (WCAG) {FOOTER_LABEL[d['type']]}")
+    project = d.get("project", "wcag")
+    if project == "simandou":
+        simandou_footer_label = {
+            "proprietaire": "du Ménage",
+            "lignage": "du Lignage",
+            "communautaire": "de la Communauté",
+        }[d["type"]]
+        canvas.drawString(
+            32, 30,
+            f"Projet BWCS SA « Simandou » Accord de compensation {simandou_footer_label}",
+        )
+    else:
+        canvas.drawString(32, 30, f"Winning Consortium Alumina Guinea (WCAG) {FOOTER_LABEL[d['type']]}")
     ref = d["codeMenage"] or d["codeIndividu"]
     canvas.drawCentredString(w / 2, 30, ref)
     canvas.drawRightString(w - 32, 30, f"Page {doc.page}")

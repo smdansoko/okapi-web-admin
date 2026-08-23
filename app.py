@@ -502,7 +502,7 @@ def _resolve_contract_data(code_individu, champ_id="", contract_type=""):
         return None
 
     if menage_match is not None:
-        d = build_contract_data(menage=menage_match)
+        d = build_contract_data(menage=menage_match, project=db.get_current_project())
         summary = compute_for_owner(champs, structures, code_individu)
         out_suffix = code_individu
     else:
@@ -518,7 +518,7 @@ def _resolve_contract_data(code_individu, champ_id="", contract_type=""):
                 contract_type = "communautaire"
             else:
                 contract_type = "proprietaire"
-        d = build_contract_data(champ=champ_match, individu=individu, contract_type=contract_type)
+        d = build_contract_data(champ=champ_match, individu=individu, contract_type=contract_type, project=db.get_current_project())
 
         # Non-merge rule: this contract accounts ONLY for champ_match's own
         # champs record. Structures are only included if this is the
