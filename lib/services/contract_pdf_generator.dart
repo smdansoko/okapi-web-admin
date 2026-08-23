@@ -1737,7 +1737,7 @@ class ContractPdfGenerator {
       }
       return pw.Container(
         color: bg,
-        child: pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: children),
+        child: pw.Row(children: children),
       );
     }
 
