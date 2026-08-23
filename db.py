@@ -131,6 +131,18 @@ def _create_tables():
             device_id TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS survey_records (
+            id TEXT PRIMARY KEY,
+            form_key TEXT NOT NULL,
+            region TEXT,
+            prefecture TEXT,
+            sous_prefecture TEXT,
+            data_json TEXT NOT NULL,
+            updated_at TEXT,
+            synced_at TEXT DEFAULT (datetime('now')),
+            device_id TEXT
+        );
+
         CREATE TABLE IF NOT EXISTS sync_log (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             device_id TEXT,
@@ -158,6 +170,8 @@ def _create_tables():
         CREATE INDEX IF NOT EXISTS idx_structures_batch ON structures(num_batch);
         CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
         CREATE INDEX IF NOT EXISTS idx_users_status ON users(approval_status);
+        CREATE INDEX IF NOT EXISTS idx_survey_records_form_key ON survey_records(form_key);
+        CREATE INDEX IF NOT EXISTS idx_survey_records_region ON survey_records(region);
         """
     )
     conn.commit()
@@ -368,6 +382,43 @@ def upsert_structure(s: dict, device_id: str = ""):
         conn.close()
 
 
+def upsert_survey_record(r: dict, device_id: str = ""):
+    """Upserts a single generic BIODIVERSITE/SOCIAL survey record. `r` is
+    the exact dict produced by the Flutter app's SurveyRecord.toMap():
+    {id, formKey, values: {...}, repeats: {...}, createdAt, updatedAt}."""
+    with _lock:
+        conn = get_conn()
+        values = r.get("values", {}) or {}
+        conn.execute(
+            """INSERT INTO survey_records
+               (id, form_key, region, prefecture, sous_prefecture,
+                data_json, updated_at, device_id)
+               VALUES (?,?,?,?,?,?,?,?)
+               ON CONFLICT(id) DO UPDATE SET
+                 form_key=excluded.form_key,
+                 region=excluded.region,
+                 prefecture=excluded.prefecture,
+                 sous_prefecture=excluded.sous_prefecture,
+                 data_json=excluded.data_json,
+                 updated_at=excluded.updated_at,
+                 synced_at=datetime('now'),
+                 device_id=excluded.device_id
+            """,
+            (
+                r.get("id"),
+                r.get("formKey", ""),
+                values.get("region", ""),
+                values.get("prefecture", ""),
+                values.get("sous_prefecture", ""),
+                json.dumps(r, ensure_ascii=False),
+                r.get("updatedAt", ""),
+                device_id,
+            ),
+        )
+        conn.commit()
+        conn.close()
+
+
 def log_sync(device_id: str, device_name: str, counts: dict):
     with _lock:
         conn = get_conn()
@@ -398,6 +449,38 @@ def all_structures():
     rows = conn.execute("SELECT * FROM structures ORDER BY num_batch, updated_at DESC").fetchall()
     conn.close()
     return [json.loads(r["data_json"]) for r in rows]
+
+
+def all_survey_records(form_key: str = None):
+    """Returns survey records grouped by formKey: {formKey: [record_dict,...]}
+    matching the shape SurveyRecord.fromMap() expects on the Flutter side.
+    If `form_key` is given, restricts to that single form (still returned
+    as a {formKey: [...]} dict for API-shape consistency)."""
+    conn = get_conn()
+    if form_key:
+        rows = conn.execute(
+            "SELECT * FROM survey_records WHERE form_key=? ORDER BY updated_at DESC",
+            (form_key,),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM survey_records ORDER BY form_key, updated_at DESC"
+        ).fetchall()
+    conn.close()
+    out: dict = {}
+    for row in rows:
+        record = json.loads(row["data_json"])
+        out.setdefault(row["form_key"], []).append(record)
+    return out
+
+
+def survey_records_count():
+    conn = get_conn()
+    rows = conn.execute(
+        "SELECT form_key, COUNT(*) c FROM survey_records GROUP BY form_key"
+    ).fetchall()
+    conn.close()
+    return {r["form_key"]: r["c"] for r in rows}
 
 
 def menage_by_id(mid: str):
@@ -431,8 +514,9 @@ def counts():
     m = conn.execute("SELECT COUNT(*) c FROM menages").fetchone()["c"]
     c = conn.execute("SELECT COUNT(*) c FROM champs").fetchone()["c"]
     s = conn.execute("SELECT COUNT(*) c FROM structures").fetchone()["c"]
+    sr = conn.execute("SELECT COUNT(*) c FROM survey_records").fetchone()["c"]
     conn.close()
-    return {"menages": m, "champs": c, "structures": s}
+    return {"menages": m, "champs": c, "structures": s, "survey_records": sr}
 
 
 def recent_syncs(limit=20):

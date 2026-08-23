@@ -1104,6 +1104,7 @@ def api_sync():
     menages = payload.get("menages", [])
     champs = payload.get("champs", [])
     structures = payload.get("structures", [])
+    survey_records = payload.get("survey_records", {}) or {}
 
     for m in menages:
         db.upsert_menage(m, device_id)
@@ -1112,10 +1113,18 @@ def api_sync():
     for s in structures:
         db.upsert_structure(s, device_id)
 
+    survey_records_total = 0
+    for form_key, records in survey_records.items():
+        for r in records or []:
+            r.setdefault("formKey", form_key)
+            db.upsert_survey_record(r, device_id)
+            survey_records_total += 1
+
     counts = {
         "menages": len(menages),
         "champs": len(champs),
         "structures": len(structures),
+        "survey_records": survey_records_total,
     }
     db.log_sync(device_id, device_name, counts)
 
@@ -1141,6 +1150,7 @@ def api_pull():
         "menages": db.all_menages(),
         "champs": db.all_champs(),
         "structures": db.all_structures(),
+        "survey_records": db.all_survey_records(),
         "totals": db.counts(),
         "pulled_at": datetime.now().isoformat(),
     })
