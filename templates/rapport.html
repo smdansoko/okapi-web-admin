@@ -6,9 +6,22 @@
   <h2>Rapport PARC — Plan d'Action de Réinstallation et de Compensation</h2>
   <p style="color:#666; font-size:13px;">Généré le {{ now.strftime('%d/%m/%Y à %H:%M') }} · modèle basé sur le rapport de référence OKAPI/AMCP</p>
 
+  <form class="filters" method="get" style="margin: 10px 0 14px;">
+    <label for="batch">Filtrer par N° de lot :</label>
+    <select name="batch" id="batch" onchange="this.form.submit()">
+      <option value="">-- Tous les lots --</option>
+      {% for b in batches %}
+      <option value="{{ b }}" {{ 'selected' if b == selected_batch else '' }}>{{ b }}</option>
+      {% endfor %}
+    </select>
+  </form>
+
   <div style="margin: 10px 0 18px;">
-    <a class="btn small maroon" href="{{ url_for('rapport_export_pdf') }}">📄 Exporter en PDF</a>
-    <a class="btn small maroon" href="{{ url_for('rapport_export_docx') }}" style="margin-left:8px;">📝 Exporter en Word (.docx)</a>
+    <a class="btn small maroon" href="{{ url_for('rapport_export_pdf', batch=selected_batch) }}">📄 Exporter en PDF</a>
+    <a class="btn small maroon" href="{{ url_for('rapport_export_docx', batch=selected_batch) }}" style="margin-left:8px;">📝 Exporter en Word (.docx)</a>
+    {% if selected_batch %}
+    <span class="badge" style="margin-left:8px;">Filtré : lot {{ selected_batch }}</span>
+    {% endif %}
   </div>
 
   <div class="cards-row">

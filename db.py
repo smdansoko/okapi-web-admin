@@ -84,6 +84,7 @@ def init_db():
             password_hash TEXT NOT NULL,
             sexe TEXT,
             statut TEXT,
+            tablette TEXT,
             approval_status TEXT NOT NULL DEFAULT 'pending',
             created_at TEXT DEFAULT (datetime('now')),
             approved_at TEXT,
@@ -97,6 +98,16 @@ def init_db():
         """
     )
     conn.commit()
+
+    # Migration-safe: add the `tablette` column to a pre-existing `users`
+    # table created before this field existed (CREATE TABLE IF NOT EXISTS
+    # does not retroactively add columns to an already-existing table).
+    try:
+        conn.execute("ALTER TABLE users ADD COLUMN tablette TEXT")
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass  # column already exists
+
     conn.close()
 
 
@@ -105,16 +116,18 @@ def init_db():
 # ---------------------------------------------------------------------------
 
 def create_user(user_id: str, nom_prenom: str, telephone: str, username: str,
-                 password_hash: str, sexe: str, statut: str):
+                 password_hash: str, sexe: str, statut: str, tablette: str = ""):
     """Inserts a new pending registration. Raises sqlite3.IntegrityError if the
-    username is already taken."""
+    username is already taken. `tablette` identifies which physical tablet
+    this account (typically a "Chef d'équipe") is assigned to, used to
+    restrict mobile sync to that tablet's own survey records."""
     with _lock:
         conn = get_conn()
         conn.execute(
             """INSERT INTO users
-               (id, nom_prenom, telephone, username, password_hash, sexe, statut, approval_status)
-               VALUES (?,?,?,?,?,?,?, 'pending')""",
-            (user_id, nom_prenom, telephone, username, password_hash, sexe, statut),
+               (id, nom_prenom, telephone, username, password_hash, sexe, statut, tablette, approval_status)
+               VALUES (?,?,?,?,?,?,?,?, 'pending')""",
+            (user_id, nom_prenom, telephone, username, password_hash, sexe, statut, tablette),
         )
         conn.commit()
         conn.close()

@@ -87,8 +87,8 @@ def build_invoice_workbook(champs, structures):
 
     thin = Side(style="thin")
     border_all = Border(top=thin, bottom=thin, left=thin, right=thin)
-    font_normal = Font(name="Calibri", size=11)
-    font_bold = Font(name="Calibri", size=11, bold=True)
+    font_normal = Font(name="Calibri", size=10.5)
+    font_bold = Font(name="Calibri", size=10.5, bold=True)
 
     ws["A1"] = "OKAPI Environnement Conseil"
     ws["A1"].font = font_bold

@@ -55,12 +55,13 @@ def _contrat_type_bucket(type_contrat: str) -> str:
     return "menage"
 
 
-def build_tableau1(menages, champs, structures):
+def build_tableau1(menages, champs, structures, num_batch=""):
     """Tableau 1 : Accords signés / Localisation par type et nombre de
     responsables. One row per lot (num_batch), columns: Ménage / Lignage /
     Collectif (contract-type counts) + Masculin / Féminin (representative's
-    sexe, one per contract row)."""
-    batches = distinct_batches(champs, structures)
+    sexe, one per contract row). If num_batch is given, restrict to that
+    single lot."""
+    batches = [num_batch] if num_batch else distinct_batches(champs, structures)
     rows = []
     tot = {"menage": 0, "lignage": 0, "collectif": 0, "masculin": 0, "feminin": 0}
     for b in batches:
@@ -81,11 +82,12 @@ def build_tableau1(menages, champs, structures):
     return {"rows": rows, "total": tot}
 
 
-def build_tableau2(menages, champs, structures):
+def build_tableau2(menages, champs, structures, num_batch=""):
     """Tableau 2 : Récapitulatif des compensations (nb PAP distincts,
     superficie totale des parcelles en m², montant total) — une ligne par
-    lot + une ligne Total."""
-    batches = distinct_batches(champs, structures)
+    lot + une ligne Total. If num_batch is given, restrict to that single
+    lot."""
+    batches = [num_batch] if num_batch else distinct_batches(champs, structures)
     rows = []
     tot_pap = 0
     tot_sup = 0.0
@@ -109,10 +111,11 @@ def build_tableau2(menages, champs, structures):
     }
 
 
-def build_tableau3(menages, champs, structures):
+def build_tableau3(menages, champs, structures, num_batch=""):
     """Tableau 3 : Récapitulatif des compensations par village (nb PAP,
-    superficie, montant), regroupé par lot puis par village."""
-    batches = distinct_batches(champs, structures)
+    superficie, montant), regroupé par lot puis par village. If num_batch
+    is given, restrict to that single lot."""
+    batches = [num_batch] if num_batch else distinct_batches(champs, structures)
     rows = []
     tot_pap = 0
     tot_sup = 0.0
@@ -145,13 +148,16 @@ def build_tableau3(menages, champs, structures):
     }
 
 
-def build_tableau4(champs):
+def build_tableau4(champs, num_batch=""):
     """Tableau 4 : Récapitulatif des compensations des cultures annuelles
-    (superficie en ha, montant en GNF), regroupé par culture."""
+    (superficie en ha, montant en GNF), regroupé par culture. If num_batch
+    is given, restrict to champs belonging to that single lot."""
     from compensation import _find, _CULTURES_ANNUELLES  # noqa: reuse price lookup
 
     by_culture = {}
     for ch in champs:
+        if num_batch and ch.get("numBatch", "") != num_batch:
+            continue
         for p in ch.get("parcelles", []):
             for champ_agr in p.get("champs", []):
                 culture = champ_agr.get("culture") or "Non spécifié"
@@ -180,11 +186,12 @@ _ARBRE_CATEGORY_LABEL = {
 }
 
 
-def build_tableau5(champs, structures):
+def build_tableau5(champs, structures, num_batch=""):
     """Tableau 5 : Récapitulatif des compensations des arbres / lot —
     regroupé par lot (num_batch) puis par catégorie d'arbre (cultures
-    pérennes / espèces sauvages / bois d'œuvre), montant en GNF."""
-    batches = distinct_batches(champs, structures)
+    pérennes / espèces sauvages / bois d'œuvre), montant en GNF. If
+    num_batch is given, restrict to that single lot."""
+    batches = [num_batch] if num_batch else distinct_batches(champs, structures)
     rows = []
     totals_by_cat = {"cultures_perennes": 0.0, "especes_sauvages": 0.0, "bois_doeuvre": 0.0}
     grand_total = 0.0
@@ -206,11 +213,14 @@ def build_tableau5(champs, structures):
     return {"rows": rows, "totals_by_cat": totals_by_cat, "grand_total": grand_total}
 
 
-def build_tableau6(champs):
+def build_tableau6(champs, num_batch=""):
     """Tableau 6 : Montants et superficie relatifs au type de terrain,
-    localisés par village — regroupé par (type_de_terrain, village)."""
+    localisés par village — regroupé par (type_de_terrain, village). If
+    num_batch is given, restrict to champs belonging to that single lot."""
     by_key = {}
     for ch in champs:
+        if num_batch and ch.get("numBatch", "") != num_batch:
+            continue
         village = ch.get("village") or "Non spécifié"
         for p in ch.get("parcelles", []):
             tdt = p.get("typeDeTerrain") or "Non spécifié"
@@ -237,12 +247,13 @@ _STATUT_CONTRAT_LABEL = {
 }
 
 
-def build_indemnisation_rows(menages, champs, structures):
+def build_indemnisation_rows(menages, champs, structures, num_batch=""):
     """Builds the full per-PAP indemnisation listing (one row per contract
     row, matching the non-merge architecture used across the app), the same
     data source as excel_export.build_compensation_table's rows. Used to
-    populate Tableaux 7+ (paginated) in the Rapport docx/PDF export."""
-    contract_rows = contract_rows_for_batch(menages, champs, structures, "")
+    populate Tableaux 7+ (paginated) in the Rapport docx/PDF export. If
+    num_batch is given, restrict to that single lot (N° de lot)."""
+    contract_rows = contract_rows_for_batch(menages, champs, structures, num_batch or "")
     contract_rows.sort(key=lambda o: (o.get("numBatch", ""), o.get("nom", "")))
 
     out = []
@@ -282,24 +293,29 @@ def paginate(rows, page_size=40):
     return [rows[i:i + page_size] for i in range(0, len(rows), page_size)]
 
 
-def build_full_report_data(menages, champs, structures, page_size=40):
+def build_full_report_data(menages, champs, structures, page_size=40, num_batch=""):
     """Builds the complete data dict consumed by both the DOCX and PDF
-    Rapport generators."""
-    t1 = build_tableau1(menages, champs, structures)
-    t2 = build_tableau2(menages, champs, structures)
-    t3 = build_tableau3(menages, champs, structures)
-    t4 = build_tableau4(champs)
-    t5 = build_tableau5(champs, structures)
-    t6 = build_tableau6(champs)
-    indemnisation_rows = build_indemnisation_rows(menages, champs, structures)
+    Rapport generators. If num_batch is given (a specific N° de lot), all
+    tableaux and the indemnisation listing are restricted to that single
+    lot instead of aggregating every lot."""
+    t1 = build_tableau1(menages, champs, structures, num_batch)
+    t2 = build_tableau2(menages, champs, structures, num_batch)
+    t3 = build_tableau3(menages, champs, structures, num_batch)
+    t4 = build_tableau4(champs, num_batch)
+    t5 = build_tableau5(champs, structures, num_batch)
+    t6 = build_tableau6(champs, num_batch)
+    indemnisation_rows = build_indemnisation_rows(menages, champs, structures, num_batch)
     pages = paginate(indemnisation_rows, page_size=page_size)
 
-    global_summary = compute_global(champs, structures)
+    filtered_champs = [c for c in champs if not num_batch or c.get("numBatch", "") == num_batch]
+    filtered_structures = [s for s in structures if not num_batch or s.get("numBatch", "") == num_batch]
+    global_summary = compute_global(filtered_champs, filtered_structures)
     batches = distinct_batches(champs, structures)
 
     return {
         "generated_at": datetime.now(),
         "batches": batches,
+        "selected_batch": num_batch,
         "tableau1": t1,
         "tableau2": t2,
         "tableau3": t3,
@@ -311,6 +327,6 @@ def build_full_report_data(menages, champs, structures, page_size=40):
         "global_summary": global_summary,
         "menages_count": len(menages),
         "total_individus": sum(len(m.get("individus", [])) for m in menages),
-        "champs_count": len(champs),
-        "structures_count": len(structures),
+        "champs_count": len(filtered_champs),
+        "structures_count": len(filtered_structures),
     }

@@ -34,6 +34,7 @@
         <th>Téléphone</th>
         <th>Sexe</th>
         <th>Statut (rôle)</th>
+        <th>Tablette</th>
         <th>Créé le</th>
         <th>État du compte</th>
         <th>Actions</th>
@@ -47,6 +48,7 @@
         <td>{{ u.telephone or '—' }}</td>
         <td>{{ u.sexe or '—' }}</td>
         <td>{{ u.statut or '—' }}</td>
+        <td>{% if u.tablette %}<span class="badge proprietaire">Tablette {{ u.tablette }}</span>{% else %}—{% endif %}</td>
         <td>{{ u.created_at }}</td>
         <td>
           {% if u.approval_status == 'pending' %}

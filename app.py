@@ -25,7 +25,7 @@ from compensation import (
     compute_global,
     CompensationSummary,
 )
-from contract_pdf import build_contract_data, generate_contract_pdf
+from contract_pdf import build_contract_data, generate_contract_pdf, scale_pdf_to_a5
 from excel_export import build_compensation_table
 from contract_rows import (
     chef_of as _chef_of,
@@ -35,7 +35,7 @@ from contract_rows import (
     contract_rows_for_batch as _contract_rows_for_batch,
     distinct_owner_count as _distinct_owner_count,
 )
-from rapport_data import build_full_report_data
+from rapport_data import build_full_report_data, build_indemnisation_rows
 from rapport_pdf import generate_rapport_pdf
 from rapport_docx import generate_rapport_docx
 from facturation_data import build_lot_superficie_rows, build_invoice_workbook
@@ -437,24 +437,22 @@ def contracts_list():
     )
 
 
-@app.route("/contracts/export/<code_individu>")
-def export_contract(code_individu):
-    """Exports a contract PDF.
+def _resolve_contract_data(code_individu, champ_id="", contract_type=""):
+    """Shared lookup + build logic used by both the contract PDF export
+    route and the A5 in-browser preview route. Returns (d, summary,
+    out_suffix) or None if the owner can't be resolved.
 
     IMPORTANT: contracts are generated PER CHAMPS RECORD, not per owner.
     When a PAP (propriétaire) has several distinct "enquêtes champs"
-    records, pass ``champ_id`` in the query string to select exactly which
-    record's contract to generate; each record produces its own separate,
-    non-merged contract. If ``champ_id`` is omitted, the first matching
-    champs record for that owner is used (kept for backward compatibility
-    with old links / structure-only or ménage-only owners).
+    records, pass ``champ_id`` to select exactly which record's contract
+    to generate; each record produces its own separate, non-merged
+    contract. If ``champ_id`` is omitted, the first matching champs
+    record for that owner is used (kept for backward compatibility with
+    old links / structure-only or ménage-only owners).
     """
     menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
-
-    contract_type = request.args.get("type", "")
-    champ_id = request.args.get("champ_id", "")
 
     # Try to find as a chef de menage first (ménage-based contract, no
     # champs record involved at all)
@@ -498,7 +496,7 @@ def export_contract(code_individu):
                     break
 
     if menage_match is None and champ_match is None:
-        abort(404, description="Owner not found")
+        return None
 
     if menage_match is not None:
         d = build_contract_data(menage=menage_match)
@@ -547,6 +545,20 @@ def export_contract(code_individu):
             summary = compute_for_owner(champs, structures, code_individu)
             out_suffix = code_individu
 
+    return d, summary, out_suffix
+
+
+@app.route("/contracts/export/<code_individu>")
+def export_contract(code_individu):
+    """Exports a contract PDF (A4, downloaded as attachment)."""
+    contract_type = request.args.get("type", "")
+    champ_id = request.args.get("champ_id", "")
+
+    resolved = _resolve_contract_data(code_individu, champ_id, contract_type)
+    if resolved is None:
+        abort(404, description="Owner not found")
+    d, summary, out_suffix = resolved
+
     pdf_bytes = generate_contract_pdf(d, summary)
 
     filename = f"Contrat_{d.get('numeroLot', code_individu)}_{out_suffix}.pdf"
@@ -558,16 +570,65 @@ def export_contract(code_individu):
     )
 
 
+@app.route("/contracts/preview/<code_individu>")
+def preview_contract(code_individu):
+    """Renders the contract as an A5-scaled PDF for in-browser preview
+    (inline, not a download). Reuses the exact same data as the A4 PDF
+    export, then rescales every page to A5 using pypdf so the visual
+    layout matches the official contract exactly (just shrunk)."""
+    contract_type = request.args.get("type", "")
+    champ_id = request.args.get("champ_id", "")
+
+    resolved = _resolve_contract_data(code_individu, champ_id, contract_type)
+    if resolved is None:
+        abort(404, description="Owner not found")
+    d, summary, out_suffix = resolved
+
+    pdf_bytes = generate_contract_pdf(d, summary)
+    a5_bytes = scale_pdf_to_a5(pdf_bytes)
+
+    filename = f"Apercu_A5_Contrat_{d.get('numeroLot', code_individu)}_{out_suffix}.pdf"
+    return send_file(
+        io.BytesIO(a5_bytes),
+        mimetype="application/pdf",
+        as_attachment=False,
+        download_name=filename,
+    )
+
+
 # ---------------------------------------------------------------------------
 # Compensation table export (.xlsx)
 # ---------------------------------------------------------------------------
 
 @app.route("/compensation")
 def compensation_page():
+    menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
     batches = _distinct_batches(champs, structures)
-    return render_template("compensation.html", batches=batches)
+
+    selected_batch = (request.args.get("batch") or "").strip()
+    if selected_batch and selected_batch not in batches:
+        selected_batch = ""
+    village_filter = (request.args.get("village") or "").strip()
+
+    preview_rows = build_indemnisation_rows(menages, champs, structures, selected_batch)
+    if village_filter:
+        vf = village_filter.lower()
+        preview_rows = [r for r in preview_rows if vf in (r.get("village") or "").lower()]
+
+    preview_total_count = len(preview_rows)
+    preview_total_montant = sum(r.get("montant", 0) for r in preview_rows)
+
+    return render_template(
+        "compensation.html",
+        batches=batches,
+        selected_batch=selected_batch,
+        village_filter=village_filter,
+        preview_rows=preview_rows[:30],
+        preview_total_count=preview_total_count,
+        preview_total_montant=preview_total_montant,
+    )
 
 
 @app.route("/compensation/export")
@@ -684,17 +745,32 @@ def rapport_page():
     champs = db.all_champs()
     structures = db.all_structures()
 
+    batches = _distinct_batches(champs, structures)
+    selected_batch = (request.args.get("batch") or "").strip()
+    if selected_batch and selected_batch not in batches:
+        selected_batch = ""
+
+    # Rich per-lot / per-village / per-culture / per-arbre / per-terrain
+    # aggregations (matching the uploaded reference report's Tableaux 1-6),
+    # computed live from the same synced data (see rapport_data.py). Reused
+    # by both the on-screen preview below and the PDF/Word export routes.
+    # When a "N° de lot" filter is selected, everything below (stats,
+    # tableaux, indemnisation preview) is restricted to that single lot.
+    report_data = build_full_report_data(menages, champs, structures, num_batch=selected_batch)
+
+    filtered_champs = [c for c in champs if not selected_batch or c.get("numBatch", "") == selected_batch]
+    filtered_structures = [s for s in structures if not selected_batch or s.get("numBatch", "") == selected_batch]
+
     total_individus = sum(len(m.get("individus", [])) for m in menages)
     total_superficie = 0.0
-    for ch in champs:
+    for ch in filtered_champs:
         for p in ch.get("parcelles", []):
             total_superficie += p.get("superficieParcelle", 0) or 0
 
-    global_summary = compute_global(champs, structures)
-    batches = _distinct_batches(champs, structures)
+    global_summary = compute_global(filtered_champs, filtered_structures)
 
     batch_report_rows = []
-    for b in batches:
+    for b in ([selected_batch] if selected_batch else batches):
         rows = _contract_rows_for_batch(menages, champs, structures, b)
         total_montant = _total_montant_for_rows(champs, structures, rows)
         villages = sorted({r["village"] for r in rows if r.get("village")})
@@ -708,18 +784,12 @@ def rapport_page():
 
     recent_syncs = db.recent_syncs(15)
 
-    # Rich per-lot / per-village / per-culture / per-arbre / per-terrain
-    # aggregations (matching the uploaded reference report's Tableaux 1-6),
-    # computed live from the same synced data (see rapport_data.py). Reused
-    # by both the on-screen preview below and the PDF/Word export routes.
-    report_data = build_full_report_data(menages, champs, structures)
-
     return render_template(
         "rapport.html",
         menages_count=len(menages),
         total_individus=total_individus,
-        champs_count=len(champs),
-        structures_count=len(structures),
+        champs_count=len(filtered_champs),
+        structures_count=len(filtered_structures),
         total_superficie=round(total_superficie, 2),
         total_montant=round(global_summary.total),
         montant_par_categorie=[
@@ -734,6 +804,8 @@ def rapport_page():
         batch_report_rows=batch_report_rows,
         recent_syncs=recent_syncs,
         report_data=report_data,
+        batches=batches,
+        selected_batch=selected_batch,
         now=datetime.now(),
     )
 
@@ -742,12 +814,16 @@ def rapport_page():
 def rapport_export_pdf():
     """Exports the full "Rapport PARC" as a PDF, modeled after the
     uploaded reference document, with all 14 Tableaux computed live from
-    the synced survey data (see rapport_pdf.py / rapport_data.py)."""
+    the synced survey data (see rapport_pdf.py / rapport_data.py). Honors
+    an optional ?batch=<N° de lot> filter, same as the on-screen preview."""
     menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
-    pdf_bytes = generate_rapport_pdf(menages, champs, structures)
-    filename = f"Rapport_PARC_{datetime.now().strftime('%Y%m%d')}.pdf"
+    selected_batch = (request.args.get("batch") or "").strip()
+    report_data = build_full_report_data(menages, champs, structures, num_batch=selected_batch)
+    pdf_bytes = generate_rapport_pdf(menages, champs, structures, report_data=report_data)
+    suffix = f"_lot_{selected_batch}" if selected_batch else ""
+    filename = f"Rapport_PARC{suffix}_{datetime.now().strftime('%Y%m%d')}.pdf"
     return send_file(
         io.BytesIO(pdf_bytes),
         mimetype="application/pdf",
@@ -760,12 +836,17 @@ def rapport_export_pdf():
 def rapport_export_docx():
     """Exports the full "Rapport PARC" as a Word (.docx) document, modeled
     after the uploaded reference document, with all 14 Tableaux computed
-    live from the synced survey data (see rapport_docx.py / rapport_data.py)."""
+    live from the synced survey data (see rapport_docx.py / rapport_data.py).
+    Honors an optional ?batch=<N° de lot> filter, same as the on-screen
+    preview."""
     menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
-    docx_bytes = generate_rapport_docx(menages, champs, structures)
-    filename = f"Rapport_PARC_{datetime.now().strftime('%Y%m%d')}.docx"
+    selected_batch = (request.args.get("batch") or "").strip()
+    report_data = build_full_report_data(menages, champs, structures, num_batch=selected_batch)
+    docx_bytes = generate_rapport_docx(menages, champs, structures, report_data=report_data)
+    suffix = f"_lot_{selected_batch}" if selected_batch else ""
+    filename = f"Rapport_PARC{suffix}_{datetime.now().strftime('%Y%m%d')}.docx"
     return send_file(
         io.BytesIO(docx_bytes),
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -876,7 +957,7 @@ def facturation_export():
     ws.append(headers)
     header_fill = PatternFill(start_color="6B1F1F", end_color="6B1F1F", fill_type="solid")
     for cell in ws[1]:
-        cell.font = Font(bold=True, color="FFFFFF")
+        cell.font = Font(bold=True, color="FFFFFF", size=10.5)
         cell.fill = header_fill
         cell.alignment = Alignment(horizontal="center")
 
@@ -904,7 +985,7 @@ def facturation_export():
     total_row = ["", "", "", "", "", "TOTAL GÉNÉRAL", "", "", "", "", "", "", round(grand_total)]
     ws.append(total_row)
     for cell in ws[ws.max_row]:
-        cell.font = Font(bold=True)
+        cell.font = Font(bold=True, size=10.5)
 
     for col_idx, width in enumerate(
         [14, 24, 16, 10, 16, 16, 16, 18, 18, 18, 16, 16, 16], start=1
@@ -1001,6 +1082,7 @@ def _user_public(u: dict):
         "username": u.get("username"),
         "sexe": u.get("sexe"),
         "statut": u.get("statut"),
+        "tablette": u.get("tablette") or "",
         "approvalStatus": u.get("approval_status"),
         "createdAt": u.get("created_at"),
         "approvedAt": u.get("approved_at"),
@@ -1018,6 +1100,7 @@ def api_register():
     password = payload.get("password") or ""
     sexe = (payload.get("sexe") or "").strip()
     statut = (payload.get("statut") or "").strip()
+    tablette = (payload.get("tablette") or "").strip()
 
     if not nom_prenom or not username or not password:
         return jsonify({
@@ -1040,7 +1123,7 @@ def api_register():
     user_id = str(uuid.uuid4())
     password_hash = generate_password_hash(password)
     try:
-        db.create_user(user_id, nom_prenom, telephone, username, password_hash, sexe, statut)
+        db.create_user(user_id, nom_prenom, telephone, username, password_hash, sexe, statut, tablette)
     except sqlite3.IntegrityError:
         return jsonify({
             "status": "error",

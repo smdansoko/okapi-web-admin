@@ -7,18 +7,77 @@
   <p>Génère le tableau au format identique à <code class="mono">OKAPI_WCAG_Tableau d'indemnisation_WCAG2613.xlsm</code>,
      calculé automatiquement à partir des enquêtes Champs et Structures synchronisées.</p>
 
-  <form class="filters" method="get" action="{{ url_for('compensation_export') }}">
+  <form class="filters" method="get" action="{{ url_for('compensation_page') }}">
     <label for="batch">N° de lot :</label>
-    <select name="batch" id="batch">
+    <select name="batch" id="batch" onchange="this.form.submit()">
       <option value="">-- Tous les lots (export global) --</option>
       {% for b in batches %}
-      <option value="{{ b }}">{{ b }}</option>
+      <option value="{{ b }}" {{ 'selected' if b == selected_batch else '' }}>{{ b }}</option>
       {% endfor %}
     </select>
     <label for="village">Libellé villages (optionnel) :</label>
-    <input type="text" name="village" id="village" placeholder="ex: Sangaredi">
-    <button class="btn maroon" type="submit">Télécharger le tableau Excel</button>
+    <input type="text" name="village" id="village" placeholder="ex: Sangaredi" value="{{ village_filter }}">
+    <button class="btn small" type="submit">Aperçu</button>
+    <a class="btn maroon" href="{{ url_for('compensation_export', batch=selected_batch, village=village_filter) }}">Télécharger le tableau Excel</a>
   </form>
+</div>
+
+<div class="panel">
+  <h2>Aperçu du tableau d'indemnisation</h2>
+  <p style="font-size:13px; color:#666; margin-bottom:14px;">
+    <strong>{{ preview_total_count }}</strong> enregistrement(s) &mdash;
+    Montant total : <strong>{{ "{:,.0f}".format(preview_total_montant).replace(",", " ") }} GNF</strong>
+    {% if selected_batch %}&mdash; filtré sur le lot <strong>{{ selected_batch }}</strong>{% endif %}
+    {% if village_filter %}&mdash; village : <strong>{{ village_filter }}</strong>{% endif %}
+  </p>
+
+  {% if preview_rows %}
+  <div style="overflow-x:auto;">
+  <table class="data-table compact-table">
+    <thead>
+      <tr>
+        <th>N°</th>
+        <th>N° de lot</th>
+        <th>Nom et prénom</th>
+        <th>Code enquête</th>
+        <th>Téléphone</th>
+        <th>Date de naissance</th>
+        <th>N° pièce ID</th>
+        <th>Genre</th>
+        <th>Village</th>
+        <th>Statut PAP</th>
+        <th>Statut contrat</th>
+        <th>Superficie (m²)</th>
+        <th>Montant (GNF)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in preview_rows %}
+      <tr>
+        <td>{{ r.n }}</td>
+        <td><code class="mono">{{ r.num_lot }}</code></td>
+        <td>{{ r.nom }}</td>
+        <td><code class="mono">{{ r.code_enquete }}</code></td>
+        <td>{{ r.telephone }}</td>
+        <td>{{ r.date_naissance or "" }}</td>
+        <td>{{ r.num_id }}</td>
+        <td>{{ r.genre }}</td>
+        <td>{{ r.village }}</td>
+        <td>{{ r.statut_pap }}</td>
+        <td>{{ r.statut_contrat }}</td>
+        <td>{{ "{:,.2f}".format(r.superficie).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant).replace(",", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if preview_total_count > 30 %}
+  <p style="font-size:12.5px; color:#888; margin-top:8px;">Aperçu limité à 30 lignes — {{ preview_total_count }} ligne(s) au total dans l'export Excel complet.</p>
+  {% endif %}
+  {% else %}
+  <div class="empty-state">Aucune donnée pour ce filtre.</div>
+  {% endif %}
 </div>
 
 {% endblock %}

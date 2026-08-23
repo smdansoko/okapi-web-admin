@@ -45,9 +45,9 @@ COL_WIDTHS = [4.9, 19.8, 31.0, 25.3, 19.7, 19.8, 19.7, 19.8, 25.0, 20.0, 20.5, 1
 
 THIN = Side(style="thin")
 BORDER_ALL = Border(top=THIN, bottom=THIN, left=THIN, right=THIN)
-TITLE_FONT = Font(name="Century Gothic", size=10, bold=True)
-HEADER_FONT = Font(name="Century Gothic", size=10, bold=True)
-CELL_FONT = Font(name="Century Gothic", size=10)
+TITLE_FONT = Font(name="Century Gothic", size=10.5, bold=True)
+HEADER_FONT = Font(name="Century Gothic", size=10.5, bold=True)
+CELL_FONT = Font(name="Century Gothic", size=10.5)
 
 
 def _fmt_date(iso_str):
@@ -192,7 +192,7 @@ def build_compensation_table(
     total_row_idx = row_idx
     ws.merge_cells(start_row=total_row_idx, start_column=1, end_row=total_row_idx, end_column=11)
     tot_label = ws.cell(row=total_row_idx, column=1, value="Total")
-    tot_label.font = Font(name="Century Gothic", size=10, bold=True)
+    tot_label.font = Font(name="Century Gothic", size=10.5, bold=True)
     tot_label.border = BORDER_ALL
 
     if last_data_row >= first_data_row:
@@ -208,7 +208,7 @@ def build_compensation_table(
         sup_cell = ws.cell(row=total_row_idx, column=12, value=0)
         mont_cell = ws.cell(row=total_row_idx, column=13, value=0)
     for c in (sup_cell, mont_cell):
-        c.font = Font(name="Century Gothic", size=10, bold=True)
+        c.font = Font(name="Century Gothic", size=10.5, bold=True)
         c.border = BORDER_ALL
         c.number_format = "#,##0.00" if c is sup_cell else "#,##0"
         c.alignment = Alignment(horizontal="right")

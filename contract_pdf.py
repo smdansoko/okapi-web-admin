@@ -32,6 +32,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 
 from compensation import compute_for_owner, CompensationSummary
+from contract_rows import code_enquete_for_champ
 
 _FONT_DIR = os.path.join(os.path.dirname(__file__), "fonts")
 _IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "img")
@@ -174,6 +175,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "codeMenage": menage.get("codeMenage", ""),
             "codeIndividu": chef.get("id", menage.get("codeMenage", "")),
             "codePap": chef.get("codePap", ""),
+            "codeEnquete": chef.get("id", menage.get("codeMenage", "")),
             "nomPrenom": chef.get("nomPrenom", ""),
             "sexe": chef.get("sexe", ""),
             "dateNaissance": fmt_date(chef.get("dateNaissance")),
@@ -199,6 +201,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "codeMenage": champ.get("codeMenage", ""),
             "codeIndividu": proprietaire.get("id", ""),
             "codePap": proprietaire.get("codePap", ""),
+            "codeEnquete": code_enquete_for_champ(champ) if champ.get("id") else proprietaire.get("id", ""),
             "nomPrenom": proprietaire.get("nomPrenom", ""),
             "sexe": proprietaire.get("sexe", ""),
             "dateNaissance": fmt_date(proprietaire.get("dateNaissance")),
@@ -427,6 +430,7 @@ def _page1(d, styles):
         ("Localité", d["village"]),
         ("Code de l'individu", d["codeIndividu"]),
         ("Code PAP", d.get("codePap", "")),
+        ("Code de l'enquête", d.get("codeEnquete", "")),
         ("Prénom et NOM", d["nomPrenom"]),
         ("Sexe", d["sexe"]),
         ("Date de naissance", d["dateNaissance"]),
@@ -1336,3 +1340,25 @@ def generate_contract_pdf(d, summary: CompensationSummary):
         onLaterPages=lambda c, dd: _header_footer(c, dd, d),
     )
     return buf.getvalue()
+
+
+def scale_pdf_to_a5(pdf_bytes: bytes) -> bytes:
+    """Takes an A4 contract PDF (as produced by generate_contract_pdf) and
+    returns a new PDF where every page has been rescaled down to A5
+    (148 x 210 mm), for in-browser preview. Uses pypdf's scale_to() so the
+    exact same A4 layout (already validated / overflow-fixed for Annexe1
+    etc.) is simply shrunk uniformly, rather than re-implementing a
+    separate A5-native layout."""
+    from pypdf import PdfReader, PdfWriter
+    from reportlab.lib.pagesizes import A5
+
+    reader = PdfReader(io.BytesIO(pdf_bytes))
+    writer = PdfWriter()
+    target_w, target_h = A5
+    for page in reader.pages:
+        page.scale_to(float(target_w), float(target_h))
+        writer.add_page(page)
+
+    out = io.BytesIO()
+    writer.write(out)
+    return out.getvalue()

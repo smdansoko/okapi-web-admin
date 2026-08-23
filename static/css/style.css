@@ -151,7 +151,7 @@ main.content {
 table.data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13.5px;
+  font-size: 10.5px;
 }
 
 table.data-table th, table.data-table td {
@@ -167,6 +167,21 @@ table.data-table th {
 }
 
 table.data-table tr:nth-child(even) { background: #FAFAF8; }
+
+/* Compact variant: forces single-line rows (Excel-like row height ~20px),
+   used for wide tables such as the Facturation breakdown table. */
+table.data-table.compact-table {
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+
+table.data-table.compact-table th,
+table.data-table.compact-table td {
+  padding: 2px 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .btn {
   display: inline-block;

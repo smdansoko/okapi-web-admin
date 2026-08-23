@@ -34,6 +34,7 @@
         <th>N° enquête</th>
         <th>Type de contrat</th>
         <th>Village</th>
+        <th>Aperçu</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -61,6 +62,12 @@
           {% endif %}
         </td>
         <td>{{ o.village }}</td>
+        <td>
+          <a class="btn small" target="_blank" rel="noopener"
+             href="{{ url_for('preview_contract', code_individu=o.code, champ_id=o.champ_id) }}">
+            👁️ Aperçu A5
+          </a>
+        </td>
         <td>
           <a class="btn small maroon js-export-pdf"
              href="{{ url_for('export_contract', code_individu=o.code, champ_id=o.champ_id) }}">
