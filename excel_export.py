@@ -3,10 +3,15 @@ OKAPI_WCAG_Tableau d'indemnisation_WCAG2613.xlsm:
 
 Row 8 (merged A:M): title "OKAPI -- WCAG -- TABLEAU D'INDEMNISATION (en date
 du <today>) / <villages> (<batch_code>)"
-Row 11: headers N°, num_lot, Prénom et Nom, Code PAP, Téléphone,
+Row 11: headers N°, num_lot, Prénom et Nom, Code de l'enquête, Téléphone,
         Date de naissance, N° ID, Genre, District/village, Statut PAP,
         Statut Contrat, Superficie (m²), Montant de Compensation (GNF)
-Row 12+: data rows, one per PAP/owner
+Row 12+: data rows, ONE ROW PER CHAMPS/ENQUÊTE RECORD (not merged per
+        owner) - matching the non-merge contract architecture used
+        elsewhere in the app: a PAP with several distinct "enquêtes
+        champs" appears on several rows, each with its own distinct
+        "Code de l'enquête" (concat(code_proprietaire, '-',
+        num_enquete_champ)) - see contract_rows.py.
 Row after data: Total row (SUM formula for Superficie + Montant)
 Signature lines below.
 """
@@ -17,13 +22,14 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-from compensation import compute_for_owner
+from compensation import compute_for_owner, compute_for_champ_record
+from contract_rows import contract_rows_for_batch, individu_lookup
 
 HEADER = [
     "N°",
     "num_lot",
     "Prénom et Nom",
-    "Code PAP",
+    "Code de l'enquête",
     "Téléphone",
     "Date de naissance",
     "N° ID",
@@ -102,107 +108,64 @@ def build_compensation_table(
         cell.border = BORDER_ALL
         cell.alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
 
-    # ---- Build PAP rows: group champs+structures by owner (code_proprietaire) ----
-    # Gather all distinct owners across champs (Lignage/Communautaire/foncier)
-    # and menages (Propriétaire households), filtered by num_batch if given.
-    owners = {}  # code -> dict(nom, telephone, date_naissance, num_id, genre, village, statut_pap, type_contrat)
+    # ---- Build indemnification rows: ONE ROW PER CHAMPS/ENQUÊTE RECORD ----
+    # (non-merge architecture, same as contract PDF export) so that each row
+    # can carry its own distinct "Code de l'enquête" survey code instead of
+    # merging every enquête belonging to the same owner into a single row.
+    contract_rows = contract_rows_for_batch(menages, champs, structures, num_batch)
 
-    def _individu_lookup(code_menage, code_individu):
-        for m in menages:
-            if m.get("codeMenage") == code_menage or m.get("id") == code_menage:
-                for ind in m.get("individus", []):
-                    if ind.get("id") == code_individu:
-                        return ind
-        return None
-
-    for champ in champs:
-        if num_batch and champ.get("numBatch", "") != num_batch:
-            continue
-        code_prop = champ.get("codeProprietaire", "")
-        if not code_prop:
-            continue
-        ind = _individu_lookup(champ.get("codeMenage", ""), code_prop) or {}
-        owners.setdefault(
-            code_prop,
-            {
-                "nom": ind.get("nomPrenom") or champ.get("proprietaireNom", ""),
-                "telephone": ind.get("telephone", ""),
-                "date_naissance": ind.get("dateNaissance"),
-                "num_id": ind.get("numeroPiece", ""),
-                "genre": ind.get("sexe", ""),
-                "village": champ.get("village", ""),
-                "statut_pap": "Propriétaire" if champ.get("typeDePropriete") == "Propriétaire" else champ.get("typeDePropriete", ""),
-                "statut_contrat": _statut_contrat_label(champ.get("typeDePropriete", "")),
-                "superficie": 0.0,
-            },
+    def _info_for_row(row):
+        ind = individu_lookup(menages, row.get("codeMenage", ""), row["code"]) or {}
+        statut_pap = (
+            "Propriétaire" if row["type_contrat"] == "Propriétaire"
+            else (row["type_contrat"] or "Propriétaire")
         )
+        return {
+            "nom": ind.get("nomPrenom") or row.get("nom", ""),
+            "telephone": ind.get("telephone", ""),
+            "date_naissance": ind.get("dateNaissance"),
+            "num_id": ind.get("numeroPiece", ""),
+            "genre": ind.get("sexe", ""),
+            "village": row.get("village", ""),
+            "statut_pap": statut_pap,
+            "statut_contrat": _statut_contrat_label(row["type_contrat"]),
+        }
 
-    for s in structures:
-        if num_batch and s.get("numBatch", "") != num_batch:
-            continue
-        code_prop = s.get("proprietaireStructure", "")
-        if not code_prop:
-            continue
-        ind = _individu_lookup(s.get("codeMenage", ""), code_prop) or {}
-        owners.setdefault(
-            code_prop,
-            {
-                "nom": ind.get("nomPrenom") or s.get("proprietaireNom", ""),
-                "telephone": ind.get("telephone", ""),
-                "date_naissance": ind.get("dateNaissance"),
-                "num_id": ind.get("numeroPiece", ""),
-                "genre": ind.get("sexe", ""),
-                "village": s.get("village", ""),
-                "statut_pap": "Propriétaire",
-                "statut_contrat": "Ménage",
-                "superficie": 0.0,
-            },
-        )
+    def _summary_for_row(row):
+        if row.get("champ_id"):
+            champ = next((c for c in champs if c.get("id") == row["champ_id"]), None)
+            if champ is None:
+                return compute_for_owner([], [], row["code"])
+            return compute_for_champ_record(
+                champ, structures, row["code"],
+                include_structures=row.get("include_structures", False),
+            )
+        structs = structures if row.get("include_structures", True) else []
+        return compute_for_owner([], structs, row["code"])
 
-    # Fallback: households with no Champs/Structures survey but matching batch
-    # (their compensation would be 0, but they should still appear if the
-    # caller wants a complete PAP roster — only add when no batch filter or
-    # if no owners found yet, to avoid double counting typical batch exports).
-    if not num_batch:
-        for m in menages:
-            chef = None
-            for ind in m.get("individus", []):
-                if ind.get("relationCdm") == "Chef de menage":
-                    chef = ind
-                    break
-            if chef is None and m.get("individus"):
-                chef = m["individus"][0]
-            if chef and chef.get("id") not in owners:
-                owners[chef.get("id")] = {
-                    "nom": chef.get("nomPrenom", ""),
-                    "telephone": chef.get("telephone", ""),
-                    "date_naissance": chef.get("dateNaissance"),
-                    "num_id": chef.get("numeroPiece", ""),
-                    "genre": chef.get("sexe", ""),
-                    "village": m.get("village", ""),
-                    "statut_pap": "Propriétaire",
-                    "statut_contrat": "Ménage",
-                    "superficie": 0.0,
-                }
-
-    # ---- Compute compensation + superficie totals per owner ----
+    # ---- Compute compensation + superficie totals per row ----
     row_idx = header_row_idx + 1
     n = 1
     total_superficie = 0.0
     total_montant = 0.0
     first_data_row = row_idx
-    for code_prop, info in owners.items():
-        summary = compute_for_owner(champs, structures, code_prop)
+    for row in contract_rows:
+        info = _info_for_row(row)
+        summary = _summary_for_row(row)
         superficie = sum(p["superficie"] for p in summary.parcelle_details)
         montant = summary.total
         total_superficie += superficie
         total_montant += montant
+        # "Code de l'enquête" = concat(code_proprietaire, '-', num_enquete_champ)
+        # for champs-based rows; falls back to the bare owner code for
+        # structure/menage-only rows (no distinct enquête record to number).
+        code_enquete = row.get("code_enquete") or row["code"]
 
         values = [
             n,
             num_batch,
             info["nom"],
-            code_prop,
+            code_enquete,
             info["telephone"],
             _fmt_date(info["date_naissance"]),
             info["num_id"],

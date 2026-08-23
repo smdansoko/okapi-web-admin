@@ -970,20 +970,26 @@ def _annexe1(d, summary: CompensationSummary, styles):
                 str(c["matures"] + c["adulteDeclinant"]), fmt_number(c["prixAdulte"]), fmt_number(m_adultes),
                 fmt_number(c["montant"]),
             ])
-        total_row = ["TOTAUX", "", "", "", "", "", "", "", "", "", "", "", fmt_number(tot_m)]
-        row0 = ["Type d'arbre", "Plantules", "", "", "Jeunes pousses non productives", "", "", "Jeunes pousses productives", "", "", "Adultes", "", "", "Montant (GNF)"]
+        # NOTE: total_row must have exactly 14 elements (one per column, same
+        # as row0/row1) so the grand total lands in the LAST cell (under
+        # "Montant (GNF)") instead of shifting one column to the left.
+        total_row = ["TOTAUX", "", "", "", "", "", "", "", "", "", "", "", "", fmt_number(tot_m)]
+        row0 = ["Type\nd'arbre", "Plantules", "", "", "Jeunes pousses\nnon productives", "", "", "Jeunes pousses\nproductives", "", "", "Adultes", "", "", "Montant\n(GNF)"]
         row1 = [
             "",
-            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
-            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
-            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
-            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
+            "Nb", "P.U.\n(GNF)", "Montant\n(GNF)",
+            "Nb", "P.U.\n(GNF)", "Montant\n(GNF)",
+            "Nb", "P.U.\n(GNF)", "Montant\n(GNF)",
+            "Nb", "P.U.\n(GNF)", "Montant\n(GNF)",
             "",
         ]
-        col_widths = [16] + [10, 13, 13] * 4 + [16]
+        # Widened "Type d'arbre" (espèce names can be long) and "Montant"
+        # solo columns, narrowed "Nombre" sub-columns, to reduce text
+        # overflow/line-wrap misalignment reported in this table.
+        col_widths = [22] + [8, 12, 13] * 4 + [20]
         story.append(_annex_table_grouped(
             row0, [(1, 3), (4, 6), (7, 9), (10, 12)], row1, rows, total_row,
-            col_widths,
+            col_widths, font_size=5.6,
         ))
         story.append(Spacer(1, 10))
 
