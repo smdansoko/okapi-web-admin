@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 data/okapi.db
 flask.log
+server.log
