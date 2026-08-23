@@ -163,6 +163,18 @@ BRAND = {
         "short": "BWCS SA",
         "oral_lang": "malinké",
     },
+    "smb": {
+        "short": "SMB",
+        # SMB's own reference PDFs are internally inconsistent here: the
+        # Ménage contract's Article 4 says "poular et en soussou" (two
+        # languages) but that same PDF's page-5 consent paragraph says only
+        # "sousou" (one language, matching the Lignage/Communautaire PDFs'
+        # Article 4, which both say "soussou" alone). We normalize to the
+        # single language used consistently everywhere else ("soussou"),
+        # matching WCAG's own existing convention, rather than reproducing
+        # the Ménage-only two-language artifact.
+        "oral_lang": "soussou",
+    },
 }
 
 
@@ -556,6 +568,15 @@ def _page1(d, styles):
             styles["para"],
         ))
         story.append(Paragraph("Ci-après dénommée «BWCS SA».", styles["para"]))
+    elif project == "smb":
+        story.append(Paragraph(
+            "LA SOCIÉTÉ MINIÈRE DE BOKÉ (SMB), société de droit guinéen enregistrée au Registre de commerce sous "
+            "le numéro RCCM/GC-KAL/055.689A/2014 dont le siège social se situe à l'Immeuble Wazni à Tombo I, "
+            "Kaloum, République de Guinée, représentée par son Directeur Général Mr WU Qiong, dûment habilité aux "
+            "fins des présentes,",
+            styles["para"],
+        ))
+        story.append(Paragraph("Ci-après dénommée «SMB».", styles["para"]))
     else:
         story.append(Paragraph(
             "LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen enregistrée au Registre de "
@@ -636,6 +657,22 @@ def _page2(d, styles):
                 styles["para"],
             ),
         ]
+    elif project == "smb":
+        # SMB's preamble bullet is identical across all 3 contract types
+        # (ménage/lignage/communautaire reference PDFs all read this exact
+        # same sentence) - much narrower "travaux de layonnage" (survey /
+        # line-cutting works) than WCAG's refinery construction or
+        # SIMANDOU's mining concession, with an open-ended "depuis" start
+        # date (no fixed end date) and an explicit "(hors foncier)"
+        # qualifier on "biens affectés".
+        preamble_bullets = [
+            Paragraph(
+                f"- En vue de la réalisation des travaux de layonnage par la {company}, un recensement des ayants "
+                "droit et un inventaire de l'ensemble de leurs biens affectés (hors foncier) ont été entrepris "
+                "depuis le 12/02/2026, dans l'emprise concernée du Projet ;",
+                styles["para"],
+            ),
+        ]
     else:
         preamble_bullets = [
             Paragraph(
@@ -689,10 +726,22 @@ def _page2(d, styles):
         Spacer(1, 6),
         Paragraph("IL A ÉTÉ CONVENU ET ARRÊTÉ CE QUI SUIT :", styles["small_bold"]),
         Paragraph("Article 1 – Principe d'indemnisation", styles["article"]),
+        # SMB's ménage contract has a NARROWER scope than lignage/communautaire:
+        # its Article 1 speaks only of "la perte des biens (hors foncier)" -
+        # explicitly EXCLUDING land/"terres" - whereas SMB's lignage and
+        # communautaire (like WCAG/SIMANDOU for all 3 types) speak of "la
+        # perte des terres et des biens". Reproduced faithfully here.
         Paragraph(
-            f"Les Parties conviennent des termes et conditions de l'indemnisation, pour la perte des terres et des "
-            f"biens {'de la' if is_communautaire else 'du'} {party_lower} figurant en Annexe 1. "
-            f"{'La' if is_communautaire else 'Le'} {party_lower} considère ces termes et conditions comme étant "
+            (
+                f"Les Parties conviennent des termes et conditions de l'indemnisation, pour la perte des biens "
+                f"(hors foncier) du {party_lower} figurant en Annexe 1. "
+                if project == "smb" and t == "proprietaire"
+                else (
+                    f"Les Parties conviennent des termes et conditions de l'indemnisation, pour la perte des terres et des "
+                    f"biens {'de la' if is_communautaire else 'du'} {party_lower} figurant en Annexe 1. "
+                )
+            )
+            + f"{'La' if is_communautaire else 'Le'} {party_lower} considère ces termes et conditions comme étant "
             "pleinement suffisants, satisfaisants et de nature à compenser intégralement tout préjudice causé par "
             "son déplacement physique et/ou économique ainsi que les éventuelles conséquences sur ses conditions de "
             f"vie, y compris tous les dommages et pertes subis par {'elle' if is_communautaire else 'lui'} du fait "
@@ -729,11 +778,18 @@ def _page3(d, styles):
             "l'Annexe 2 à renoncer :",
             styles["para"],
         ),
-        Paragraph(
-            "- À tous droits de quelque nature que ce soit, formels, informels ou coutumiers, sur les parcelles "
-            "listées en Annexe 1 pour la durée prévue à cet accord ;",
-            styles["para"],
-        ),
+        # SMB's ménage contract has only ONE renunciation bullet (actifs
+        # only - no parcelles/land renunciation, consistent with its
+        # narrower "hors foncier" scope in the preamble/Article 1 above).
+        # SMB's lignage/communautaire, like WCAG/SIMANDOU for all types,
+        # have BOTH bullets (parcelles + actifs).
+        *([] if (project == "smb" and t == "proprietaire") else [
+            Paragraph(
+                "- À tous droits de quelque nature que ce soit, formels, informels ou coutumiers, sur les parcelles "
+                "listées en Annexe 1 pour la durée prévue à cet accord ;",
+                styles["para"],
+            ),
+        ]),
         Paragraph(
             "- À tous droits sur les actifs de quelque nature que ce soit qui y sont implantés ou édifiés, "
             "(ci-après les « Actifs ») pour la durée prévue à cet accord.",
@@ -865,11 +921,19 @@ def _page5(d, summary, styles):
     oral_lang = BRAND.get(project, BRAND["wcag"])["oral_lang"]
     chef_name = d["nomPrenom"] or "..........................."
     party = PARTY_LABEL[d["type"]]
+    # "dudit Ménage" / "dudit Lignage" / "de ladite Communauté" - matches
+    # the reference contracts' wording ("en plein accord avec les membres
+    # dudit Ménage" / "de ladite Communauté") instead of a bare
+    # "du/de+la {mot}" construction (which previously produced the invalid
+    # "due Communauté" for the communautaire type).
+    membres_dudit = (
+        "de ladite Communauté" if d["type"] == "communautaire" else f"dudit {party.split()[0]}"
+    )
     consent = (
         f"Je, soussigné, {'Monsieur ' if d['type'] != 'communautaire' else ''}{chef_name}, en ma qualité de "
-        f"{CHEF_LABEL[d['type']]}, certifie, en plein accord avec les membres du{'e' if d['type']=='communautaire' else ''} "
-        f"{party.split()[0]}, donner mon consentement à l'ensemble des termes et conditions du présent Accord qui m'ont "
-        f"été traduits oralement du français en {oral_lang}, et ce, en présence d'un représentant des autorités locales dont "
+        f"{CHEF_LABEL[d['type']]}, certifie, en plein accord avec les membres {membres_dudit}, donner mon "
+        "consentement à l'ensemble des termes et conditions du présent Accord qui m'ont été traduits oralement "
+        f"du français en {oral_lang}, et ce, en présence d'un représentant des autorités locales dont "
         "la fonction est ............................................................................"
     )
     dt = fmt_date(d.get("dateEnquete")) or ""
@@ -1161,8 +1225,11 @@ def _annexe1(d, summary: CompensationSummary, styles):
 
 
 def _annexe2(d, summary, styles):
-    if d.get("project") == "simandou":
+    project = d.get("project")
+    if project == "simandou":
         return _annexe2_simandou(d, summary, styles)
+    if project == "smb":
+        return _annexe2_smb(d, summary, styles)
     return _annexe2_wcag(d, summary, styles)
 
 
@@ -1680,6 +1747,244 @@ def _annexe2_wcag(d, summary, styles):
     ]
 
 
+def _annexe2_smb(d, summary, styles):
+    """SMB Annexe 2, following the 3 reference PDFs exactly - notably
+    SIMPLER than SIMANDOU's:
+      - proprietaire (Ménage) AND lignage: both use the SAME single
+        cash-only section ("ANNEXE 2 : MODALITÉS D'INDEMNISATION EN
+        NUMÉRAIRE" - §1 INDEMNISATION FINANCIÈRE + §2 MODALITÉS DE
+        PAIEMENT), unlike SIMANDOU where lignage got a dual 2A+A2
+        structure. Only the party label changes between the two.
+      - communautaire: collective-project mechanism only ("ANNEXE 2 :
+        MODALITÉS D'INDEMNISATION", no "EN NUMÉRAIRE" suffix), matching
+        WCAG's own communautaire structure closely.
+
+    Normalizations applied (source-PDF artifacts NOT reproduced literally):
+      - The reference PDFs mix "AMC" (old template leftover) and "SMB" as
+        the company name throughout the body text of Annexe 2 - always
+        normalized to "SMB" here.
+      - The communautaire PDF's §2 mentions "la Commune Urbaine de
+        Kérouané" - Kérouané is SIMANDOU's prefecture, an obvious
+        copy-paste leftover unrelated to SMB/Boké - replaced with the
+        generic "Commune concernée" wording (same as WCAG's own template).
+      - Minor "à son nom" / "au nom" typo in the lignage PDF's final
+        clause normalized to "à son nom" (matching the ménage PDF and
+        WCAG's own wording).
+    """
+    t = d["type"]
+    party = PARTY_LABEL[t]  # "Ménage affecté" / "Lignage affecté" / "Communauté affectée"
+
+    if t == "communautaire":
+        return [
+            Paragraph("ANNEXE 2 : MODALITÉS D'INDEMNISATION", styles["section"]),
+            Paragraph(
+                "La Communauté Affectée, signataire de l'Accord, accepte de quitter la ou les parcelles dont la "
+                "liste figure en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il "
+                "appartient donc à la Communauté Affectée de prendre toutes les dispositions utiles afin de "
+                "retirer les éléments meubles et immeubles qui s'y trouvent avant cette échéance.",
+                styles["para"],
+            ),
+            Paragraph(
+                "En contrepartie, SMB s'engage, conformément au PARC, à indemniser la Communauté Affectée des "
+                "conséquences du Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par "
+                "lui du fait de ce Projet, de la manière et dans les conditions décrites ci-après :",
+                styles["para"],
+            ),
+            Paragraph("1. CONSTITUTION D'UN BUDGET PROJET", styles["article"]),
+            Paragraph(
+                "Conformément aux modalités d'indemnisation prévues dans le PARC, les biens détenus par la "
+                "Communauté Affectée seront compensés par le biais d'un ou plusieurs projets d'intérêt général "
+                "réalisés au profit de la Communauté Affectée.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Le budget dévolu à ce ou ces projets est fonction de la superficie totale des parcelles impactées "
+                "par le projet et des biens qui s'y trouvent, tel qu'énumérés en Annexe 1.",
+                styles["para"],
+            ),
+            Paragraph(
+                "La Communauté Affectée considère ce budget comme étant suffisant, satisfaisant et de nature à "
+                "compenser intégralement les pertes occasionnées par le Projet.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"Sur cette base, le budget total disponible s'élève ainsi à {fmt_gnf(summary.total)}.",
+                styles["para"],
+            ),
+            Paragraph("2. IDENTIFICATION DES PROJETS COLLECTIFS", styles["article"]),
+            Paragraph(
+                "Conformément aux dispositions du PARC, les projets communautaires seront identifiés conjointement "
+                "par :",
+                styles["para"],
+            ),
+            Paragraph(
+                "- La Communauté Affectée, représentée par un comité constitué à cet effet ; et<br/>"
+                "- SMB ou son représentant désigné,",
+                styles["para"],
+            ),
+            Paragraph(
+                "L'appui des Services Techniques Déconcentrés compétents en la matière sera également sollicité, "
+                "et une cohérence recherchée avec le Plan de Développement Local et le Plan Annuel "
+                "d'Investissement de la Commune concernée.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les Parties s'engagent à prendre toutes les mesures requises afin que le ou les projets soient "
+                "identifiés et démarrés dans un délai maximum de trois (3) mois à compter de la signature du "
+                "présent Accord.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les projets seront sélectionnés parmi la liste de projets-types proposés ci-dessous :",
+                styles["para"],
+            ),
+            Paragraph(
+                "- Aménagement agricole collectif ;<br/>"
+                "- Puits (pastoral, maraîcher, ou domestique) ;<br/>"
+                "- Marché (amélioration d'une structure existante) ;<br/>"
+                "- École, centre de santé (amélioration et équipement d'une structure existante) ;<br/>"
+                "- Voies d'accès à partir de la voie nouvellement créée ou en direction des axes principaux "
+                "existants (cette création ne pourra pas donner lieu à de nouvelle compensation et leur tracé doit "
+                "donc faire l'objet d'un consentement mutuel avec les parties concernées) ;<br/>"
+                "- Autre projet identifié par la communauté et dans les limites du budget disponible.",
+                styles["para"],
+            ),
+            Paragraph(
+                "À l'issue de ce processus de concertation, une fiche d'identification sommaire sera corédigée "
+                "par SMB et le comité établi par la Communauté Affectée en vue de leur mise en œuvre. La fiche "
+                "comprendra la sélection des projets à mettre en œuvre (plusieurs peuvent être prévus), et une "
+                "estimation budgétaire par composante ainsi que le montant total.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Seuls les projets pouvant être exécutés intégralement dans les limites du budget défini au point "
+                "1 ci-dessus pourront être entrepris dans le cadre du présent Accord.",
+                styles["para"],
+            ),
+            Paragraph("3. MISE EN ŒUVRE DES PROJETS", styles["article"]),
+            Paragraph(
+                "Conformément aux dispositions du PARC, les projets seront mis en œuvre par des prestataires "
+                "sélectionnés par appel d'offres ou directement par leur soin (cas des voies d'accès notamment), "
+                "selon leurs capacités techniques, leurs expériences et les prix proposés. À qualité et à prix "
+                "comparables, la préférence sera accordée aux prestataires installés dans la préfecture "
+                "d'implantation du projet.",
+                styles["para"],
+            ),
+            Paragraph("À cet effet :", styles["para"]),
+            Paragraph(
+                "- Un dossier d'appel d'offres sera développé par le maître d'œuvre, sur base de la fiche "
+                "d'identification sommaire ;<br/>"
+                "- Les offres seront ouvertes à l'occasion d'une réunion convoquée par le maître d'œuvre, en "
+                "présence du comité constitué par la Communauté Affectée.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les marchés seront attribués par SMB, qui reste seule responsable de la sélection finale du ou "
+                "des prestataires, sur base des critères énoncés dans le dossier d'appel d'offres, puis de la "
+                "réalisation des travaux.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les travaux seront réalisés sous la supervision du maître d'œuvre et du comité constitué par la "
+                "Communauté Affectée. La réception provisoire du projet sera accordée à l'achèvement des travaux, "
+                "moyennant l'accord du maître d'œuvre et dudit comité.",
+                styles["para"],
+            ),
+            Paragraph("4. RÉTROCESSION DES PROJETS", styles["article"]),
+            Paragraph(
+                "À la suite de la réception provisoire des projets, il sera procédé à leur rétrocession formelle à "
+                "la Communauté Affectée. À cet effet, un acte de rétrocession sera dressé dans lequel la "
+                "Communauté Affectée s'engage à utiliser le projet selon sa destination convenue jusqu'à "
+                "l'achèvement de la période de garantie et le versement, par SMB, de la retenue de garantie.",
+                styles["para"],
+            ),
+            Paragraph(
+                "La signature de l'acte de rétrocession marque également la fin du processus de compensation.",
+                styles["para"],
+            ),
+            Paragraph("5. GESTION DES FONDS", styles["article"]),
+            Paragraph(
+                "Le budget défini au point 1 ci-dessus sera provisionné sur les livres de SMB en vue de son "
+                "décaissement progressif, au bénéfice des prestataires désignés pour assurer l'exécution des "
+                "projets.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Une situation financière détaillée sera dressée par SMB à la fin de chaque trimestre et transmise "
+                "au comité constitué par la Communauté Affectée, avec copie au Préfet, afin qu'à tout moment, la "
+                "Communauté Affectée dispose d'une information complète quant à la gestion des fonds.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Conformément au PARC, les reliquats éventuels seront soit mis à la disposition de la Communauté "
+                "Affectée, soit engagés sur un nouveau projet au bénéfice de la Communauté Affectée, selon leur "
+                "montant. Dans tous les cas, ces reliquats éventuels restent acquis à la Communauté Affectée.",
+                styles["para"],
+            ),
+        ]
+
+    # proprietaire / lignage: identical simple cash-only section, only the
+    # party label changes (matches both SMB reference PDFs exactly).
+    return [
+        Paragraph("ANNEXE 2 : MODALITÉS D'INDEMNISATION EN NUMÉRAIRE", styles["section"]),
+        Paragraph(
+            f"Le {party}, signataire de l'Accord, accepte de quitter définitivement et irrévocablement la ou les "
+            "parcelles dont la liste figure sur sa fiche d'indemnisation, au plus tard sept (7) jours après la "
+            f"mise en œuvre des dispositions décrites ci-dessous. Il appartient donc au {party} de prendre toutes "
+            "les dispositions utiles afin de retirer les éléments meubles et immeubles qui s'y trouvent avant "
+            "cette échéance.",
+            styles["para"],
+        ),
+        Paragraph(
+            f"En contrepartie, SMB s'engage, conformément au PARC, à indemniser le {party} des conséquences du "
+            "Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par lui du fait du "
+            "Projet, de la manière et dans les conditions décrites ci-après :",
+            styles["para"],
+        ),
+        Paragraph("1. INDEMNISATION FINANCIÈRE", styles["article"]),
+        Paragraph(
+            "Conformément aux modalités d'indemnisation prévues dans le PARC, les Parties conviennent que le "
+            f"montant total des indemnisations financières devant être payées au {party} sera celui indiqué sur "
+            f"la fiche individuelle de compensation qui a été remise au {CHEF_LABEL[t]}, soit "
+            f"{fmt_gnf(summary.total)}. Le {party} considère le montant total de l'indemnisation comme étant "
+            "suffisant, satisfaisant et de nature à compenser intégralement ses pertes du fait du Projet.",
+            styles["para"],
+        ),
+        Paragraph("2. MODALITÉS DE PAIEMENT", styles["article"]),
+        Paragraph(
+            f"SMB portera assistance au {party} pour l'ouverture d'un compte bancaire afin de recevoir les "
+            "paiements dus par SMB au titre de l'indemnisation financière.",
+            styles["para"],
+        ),
+        Paragraph(
+            "En cas de retard toutefois dans l'ouverture de ce compte bancaire, le paiement de l'indemnisation "
+            "financière pourra s'effectuer selon les modalités suivantes :",
+            styles["para"],
+        ),
+        Paragraph(
+            "- Tous les montants seront réglés par chèque, établi en francs guinéens à l'ordre de la PAP.",
+            styles["para"],
+        ),
+        Paragraph(
+            "Dans tous les cas, les paiements seront effectués dans un délai maximal de vingt (20) jours après la "
+            "signature du présent Accord.",
+            styles["para"],
+        ),
+        Paragraph(
+            "Le paiement, selon les modalités prévues ici, des sommes indiquées ci-dessus libère SMB de toute "
+            "obligation au titre du paiement de l'indemnisation.",
+            styles["para"],
+        ),
+        Paragraph(
+            f"Pour faire valoir ses droits et être payé, le {party} devra obligatoirement se munir de l'Annexe 1 "
+            "(montant et désignation du bénéficiaire) signée et validée par toutes les parties lors des "
+            "inventaires des biens et de la carte d'identité nationale à son nom renseignée sur l'accord de "
+            "compensation.",
+            styles["para"],
+        ),
+    ]
+
+
 def _header_footer(canvas, doc, d):
     canvas.saveState()
     w, h = A4
@@ -1724,6 +2029,18 @@ def _header_footer(canvas, doc, d):
             32, 30,
             f"Projet BWCS SA « Simandou » Accord de compensation {simandou_footer_label}",
         )
+    elif project == "smb":
+        # SMB footer format, distinct from both WCAG's and SIMANDOU's:
+        # "Société Minière de Boké (SMB) Accord {Ménage|Lignage|collectif} {ref} Page X de Y"
+        # ("de" not "sur"). Uses the full-precision ref code (not the
+        # truncated one seen in the lignage reference PDF sample, which is
+        # a PDF-generation artifact of that specific sample, not a rule).
+        smb_footer_label = {
+            "proprietaire": "Ménage",
+            "lignage": "Lignage",
+            "communautaire": "collectif",
+        }[d["type"]]
+        canvas.drawString(32, 30, f"Société Minière de Boké (SMB) Accord {smb_footer_label}")
     else:
         canvas.drawString(32, 30, f"Winning Consortium Alumina Guinea (WCAG) {FOOTER_LABEL[d['type']]}")
     ref = d["codeMenage"] or d["codeIndividu"]
