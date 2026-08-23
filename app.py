@@ -35,6 +35,9 @@ from contract_rows import (
     contract_rows_for_batch as _contract_rows_for_batch,
     distinct_owner_count as _distinct_owner_count,
 )
+from rapport_data import build_full_report_data
+from rapport_pdf import generate_rapport_pdf
+from rapport_docx import generate_rapport_docx
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
@@ -704,6 +707,12 @@ def rapport_page():
 
     recent_syncs = db.recent_syncs(15)
 
+    # Rich per-lot / per-village / per-culture / per-arbre / per-terrain
+    # aggregations (matching the uploaded reference report's Tableaux 1-6),
+    # computed live from the same synced data (see rapport_data.py). Reused
+    # by both the on-screen preview below and the PDF/Word export routes.
+    report_data = build_full_report_data(menages, champs, structures)
+
     return render_template(
         "rapport.html",
         menages_count=len(menages),
@@ -723,7 +732,44 @@ def rapport_page():
         ],
         batch_report_rows=batch_report_rows,
         recent_syncs=recent_syncs,
+        report_data=report_data,
         now=datetime.now(),
+    )
+
+
+@app.route("/rapport/export/pdf")
+def rapport_export_pdf():
+    """Exports the full "Rapport PARC" as a PDF, modeled after the
+    uploaded reference document, with all 14 Tableaux computed live from
+    the synced survey data (see rapport_pdf.py / rapport_data.py)."""
+    menages = db.all_menages()
+    champs = db.all_champs()
+    structures = db.all_structures()
+    pdf_bytes = generate_rapport_pdf(menages, champs, structures)
+    filename = f"Rapport_PARC_{datetime.now().strftime('%Y%m%d')}.pdf"
+    return send_file(
+        io.BytesIO(pdf_bytes),
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+@app.route("/rapport/export/docx")
+def rapport_export_docx():
+    """Exports the full "Rapport PARC" as a Word (.docx) document, modeled
+    after the uploaded reference document, with all 14 Tableaux computed
+    live from the synced survey data (see rapport_docx.py / rapport_data.py)."""
+    menages = db.all_menages()
+    champs = db.all_champs()
+    structures = db.all_structures()
+    docx_bytes = generate_rapport_docx(menages, champs, structures)
+    filename = f"Rapport_PARC_{datetime.now().strftime('%Y%m%d')}.docx"
+    return send_file(
+        io.BytesIO(docx_bytes),
+        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        as_attachment=True,
+        download_name=filename,
     )
 
 

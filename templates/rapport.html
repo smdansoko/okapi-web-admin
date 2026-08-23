@@ -3,8 +3,13 @@
 {% block content %}
 
 <div class="panel">
-  <h2>Rapport de synthèse — enquête OKAPI Survey</h2>
-  <p style="color:#666; font-size:13px;">Généré le {{ now.strftime('%d/%m/%Y à %H:%M') }}</p>
+  <h2>Rapport PARC — Plan d'Action de Réinstallation et de Compensation</h2>
+  <p style="color:#666; font-size:13px;">Généré le {{ now.strftime('%d/%m/%Y à %H:%M') }} · modèle basé sur le rapport de référence OKAPI/AMCP</p>
+
+  <div style="margin: 10px 0 18px;">
+    <a class="btn small maroon" href="{{ url_for('rapport_export_pdf') }}">📄 Exporter en PDF</a>
+    <a class="btn small maroon" href="{{ url_for('rapport_export_docx') }}" style="margin-left:8px;">📝 Exporter en Word (.docx)</a>
+  </div>
 
   <div class="cards-row">
     <div class="stat-card">
@@ -81,6 +86,232 @@
       {% endfor %}
     </tbody>
   </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tableau 1 — Accords signés / Localisation par type et nombre de responsables</h2>
+  {% if report_data.tableau1.rows %}
+  <table class="data-table">
+    <thead>
+      <tr><th>Lot</th><th>Ménage</th><th>Lignage</th><th>Collectif</th><th>Masculin</th><th>Féminin</th><th>Total</th></tr>
+    </thead>
+    <tbody>
+      {% for r in report_data.tableau1.rows %}
+      <tr>
+        <td><code class="mono">{{ r.lot }}</code></td>
+        <td>{{ r.menage }}</td>
+        <td>{{ r.lignage }}</td>
+        <td>{{ r.collectif }}</td>
+        <td>{{ r.masculin }}</td>
+        <td>{{ r.feminin }}</td>
+        <td><strong>{{ r.total }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      {% set t = report_data.tableau1.total %}
+      <tr>
+        <td style="font-weight:700;">TOTAL</td>
+        <td style="font-weight:700;">{{ t.menage }}</td>
+        <td style="font-weight:700;">{{ t.lignage }}</td>
+        <td style="font-weight:700;">{{ t.collectif }}</td>
+        <td style="font-weight:700;">{{ t.masculin }}</td>
+        <td style="font-weight:700;">{{ t.feminin }}</td>
+        <td style="font-weight:800;">{{ t.total }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tableau 2 — Récapitulatif des compensations</h2>
+  {% if report_data.tableau2.rows %}
+  <table class="data-table">
+    <thead><tr><th>Lot</th><th>Nombre de PAP</th><th>Superficie (m²)</th><th>Compensation (GNF)</th></tr></thead>
+    <tbody>
+      {% for r in report_data.tableau2.rows %}
+      <tr>
+        <td><code class="mono">{{ r.lot }}</code></td>
+        <td>{{ r.nb_pap }}</td>
+        <td>{{ "{:,.2f}".format(r.superficie).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant).replace(",", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      {% set t = report_data.tableau2.total %}
+      <tr>
+        <td style="font-weight:700;">TOTAL</td>
+        <td style="font-weight:700;">{{ t.nb_pap }}</td>
+        <td style="font-weight:700;">{{ "{:,.2f}".format(t.superficie).replace(",", " ") }}</td>
+        <td style="font-weight:800;">{{ "{:,.0f}".format(t.montant).replace(",", " ") }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tableau 3 — Récapitulatif des compensations par village</h2>
+  {% if report_data.tableau3.rows %}
+  <table class="data-table">
+    <thead><tr><th>Lot</th><th>Village</th><th>Nombre de PAP</th><th>Superficie (m²)</th><th>Compensation (GNF)</th></tr></thead>
+    <tbody>
+      {% for r in report_data.tableau3.rows %}
+      <tr>
+        <td><code class="mono">{{ r.lot }}</code></td>
+        <td>{{ r.village }}</td>
+        <td>{{ r.nb_pap }}</td>
+        <td>{{ "{:,.2f}".format(r.superficie).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant).replace(",", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      {% set t = report_data.tableau3.total %}
+      <tr>
+        <td colspan="2" style="font-weight:700; text-align:right;">TOTAL</td>
+        <td style="font-weight:700;">{{ t.nb_pap }}</td>
+        <td style="font-weight:700;">{{ "{:,.2f}".format(t.superficie).replace(",", " ") }}</td>
+        <td style="font-weight:800;">{{ "{:,.0f}".format(t.montant).replace(",", " ") }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tableau 4 — Récapitulatif des compensations des cultures annuelles</h2>
+  {% if report_data.tableau4.rows %}
+  <table class="data-table">
+    <thead><tr><th>Culture</th><th>Superficie (ha)</th><th>Compensation (GNF)</th></tr></thead>
+    <tbody>
+      {% for r in report_data.tableau4.rows %}
+      <tr>
+        <td>{{ r.culture }}</td>
+        <td>{{ "{:,.4f}".format(r.superficie).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant).replace(",", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      {% set t = report_data.tableau4.total %}
+      <tr>
+        <td style="font-weight:700;">TOTAL</td>
+        <td style="font-weight:700;">{{ "{:,.4f}".format(t.superficie).replace(",", " ") }}</td>
+        <td style="font-weight:800;">{{ "{:,.0f}".format(t.montant).replace(",", " ") }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tableau 5 — Récapitulatif des compensations des arbres / lot</h2>
+  <p class="hint">Régénéré à partir des données de l'application (les Tableaux 5 à 14 du document de référence étaient des images non lisibles).</p>
+  {% if report_data.tableau5.rows %}
+  <table class="data-table">
+    <thead><tr><th>Lot</th><th>Cultures pérennes (GNF)</th><th>Espèces sauvages (GNF)</th><th>Bois d'œuvre (GNF)</th><th>Total (GNF)</th></tr></thead>
+    <tbody>
+      {% for r in report_data.tableau5.rows %}
+      <tr>
+        <td><code class="mono">{{ r.lot }}</code></td>
+        <td>{{ "{:,.0f}".format(r.cultures_perennes).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.especes_sauvages).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.bois_doeuvre).replace(",", " ") }}</td>
+        <td><strong>{{ "{:,.0f}".format(r.total).replace(",", " ") }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      {% set tb = report_data.tableau5.totals_by_cat %}
+      <tr>
+        <td style="font-weight:700;">TOTAL</td>
+        <td style="font-weight:700;">{{ "{:,.0f}".format(tb.cultures_perennes).replace(",", " ") }}</td>
+        <td style="font-weight:700;">{{ "{:,.0f}".format(tb.especes_sauvages).replace(",", " ") }}</td>
+        <td style="font-weight:700;">{{ "{:,.0f}".format(tb.bois_doeuvre).replace(",", " ") }}</td>
+        <td style="font-weight:800;">{{ "{:,.0f}".format(report_data.tableau5.grand_total).replace(",", " ") }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée d'arbres synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tableau 6 — Montants et superficie par type de terrain / village</h2>
+  {% if report_data.tableau6.rows %}
+  <table class="data-table">
+    <thead><tr><th>Type de terrain</th><th>Village</th><th>Superficie (m²)</th><th>Montant (GNF)</th></tr></thead>
+    <tbody>
+      {% for r in report_data.tableau6.rows %}
+      <tr>
+        <td>{{ r.type_terrain }}</td>
+        <td>{{ r.village }}</td>
+        <td>{{ "{:,.2f}".format(r.superficie).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant).replace(",", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      {% set t = report_data.tableau6.total %}
+      <tr>
+        <td colspan="2" style="font-weight:700; text-align:right;">TOTAL</td>
+        <td style="font-weight:700;">{{ "{:,.2f}".format(t.superficie).replace(",", " ") }}</td>
+        <td style="font-weight:800;">{{ "{:,.0f}".format(t.montant).replace(",", " ") }}</td>
+      </tr>
+    </tfoot>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Tableau d'indemnisation des PAP (Tableaux 7+)</h2>
+  <p class="hint">{{ report_data.indemnisation_count }} enregistrement(s), paginés par groupes de 40 dans les exports PDF/Word.</p>
+  {% if report_data.indemnisation_pages %}
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>N°</th><th>Lot</th><th>Prénom et Nom</th><th>Code de l'enquête</th>
+        <th>Genre</th><th>Village</th><th>Statut contrat</th><th>Superficie (m²)</th><th>Montant (GNF)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in report_data.indemnisation_pages[0][:15] %}
+      <tr>
+        <td>{{ r.n }}</td>
+        <td><code class="mono">{{ r.num_lot }}</code></td>
+        <td>{{ r.nom }}</td>
+        <td><code class="mono">{{ r.code_enquete }}</code></td>
+        <td>{{ r.genre }}</td>
+        <td>{{ r.village }}</td>
+        <td>{{ r.statut_contrat }}</td>
+        <td>{{ "{:,.2f}".format(r.superficie).replace(",", " ") }}</td>
+        <td>{{ "{:,.0f}".format(r.montant).replace(",", " ") }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% if report_data.indemnisation_count > 15 %}
+  <p style="font-size:12.5px; color:#888; margin-top:8px;">Aperçu limité à 15 lignes — {{ report_data.indemnisation_count }} ligne(s) au total dans l'export complet (PDF/Word).</p>
+  {% endif %}
   {% else %}
   <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
   {% endif %}

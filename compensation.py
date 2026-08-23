@@ -60,6 +60,14 @@ def _find(lst, key, value):
     return None
 
 
+def terrain_price(type_de_terrain):
+    """Public helper: returns the compensation price per m² (GNF) for a
+    given `typeDeTerrain` label, using the same price_matrix.json reference
+    data as the rest of the compensation logic. Returns 0 if not found."""
+    t = _find(_TERRAINS, "type", type_de_terrain)
+    return (t or {}).get("prix_compensation", 0) or 0
+
+
 class CompensationSummary:
     def __init__(self):
         self.parcelles = 0.0
