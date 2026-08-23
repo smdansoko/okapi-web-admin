@@ -35,6 +35,13 @@ class EnqueteChamp {
   DateTime createdAt;
   DateTime updatedAt;
 
+  /// Code de l'enquête auto-généré:
+  /// concat(codeProprietaire, '-', numEnqueteChamp).
+  /// Read-only, always derived — never manually entered.
+  String get codeEnquete => codeProprietaire.isEmpty
+      ? ''
+      : '$codeProprietaire-$numEnqueteChamp';
+
   EnqueteChamp({
     required this.id,
     required this.dateEnquete,

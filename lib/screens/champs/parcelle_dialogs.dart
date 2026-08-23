@@ -7,9 +7,16 @@ import '../../widgets/repeat_section.dart';
 const _uuid = Uuid();
 
 /// Dialog to add/edit a "Champ" (culture) inside a parcelle.
+///
+/// [codeParcelle] is the parent parcelle's auto-generated code, used to
+/// live-compute the read-only "Code de champ" = concat(codeParcelle, '-',
+/// numOrdreChamps). [nextNumOrdre] is the suggested (but still manually
+/// editable by the enquêteur) default value for a brand-new champ.
 Future<ChampAgricole?> showChampDialog(
   BuildContext context, {
   ChampAgricole? existing,
+  String codeParcelle = '',
+  int nextNumOrdre = 1,
 }) {
   final superficieCtrl = TextEditingController(
     text: existing?.superficieChamps.toString() ?? '',
@@ -23,9 +30,18 @@ Future<ChampAgricole?> showChampDialog(
   final observationCtrl = TextEditingController(
     text: existing?.observation ?? '',
   );
+  final numOrdreCtrl = TextEditingController(
+    text: (existing?.numOrdreChamps ?? nextNumOrdre).toString(),
+  );
   String etatChamps = existing?.etatChamps ?? '';
   String culture = existing?.culture ?? '';
   String propUsager = existing?.propUsager ?? 'Oui';
+
+  String computeCodeChamp() {
+    final n = numOrdreCtrl.text.trim();
+    if (codeParcelle.isEmpty || n.isEmpty) return '';
+    return '$codeParcelle-$n';
+  }
 
   return showDialog<ChampAgricole>(
     context: context,
@@ -42,6 +58,24 @@ Future<ChampAgricole?> showChampDialog(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  LabeledTextField(
+                    label: 'N° d\'ordre du champ',
+                    controller: numOrdreCtrl,
+                    keyboardType: TextInputType.number,
+                    required: true,
+                    onChanged: (_) => setDialogState(() {}),
+                  ),
+                  const SizedBox(height: 12),
+                  IgnorePointer(
+                    child: LabeledTextField(
+                      label: 'Code de champ (généré automatiquement)',
+                      controller: TextEditingController(
+                        text: computeCodeChamp(),
+                      ),
+                      readOnly: true,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   ChoiceDropdown(
                     listName: 'etat_champs',
                     label: 'État du champs',
@@ -107,7 +141,8 @@ Future<ChampAgricole?> showChampDialog(
               onPressed: () {
                 if (etatChamps.isEmpty ||
                     culture.isEmpty ||
-                    superficieCtrl.text.isEmpty) {
+                    superficieCtrl.text.isEmpty ||
+                    numOrdreCtrl.text.isEmpty) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
                     const SnackBar(
                       content: Text(
@@ -117,10 +152,13 @@ Future<ChampAgricole?> showChampDialog(
                   );
                   return;
                 }
+                final numOrdre =
+                    int.tryParse(numOrdreCtrl.text) ??
+                    (existing?.numOrdreChamps ?? nextNumOrdre);
                 Navigator.of(ctx).pop(
                   ChampAgricole(
                     id: existing?.id ?? _uuid.v4(),
-                    numOrdreChamps: existing?.numOrdreChamps ?? 1,
+                    numOrdreChamps: numOrdre,
                     etatChamps: etatChamps,
                     culture: culture,
                     autreCulture: autreCultureCtrl.text.isEmpty
@@ -132,6 +170,9 @@ Future<ChampAgricole?> showChampDialog(
                         : codeExploitantCtrl.text,
                     superficieChamps: double.tryParse(superficieCtrl.text) ?? 0,
                     observation: observationCtrl.text,
+                    codeChamp: codeParcelle.isEmpty
+                        ? ''
+                        : '$codeParcelle-$numOrdre',
                   ),
                 );
               },
@@ -496,23 +537,40 @@ Future<RessourceNaturelle?> showRessourceDialog(
 
 /// Dialog to add/edit a "Parcelle agricole" — includes nested champs and arbres
 /// management within its own StatefulBuilder-based mini screen.
+///
+/// [codeEnquete] is the parent enquête's auto-generated code, used to
+/// live-compute the read-only "Code de parcelle" = concat(codeEnquete, '-',
+/// numOrdreParcelle). [nextNumOrdre] is the suggested (but still manually
+/// editable by the enquêteur) default value for a brand-new parcelle.
 Future<ParcelleAgricole?> showParcelleDialog(
   BuildContext context, {
   ParcelleAgricole? existing,
+  String codeEnquete = '',
+  int nextNumOrdre = 1,
 }) {
   final superficieCtrl = TextEditingController(
     text: existing?.superficieParcelle.toString() ?? '',
+  );
+  final numOrdreCtrl = TextEditingController(
+    text: (existing?.numOrdreParcelle ?? nextNumOrdre).toString(),
   );
   String typeDeTerrain = existing?.typeDeTerrain ?? '';
   String arbreDansParcelle = existing?.arbreDansParcelle ?? 'Non';
   final champs = List<ChampAgricole>.from(existing?.champs ?? []);
   final arbres = List<ArbreParcelle>.from(existing?.arbres ?? []);
 
+  String computeCodeParcelle() {
+    final n = numOrdreCtrl.text.trim();
+    if (codeEnquete.isEmpty || n.isEmpty) return '';
+    return '$codeEnquete-$n';
+  }
+
   return showDialog<ParcelleAgricole>(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, setDialogState) {
+        final currentCodeParcelle = computeCodeParcelle();
         return AlertDialog(
           title: Text(
             existing == null
@@ -525,6 +583,24 @@ Future<ParcelleAgricole?> showParcelleDialog(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  LabeledTextField(
+                    label: 'N° d\'ordre de la parcelle',
+                    controller: numOrdreCtrl,
+                    keyboardType: TextInputType.number,
+                    required: true,
+                    onChanged: (_) => setDialogState(() {}),
+                  ),
+                  const SizedBox(height: 12),
+                  IgnorePointer(
+                    child: LabeledTextField(
+                      label: 'Code de parcelle (généré automatiquement)',
+                      controller: TextEditingController(
+                        text: currentCodeParcelle,
+                      ),
+                      readOnly: true,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                   ChoiceDropdown(
                     listName: 'type_terrain',
                     label: 'Type de terrain',
@@ -551,13 +627,22 @@ Future<ParcelleAgricole?> showParcelleDialog(
                     itemTitle: (item, i) =>
                         '${i + 1}. ${item.culture == "Aucun" ? (item.autreCulture ?? "Aucun") : item.culture}',
                     itemSubtitle: (item, i) =>
-                        '${item.etatChamps} — ${item.superficieChamps} ha',
+                        '${item.etatChamps} — ${item.superficieChamps} ha'
+                        '${item.codeChamp.isEmpty ? "" : " — ${item.codeChamp}"}',
                     onAdd: () async {
-                      final r = await showChampDialog(ctx);
+                      final r = await showChampDialog(
+                        ctx,
+                        codeParcelle: currentCodeParcelle,
+                        nextNumOrdre: champs.length + 1,
+                      );
                       if (r != null) setDialogState(() => champs.add(r));
                     },
                     onEdit: (i) async {
-                      final r = await showChampDialog(ctx, existing: champs[i]);
+                      final r = await showChampDialog(
+                        ctx,
+                        existing: champs[i],
+                        codeParcelle: currentCodeParcelle,
+                      );
                       if (r != null) setDialogState(() => champs[i] = r);
                     },
                     onDelete: (i) => setDialogState(() => champs.removeAt(i)),
@@ -603,7 +688,9 @@ Future<ParcelleAgricole?> showParcelleDialog(
             ),
             ElevatedButton(
               onPressed: () {
-                if (typeDeTerrain.isEmpty || superficieCtrl.text.isEmpty) {
+                if (typeDeTerrain.isEmpty ||
+                    superficieCtrl.text.isEmpty ||
+                    numOrdreCtrl.text.isEmpty) {
                   ScaffoldMessenger.of(ctx).showSnackBar(
                     const SnackBar(
                       content: Text(
@@ -613,16 +700,22 @@ Future<ParcelleAgricole?> showParcelleDialog(
                   );
                   return;
                 }
+                final numOrdre =
+                    int.tryParse(numOrdreCtrl.text) ??
+                    (existing?.numOrdreParcelle ?? nextNumOrdre);
                 Navigator.of(ctx).pop(
                   ParcelleAgricole(
                     id: existing?.id ?? _uuid.v4(),
-                    numOrdreParcelle: existing?.numOrdreParcelle ?? 1,
+                    numOrdreParcelle: numOrdre,
                     typeDeTerrain: typeDeTerrain,
                     superficieParcelle:
                         double.tryParse(superficieCtrl.text) ?? 0,
                     champs: champs,
                     arbreDansParcelle: arbreDansParcelle,
                     arbres: arbres,
+                    codeParcelle: codeEnquete.isEmpty
+                        ? ''
+                        : '$codeEnquete-$numOrdre',
                   ),
                 );
               },

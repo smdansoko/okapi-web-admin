@@ -33,6 +33,7 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
   late TextEditingController _enqueteursCtrl;
   late TextEditingController _numBatchCtrl;
   late TextEditingController _numEnqueteCtrl;
+  late TextEditingController _codeEnqueteCtrl;
   late TextEditingController _nomRepondantCtrl;
   late TextEditingController _telRepondantCtrl;
   late TextEditingController _numeroPieceRepondantCtrl;
@@ -68,6 +69,7 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
     _numEnqueteCtrl = TextEditingController(
       text: _enquete.numEnqueteChamp.toString(),
     );
+    _codeEnqueteCtrl = TextEditingController(text: _enquete.codeEnquete);
     _nomRepondantCtrl = TextEditingController(
       text: _enquete.nomPrenomRepondant ?? '',
     );
@@ -84,6 +86,7 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
     _enqueteursCtrl.dispose();
     _numBatchCtrl.dispose();
     _numEnqueteCtrl.dispose();
+    _codeEnqueteCtrl.dispose();
     _nomRepondantCtrl.dispose();
     _telRepondantCtrl.dispose();
     _numeroPieceRepondantCtrl.dispose();
@@ -116,13 +119,26 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
   void _refreshNumEnqueteDisplay() {
     final n = _computeNumEnquete(context);
     _numEnqueteCtrl.text = n.toString();
+    final owner = _selectedProprietaire;
+    _codeEnqueteCtrl.text = owner == null ? '' : '${owner.id}-$n';
   }
 
   Future<void> _addOrEditParcelle({
     ParcelleAgricole? existing,
     int? index,
   }) async {
-    final result = await showParcelleDialog(context, existing: existing);
+    // Live preview of "Code enquête" so the parcelle dialog can compute
+    // "Code de parcelle" even before the final save (uses current owner
+    // selection state).
+    final previewCodeEnquete = _selectedProprietaire == null
+        ? ''
+        : '${_selectedProprietaire!.id}-${_computeNumEnquete(context)}';
+    final result = await showParcelleDialog(
+      context,
+      existing: existing,
+      codeEnquete: previewCodeEnquete,
+      nextNumOrdre: _enquete.parcelles.length + 1,
+    );
     if (result != null) {
       setState(() {
         if (index != null) {
@@ -131,6 +147,20 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
           _enquete.parcelles.add(result);
         }
       });
+    }
+  }
+
+  /// Recomputes codeParcelle/codeChamp for every parcelle/champ based on the
+  /// final "Code enquête" value, so codes stay consistent even if the owner
+  /// (and therefore codeEnquete) changed after parcelles/champs were added.
+  void _refreshDerivedCodes() {
+    final codeEnquete = _enquete.codeEnquete;
+    if (codeEnquete.isEmpty) return;
+    for (final p in _enquete.parcelles) {
+      p.codeParcelle = '$codeEnquete-${p.numOrdreParcelle}';
+      for (final c in p.champs) {
+        c.codeChamp = '${p.codeParcelle}-${c.numOrdreChamps}';
+      }
     }
   }
 
@@ -194,6 +224,9 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
     // PAP gets its own distinct, sequential number - and later, its own
     // separate (non-merged) contract.
     _enquete.numEnqueteChamp = _computeNumEnquete(context);
+    // Code enquête / code parcelle / code champ are all auto-generated and
+    // read-only; recompute them now that numEnqueteChamp is final.
+    _refreshDerivedCodes();
     _enquete.nomPrenomRepondant = _nomRepondantCtrl.text.isEmpty
         ? null
         : _nomRepondantCtrl.text;
@@ -262,6 +295,12 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
                 'chaque enquête générera son propre contrat (non fusionné).',
                 style: TextStyle(color: Colors.grey, fontSize: 12),
               ),
+            ),
+            const SizedBox(height: 12),
+            LabeledTextField(
+              label: 'Code enquête (généré automatiquement)',
+              controller: _codeEnqueteCtrl,
+              readOnly: true,
             ),
             const SizedBox(height: 16),
             const SectionHeader(title: 'Localisation', icon: Icons.map_rounded),
@@ -406,7 +445,8 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
               addLabel: 'Ajouter une parcelle',
               itemTitle: (item, i) => '${i + 1}. ${item.typeDeTerrain}',
               itemSubtitle: (item, i) =>
-                  '${item.superficieParcelle} m² — ${item.champs.length} champ(s), ${item.arbres.length} arbre(s)',
+                  '${item.superficieParcelle} m² — ${item.champs.length} champ(s), ${item.arbres.length} arbre(s)'
+                  '${item.codeParcelle.isEmpty ? "" : " — ${item.codeParcelle}"}',
               onAdd: () => _addOrEditParcelle(),
               onEdit: (i) =>
                   _addOrEditParcelle(existing: _enquete.parcelles[i], index: i),

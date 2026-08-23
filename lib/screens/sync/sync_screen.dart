@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/app_data_provider.dart';
+import '../../services/auth_service.dart';
 import '../../services/sync_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+
+/// Only users with this exact "statut" are allowed to push data to the
+/// server via "Synchroniser" (PUSH). All users (regardless of statut) may
+/// still pull via "Actualiser".
+const String _kChefDEquipeStatut = "Chef d'équipe";
 
 /// "Synchroniser" tab: lets the field team push all locally collected data
 /// (Ménages, Enquêtes Champs, Enquêtes Structures — including the recent
@@ -30,10 +36,20 @@ class _SyncScreenState extends State<SyncScreen> {
   SyncResult? _lastResult;
   PullResult? _lastPullResult;
 
+  AppUser? _currentUser;
+  bool get _canSynchronize => _currentUser?.statut == _kChefDEquipeStatut;
+
   @override
   void initState() {
     super.initState();
     _loadPrefs();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final user = await AuthService.instance.currentUser;
+    if (!mounted) return;
+    setState(() => _currentUser = user);
   }
 
   Future<void> _loadPrefs() async {
@@ -82,6 +98,18 @@ class _SyncScreenState extends State<SyncScreen> {
   }
 
   Future<void> _synchronize() async {
+    if (!_canSynchronize) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Seuls les utilisateurs avec le statut "$_kChefDEquipeStatut" '
+            'peuvent effectuer la synchronisation (envoi vers le serveur).',
+          ),
+          backgroundColor: Colors.red.shade700,
+        ),
+      );
+      return;
+    }
     await _saveServerSettings();
     if (!mounted) return;
     final data = context.read<AppDataProvider>();
@@ -512,10 +540,13 @@ class _SyncScreenState extends State<SyncScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
-                    onPressed: _syncing ? null : _synchronize,
+                    onPressed: (_syncing || !_canSynchronize)
+                        ? null
+                        : _synchronize,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: OkapiColors.primary,
                       foregroundColor: Colors.white,
+                      disabledBackgroundColor: Colors.grey.shade400,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     icon: _syncing
@@ -527,7 +558,11 @@ class _SyncScreenState extends State<SyncScreen> {
                               color: Colors.white,
                             ),
                           )
-                        : const Icon(Icons.cloud_upload_rounded),
+                        : Icon(
+                            _canSynchronize
+                                ? Icons.cloud_upload_rounded
+                                : Icons.lock_outline,
+                          ),
                     label: Text(
                       _syncing
                           ? 'Synchronisation en cours…'
@@ -539,6 +574,30 @@ class _SyncScreenState extends State<SyncScreen> {
                     ),
                   ),
                 ),
+                if (!_canSynchronize) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: Colors.red.shade700,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Réservé aux utilisateurs avec le statut '
+                          '"$_kChefDEquipeStatut". Votre statut actuel : '
+                          '${_currentUser?.statut.isNotEmpty == true ? _currentUser!.statut : "inconnu"}.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.red.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 12),
 
                 // ---- Actualiser (pull-sync croisé entre tablettes) ----

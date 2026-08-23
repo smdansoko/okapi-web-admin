@@ -11,6 +11,10 @@ class ChampAgricole {
   double superficieChamps;
   String observation;
 
+  /// Code de champ auto-généré: concat(codeParcelle, '-', numOrdreChamps).
+  /// Read-only, computed and stored at save time by the UI dialog.
+  String codeChamp;
+
   ChampAgricole({
     required this.id,
     required this.numOrdreChamps,
@@ -22,6 +26,7 @@ class ChampAgricole {
     this.codeExploitant,
     this.superficieChamps = 0,
     this.observation = '',
+    this.codeChamp = '',
   });
 
   Map<String, dynamic> toMap() => {
@@ -35,6 +40,7 @@ class ChampAgricole {
     'codeExploitant': codeExploitant,
     'superficieChamps': superficieChamps,
     'observation': observation,
+    'codeChamp': codeChamp,
   };
 
   factory ChampAgricole.fromMap(Map map) => ChampAgricole(
@@ -48,6 +54,7 @@ class ChampAgricole {
     codeExploitant: map['codeExploitant'] as String?,
     superficieChamps: (map['superficieChamps'] as num?)?.toDouble() ?? 0,
     observation: map['observation'] as String? ?? '',
+    codeChamp: map['codeChamp'] as String? ?? '',
   );
 }
 
@@ -179,6 +186,10 @@ class ParcelleAgricole {
   String arbreDansParcelle; // Oui/Non
   List<ArbreParcelle> arbres;
 
+  /// Code de parcelle auto-généré: concat(codeEnquete, '-', numOrdreParcelle).
+  /// Read-only, computed and stored at save time by the UI dialog.
+  String codeParcelle;
+
   ParcelleAgricole({
     required this.id,
     required this.numOrdreParcelle,
@@ -187,6 +198,7 @@ class ParcelleAgricole {
     List<ChampAgricole>? champs,
     this.arbreDansParcelle = 'Non',
     List<ArbreParcelle>? arbres,
+    this.codeParcelle = '',
   }) : champs = champs ?? [],
        arbres = arbres ?? [];
 
@@ -198,6 +210,7 @@ class ParcelleAgricole {
     'champs': champs.map((e) => e.toMap()).toList(),
     'arbreDansParcelle': arbreDansParcelle,
     'arbres': arbres.map((e) => e.toMap()).toList(),
+    'codeParcelle': codeParcelle,
   };
 
   factory ParcelleAgricole.fromMap(Map map) => ParcelleAgricole(
@@ -212,5 +225,6 @@ class ParcelleAgricole {
     arbres: (map['arbres'] as List? ?? [])
         .map((e) => ArbreParcelle.fromMap(e as Map))
         .toList(),
+    codeParcelle: map['codeParcelle'] as String? ?? '',
   );
 }

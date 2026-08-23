@@ -691,6 +691,31 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                 ),
               ],
             ),
+            if (_menage.individus.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              InputDecorator(
+                decoration: const InputDecoration(
+                  label: Text('Codes des individus (généré automatiquement)'),
+                  filled: true,
+                  fillColor: Color(0xFFF5F5F5),
+                ),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  children: _menage.individus
+                      .map(
+                        (ind) => Chip(
+                          label: Text(
+                            '${ind.id}${ind.nomPrenom.isEmpty ? "" : " — ${ind.nomPrenom}"}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ],
             const SizedBox(height: 12),
             OuiNonField(
               label: 'Résidence principale ?',
