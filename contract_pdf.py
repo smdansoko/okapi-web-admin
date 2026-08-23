@@ -339,6 +339,46 @@ def _annex_table(header, rows, total_row, col_widths):
     return t
 
 
+def _annex_table_grouped(row0_labels, row0_spans, row1_labels, rows, total_row, col_widths, font_size=6.3):
+    """Renders an ANNEXE 1 table with a 2-row header where groups of
+    sub-columns share a merged top-level label (row0), e.g. "Plantules"
+    spanning "Nombre / Prix unitaire (GNF) / Montant (GNF)". `row0_spans` is
+    a list of (start_col, end_col) inclusive column indices to merge on row
+    0. Columns whose row0 label is "" (e.g. the leading "Type d'arbre" and
+    trailing "Montant (GNF)" columns) are automatically vertically merged
+    across both header rows."""
+    styles = _styles()
+    data = [row0_labels, row1_labels] + rows + [total_row]
+    scaled_widths = [w * mm for w in _scale_widths(col_widths)]
+    t = Table(data, colWidths=scaled_widths, repeatRows=2, hAlign="LEFT")
+    style = [
+        ("GRID", (0, 0), (-1, -1), 0.5, GREY_BORDER),
+        ("BACKGROUND", (0, 0), (-1, 1), GREY_LIGHT),
+        ("BACKGROUND", (0, -1), (-1, -1), GREY_LIGHT),
+        ("FONTNAME", (0, 0), (-1, 1), "DejaVu-Bold"),
+        ("FONTNAME", (0, -1), (-1, -1), "DejaVu-Bold"),
+        ("FONTNAME", (0, 2), (-1, -2), "DejaVu"),
+        ("FONTSIZE", (0, 0), (-1, -1), font_size),
+        ("ALIGN", (0, 0), (-1, 1), "CENTER"),
+        ("ALIGN", (1, 2), (-1, -1), "RIGHT"),
+        ("ALIGN", (0, 2), (0, -1), "LEFT"),
+        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+        ("TOPPADDING", (0, 0), (-1, -1), 2.5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 2.5),
+        ("LEFTPADDING", (0, 0), (-1, -1), 2),
+        ("RIGHTPADDING", (0, 0), (-1, -1), 2),
+    ]
+    grouped_cols = set()
+    for (c0, c1) in row0_spans:
+        style.append(("SPAN", (c0, 0), (c1, 0)))
+        grouped_cols.update(range(c0, c1 + 1))
+    for col_idx, label in enumerate(row0_labels):
+        if label == "" and col_idx not in grouped_cols:
+            style.append(("SPAN", (col_idx, 0), (col_idx, 1)))
+    t.setStyle(TableStyle(style))
+    return t
+
+
 def _page1(d, styles):
     story = []
     story.append(Paragraph(
@@ -850,25 +890,9 @@ def _annexe1(d, summary: CompensationSummary, styles):
         ))
     story.append(Spacer(1, 10))
 
-    # Cultures annuelles
-    story.append(Paragraph("CULTURES ANNUELLES (CHAMPS)", styles["annex_sub"]))
-    if not summary.culture_annuelle_details:
-        story.append(Paragraph("Aucun bien de cette catégorie n'a été recensé.", styles["empty_note"]))
-    else:
-        rows = []
-        tot_sup = tot_m = 0
-        for c in summary.culture_annuelle_details:
-            tot_sup += c["superficieHa"]
-            tot_m += c["montant"]
-            rows.append([c["culture"], f"{c['superficieHa']:.2f}", fmt_number(c["revenuHa"]), fmt_number(c["montant"])])
-        total_row = ["TOTAL", f"{tot_sup:.2f}", "", fmt_number(tot_m)]
-        story.append(_annex_table(
-            ["Culture", "Superficie (ha)", "Revenu/ha (GNF)", "Montant (GNF)"],
-            rows, total_row, [60 * mm, 33 * mm, 33 * mm, 34 * mm],
-        ))
-    story.append(Spacer(1, 10))
-
-    # Bois d'oeuvre
+    # Bois d'oeuvre — column order matches the reference contracts: Espèce,
+    # Circonférence, Hauteur, Volume unitaire, Nombre de pieds, Coût/m³,
+    # Volume total, Montant (GNF).
     story.append(Paragraph("BOIS D'ŒUVRE", styles["annex_sub"]))
     if not summary.bois_doeuvre_details:
         story.append(Paragraph("Aucun bien de cette catégorie n'a été recensé.", styles["empty_note"]))
@@ -879,45 +903,89 @@ def _annexe1(d, summary: CompensationSummary, styles):
             tot_m += b["montant"]
             rows.append([
                 b["espece"], f"{b['circonference']:.2f}", f"{b['hauteur']:.2f}",
-                str(b["nombrePieds"]), f"{b['volumeTotal']:.2f}", fmt_number(b["montant"]),
+                f"{b['volumeUnitaire']:.3f}", str(b["nombrePieds"]),
+                fmt_number(b["prixUnitaire"]), f"{b['volumeTotal']:.3f}",
+                fmt_number(b["montant"]),
             ])
-        total_row = ["TOTAL", "", "", "", "", fmt_number(tot_m)]
+        total_row = ["TOTAL", "", "", "", "", "", "", fmt_number(tot_m)]
         story.append(_annex_table(
-            ["Espèce", "Circ. DHP (m)", "Hauteur (m)", "Nb pieds", "Vol. total (m³)", "Montant (GNF)"],
-            rows, total_row, [40 * mm, 22 * mm, 22 * mm, 20 * mm, 25 * mm, 31 * mm],
+            [
+                "Espèce", "Circonférence\nau DHP (m)", "Hauteur (m)",
+                "Volume\nunitaire (m³)", "Nombre\nde pieds", "Coût/m³ (GNF)",
+                "Volume\ntotal (m³)", "Montant (GNF)",
+            ],
+            rows, total_row,
+            [26 * mm, 22 * mm, 18 * mm, 20 * mm, 18 * mm, 24 * mm, 20 * mm, 28 * mm],
         ))
     story.append(Spacer(1, 10))
 
-    # Cultures pérennes
+    # Cultures pérennes — multi-level headers: Type d'arbre | Plantules
+    # {Nombre, Prix unitaire, Montant} | Jeunes pousses non productives
+    # {...} | Jeunes pousses productives {...} | Adultes {...} | Montant
+    # (GNF) total, matching the reference contracts exactly.
     if summary.culture_perenne_details:
         story.append(Paragraph("CULTURES PÉRENNES", styles["annex_sub"]))
         rows = []
         tot_m = 0
         for c in summary.culture_perenne_details:
             tot_m += c["montant"]
+            m_plantules = c["plantules"] * c["prixPlante"]
+            m_jnp = c["jeunesNp"] * c["prixJeuneNp"]
+            m_jp = c["jeunesP"] * c["prixJeuneP"]
+            m_adultes = (c["matures"] + c["adulteDeclinant"]) * c["prixAdulte"]
             rows.append([
-                c["espece"], str(c["plantules"]), str(c["jeunesNp"]), str(c["jeunesP"]),
-                str(c["matures"]), str(c["adulteDeclinant"]), fmt_number(c["montant"]),
+                c["espece"],
+                str(c["plantules"]), fmt_number(c["prixPlante"]), fmt_number(m_plantules),
+                str(c["jeunesNp"]), fmt_number(c["prixJeuneNp"]), fmt_number(m_jnp),
+                str(c["jeunesP"]), fmt_number(c["prixJeuneP"]), fmt_number(m_jp),
+                str(c["matures"] + c["adulteDeclinant"]), fmt_number(c["prixAdulte"]), fmt_number(m_adultes),
+                fmt_number(c["montant"]),
             ])
-        total_row = ["TOTAUX", "", "", "", "", "", fmt_number(tot_m)]
-        story.append(_annex_table(
-            ["Type d'arbre", "Plantules", "Jeunes NP", "Jeunes P", "Matures", "Adulte décl.", "Montant (GNF)"],
-            rows, total_row, [32 * mm, 20 * mm, 20 * mm, 18 * mm, 18 * mm, 20 * mm, 32 * mm],
+        total_row = ["TOTAUX", "", "", "", "", "", "", "", "", "", "", "", fmt_number(tot_m)]
+        row0 = ["Type d'arbre", "Plantules", "", "", "Jeunes pousses non productives", "", "", "Jeunes pousses productives", "", "", "Adultes", "", "", "Montant (GNF)"]
+        row1 = [
+            "",
+            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
+            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
+            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
+            "Nombre", "Prix unitaire\n(GNF)", "Montant\n(GNF)",
+            "",
+        ]
+        col_widths = [16] + [10, 13, 13] * 4 + [16]
+        story.append(_annex_table_grouped(
+            row0, [(1, 3), (4, 6), (7, 9), (10, 12)], row1, rows, total_row,
+            col_widths,
         ))
         story.append(Spacer(1, 10))
 
-    # Especes sauvages
+    # Especes sauvages — multi-level headers: Type d'arbre | Jeunes pousses
+    # non productives {Prix unitaire, Nombre, Montant} | Jeunes pousses
+    # productives {Prix unitaire, Nombre, Montant} | Montant (GNF) total.
     if summary.espece_sauvage_details:
         story.append(Paragraph("ESPÈCES SAUVAGES", styles["annex_sub"]))
         rows = []
         tot_m = 0
         for e in summary.espece_sauvage_details:
             tot_m += e["montant"]
-            rows.append([e["espece"], str(e["jeunesNp"]), str(e["jeunesP"]), fmt_number(e["montant"])])
-        total_row = ["TOTAUX", "", "", fmt_number(tot_m)]
-        story.append(_annex_table(
-            ["Type d'arbre", "Nombre NP", "Nombre P", "Montant (GNF)"],
-            rows, total_row, [60 * mm, 33 * mm, 33 * mm, 34 * mm],
+            m_np = e["jeunesNp"] * e["prixNp"]
+            m_p = e["jeunesP"] * e["prixP"]
+            rows.append([
+                e["espece"],
+                fmt_number(e["prixNp"]), str(e["jeunesNp"]), fmt_number(m_np),
+                fmt_number(e["prixP"]), str(e["jeunesP"]), fmt_number(m_p),
+                fmt_number(e["montant"]),
+            ])
+        total_row = ["TOTAUX", "", "", "", "", "", "", fmt_number(tot_m)]
+        row0 = ["Type d'arbre", "Jeunes pousses non productives", "", "", "Jeunes pousses productives", "", "", "Montant (GNF)"]
+        row1 = [
+            "",
+            "Prix unitaire\n(GNF)", "Nombre", "Montant\n(GNF)",
+            "Prix unitaire\n(GNF)", "Nombre", "Montant\n(GNF)",
+            "",
+        ]
+        story.append(_annex_table_grouped(
+            row0, [(1, 3), (4, 6)], row1, rows, total_row,
+            [34, 24, 18, 24, 24, 18, 24, 30],
         ))
         story.append(Spacer(1, 10))
 
@@ -956,38 +1024,146 @@ def _annexe2(d, summary, styles):
     if d["type"] == "communautaire":
         return [
             Paragraph("ANNEXE 2 : MODALITÉS D'INDEMNISATION", styles["section"]),
+            Paragraph(
+                "La Communauté Affectée, signataire de l'Accord, accepte de quitter la ou les parcelles dont la liste "
+                "figure en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il appartient "
+                "donc à la Communauté Affectée de prendre toutes les dispositions utiles afin de retirer les éléments "
+                "meubles et immeubles qui s'y trouvent avant cette échéance.",
+                styles["para"],
+            ),
+            Paragraph(
+                "En contrepartie, WCAG s'engage, conformément au PARC, à indemniser la Communauté Affectée des "
+                "conséquences du Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par lui "
+                "du fait de ce Projet, de la manière et dans les conditions décrites ci-après :",
+                styles["para"],
+            ),
             Paragraph("1. CONSTITUTION D'UN BUDGET PROJET", styles["article"]),
             Paragraph(
-                f"Conformément au PARC, le montant total de l'indemnisation due à la Communauté Affectée, indiqué en Annexe "
-                f"1 du présent Accord (soit {fmt_gnf(summary.total)}), est affecté à la constitution d'un budget "
-                "destiné au financement de projets collectifs au bénéfice de la Communauté Affectée.",
+                "Conformément aux modalités d'indemnisation prévues dans le PARC, les biens détenus par la Communauté "
+                "Affectée seront compensés par le biais d'un ou plusieurs projets d'intérêt général réalisés au profit "
+                "de la Communauté Affectée.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Le budget dévolu à ce ou ces projets est fonction de la superficie totale des parcelles impactées par "
+                "le projet et des biens qui s'y trouvent, tel qu'énumérés en Annexe 1.",
+                styles["para"],
+            ),
+            Paragraph(
+                "La Communauté Affectée considère ce budget comme étant suffisant, satisfaisant et de nature à "
+                "compenser intégralement les pertes occasionnées par le Projet.",
+                styles["para"],
+            ),
+            Paragraph(
+                f"Sur cette base, le budget total disponible s'élève ainsi à {fmt_gnf(summary.total)}.",
                 styles["para"],
             ),
             Paragraph("2. IDENTIFICATION DES PROJETS COLLECTIFS", styles["article"]),
             Paragraph(
-                "Les projets collectifs financés par ce budget sont co-identifiés par la Communauté Affectée, représentée par "
-                "un comité désigné à cet effet, et par AMC. Les catégories de projets éligibles incluent notamment : les "
-                "aménagements agricoles collectifs, les puits communautaires, l'amélioration des marchés, les écoles et "
-                "centres de santé, ainsi que les pistes d'accès.",
+                "Conformément aux dispositions du PARC, les projets communautaires seront identifiés conjointement "
+                "par :",
+                styles["para"],
+            ),
+            Paragraph(
+                "- La Communauté Affectée, représentée par un comité constitué à cet effet ; et<br/>"
+                "- WCAG ou son représentant désigné,",
+                styles["para"],
+            ),
+            Paragraph(
+                "L'appui des Services Techniques Déconcentrés compétents en la matière sera également sollicité, et "
+                "une cohérence recherchée avec le Plan de Développement Local et le Plan Annuel d'Investissement de la "
+                "Commune concernée.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les Parties s'engagent à prendre toutes les mesures requises afin que le ou les projets soient "
+                "identifiés et démarrés dans un délai maximum de trois (3) mois à compter de la signature du présent "
+                "Accord.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les projets seront sélectionnés parmi la liste de projets-types proposés ci-dessous :",
+                styles["para"],
+            ),
+            Paragraph(
+                "- Aménagement agricole collectif ;<br/>"
+                "- Puits (pastoral, maraîcher, ou domestique) ;<br/>"
+                "- Marché (amélioration d'une structure existante) ;<br/>"
+                "- École, centre de santé (amélioration et équipement d'une structure existante) ;<br/>"
+                "- Voies d'accès à partir de la voie nouvellement créée ou en direction des axes principaux existants "
+                "(cette création ne pourra pas donner lieu à de nouvelle compensation et leur tracé doit donc faire "
+                "l'objet d'un consentement mutuel avec les parties concernées) ;<br/>"
+                "- Autre projet identifié par la communauté et dans les limites du budget disponible.",
+                styles["para"],
+            ),
+            Paragraph(
+                "À l'issue de ce processus de concertation, une fiche d'identification sommaire sera corédigée par "
+                "WCAG et le comité établi par la Communauté Affectée en vue de leur mise en œuvre. La fiche comprendra "
+                "la sélection des projets à mettre en œuvre (plusieurs peuvent être prévus), et une estimation "
+                "budgétaire par composante ainsi que le montant total.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Seuls les projets pouvant être exécutés intégralement dans les limites du budget défini au point 1 "
+                "ci-dessus pourront être entrepris dans le cadre du présent Accord.",
                 styles["para"],
             ),
             Paragraph("3. MISE EN ŒUVRE DES PROJETS", styles["article"]),
             Paragraph(
-                "Les projets retenus sont mis en œuvre par des prestataires tiers sélectionnés par appel d'offres, en "
-                "coopération avec le comité communautaire désigné par la Communauté Affectée.",
+                "Conformément aux dispositions du PARC, les projets seront mis en œuvre par des prestataires "
+                "sélectionnés par appel d'offres ou directement par leur soin (cas des voies d'accès notamment), selon "
+                "leurs capacités techniques, leurs expériences et les prix proposés. À qualité et à prix comparables, "
+                "la préférence sera accordée aux prestataires installés dans la préfecture d'implantation du projet.",
+                styles["para"],
+            ),
+            Paragraph("À cet effet :", styles["para"]),
+            Paragraph(
+                "- Un dossier d'appel d'offres sera développé par le maître d'œuvre, sur base de la fiche "
+                "d'identification sommaire ;<br/>"
+                "- Les offres seront ouvertes à l'occasion d'une réunion convoquée par le maître d'œuvre, en présence "
+                "du comité constitué par la Communauté Affectée.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les marchés seront attribués par WCAG, qui reste seule responsable de la sélection finale du ou des "
+                "prestataires, sur base des critères énoncés dans le dossier d'appel d'offres, puis de la réalisation "
+                "des travaux.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Les travaux seront réalisés sous la supervision du maître d'œuvre et du comité constitué par la "
+                "Communauté Affectée. La réception provisoire du projet sera accordée à l'achèvement des travaux, "
+                "moyennant l'accord du maître d'œuvre et dudit comité.",
                 styles["para"],
             ),
             Paragraph("4. RÉTROCESSION DES PROJETS", styles["article"]),
             Paragraph(
-                "À l'achèvement de chaque projet, celui-ci fait l'objet d'une rétrocession formelle à la Communauté "
-                "Affectée, matérialisée par un procès-verbal de remise signé par les représentants des deux Parties.",
+                "À la suite de la réception provisoire des projets, il sera procédé à leur rétrocession formelle à la "
+                "Communauté Affectée. À cet effet, un acte de rétrocession sera dressé dans lequel la Communauté "
+                "Affectée s'engage à utiliser le projet selon sa destination convenue jusqu'à l'achèvement de la "
+                "période de garantie et le versement, par WCAG, de la retenue de garantie.",
+                styles["para"],
+            ),
+            Paragraph(
+                "La signature de l'acte de rétrocession marque également la fin du processus de compensation.",
                 styles["para"],
             ),
             Paragraph("5. GESTION DES FONDS", styles["article"]),
             Paragraph(
-                "Le budget alloué est provisionné dans la comptabilité d'AMC et décaissé progressivement au fur et à mesure "
-                "de l'avancement des projets. Des points d'étape financiers sont partagés trimestriellement avec le comité "
-                "formé par la Communauté Affectée.",
+                "Le budget défini au point 1 ci-dessus sera provisionné sur les livres de WCAG en vue de son "
+                "décaissement progressif, au bénéfice des prestataires désignés pour assurer l'exécution des projets.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Une situation financière détaillée sera dressée par WCAG à la fin de chaque trimestre et transmise "
+                "au comité constitué par la Communauté Affectée, avec copie au Préfet, afin qu'à tout moment, la "
+                "Communauté Affectée dispose d'une information complète quant à la gestion des fonds.",
+                styles["para"],
+            ),
+            Paragraph(
+                "Conformément au PARC, les reliquats éventuels seront soit mis à la disposition de la Communauté "
+                "Affectée, soit engagés sur un nouveau projet au bénéfice de la Communauté Affectée, selon leur "
+                "montant. Dans tous les cas, ces reliquats éventuels restent acquis à la Communauté Affectée.",
                 styles["para"],
             ),
         ]
