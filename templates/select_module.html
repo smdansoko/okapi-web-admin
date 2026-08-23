@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choisir un module - OKAPI Survey Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo_small.png') }}">
+</head>
+<body class="auth-body">
+  <div class="auth-wrap">
+    <div class="auth-card select-card">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="OKAPI logo" class="auth-logo">
+      <h1>Projet {{ project_label }}</h1>
+      <p class="auth-subtitle">Sélectionnez un module</p>
+
+      <form method="post" class="select-grid">
+        {% for m in modules %}
+        <button type="submit" name="module" value="{{ m.code }}" class="select-tile {{ '' if m.available else 'select-tile-disabled' }}">
+          {{ m.label }}
+          {% if not m.available %}<span class="select-tile-soon">à venir</span>{% endif %}
+        </button>
+        {% endfor %}
+      </form>
+
+      <div class="select-links">
+        <a href="{{ url_for('switch_project') }}">&larr; Changer de projet</a>
+        <form action="{{ url_for('logout') }}" method="post" class="logout-form-inline">
+          <button type="submit" class="btn btn-outline">Se déconnecter</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

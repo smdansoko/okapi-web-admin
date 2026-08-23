@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Accès refusé - OKAPI Survey Admin{% endblock %}
+{% block content %}
+<div class="panel empty-state">
+  <div style="font-size: 48px; margin-bottom: 8px;">🔒</div>
+  <h2 style="border:none;">Accès refusé</h2>
+  <p>{{ message or "Vous n'avez pas les droits nécessaires pour accéder à cette page." }}</p>
+  <p><a href="{{ url_for('dashboard') }}" class="btn maroon">Retour au tableau de bord</a></p>
+</div>
+{% endblock %}

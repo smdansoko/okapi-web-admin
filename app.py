@@ -19,6 +19,7 @@ from flask import Flask, render_template, request, jsonify, send_file, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import db
+import auth
 from compensation import (
     compute_for_owner,
     compute_for_champ_record,
@@ -42,8 +43,10 @@ from facturation_data import build_lot_superficie_rows, build_invoice_workbook
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
+app.secret_key = os.environ.get("OKAPI_SECRET_KEY", "okapi-survey-dev-secret-key-2026")
 
 db.init_db()
+auth.register_auth_routes(app)
 
 
 @app.after_request
@@ -1188,6 +1191,7 @@ def api_user_status(user_id):
 # ---------------------------------------------------------------------------
 
 @app.route("/users")
+@auth.admin_required
 def users_list():
     users = db.all_users()
     counts = db.users_counts()
@@ -1195,18 +1199,21 @@ def users_list():
 
 
 @app.route("/users/<user_id>/approve", methods=["POST"])
+@auth.admin_required
 def user_approve(user_id):
     db.set_user_approval(user_id, "approved", approved_by="admin")
     return ("", 204) if request.args.get("ajax") else _redirect_users()
 
 
 @app.route("/users/<user_id>/reject", methods=["POST"])
+@auth.admin_required
 def user_reject(user_id):
     db.set_user_approval(user_id, "rejected", approved_by="admin")
     return ("", 204) if request.args.get("ajax") else _redirect_users()
 
 
 @app.route("/users/<user_id>/delete", methods=["POST"])
+@auth.admin_required
 def user_delete(user_id):
     db.delete_user(user_id)
     return ("", 204) if request.args.get("ajax") else _redirect_users()

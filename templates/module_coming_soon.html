@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Module à venir - OKAPI Survey Admin{% endblock %}
+{% block content %}
+<div class="panel empty-state">
+  <div style="font-size: 48px; margin-bottom: 8px;">🚧</div>
+  <h2 style="border:none;">Module {{ module_label }} &mdash; {{ project_label }}</h2>
+  <p>Ce module n'est pas encore configuré. Les formulaires et la codification correspondants
+  seront ajoutés prochainement.</p>
+  <p><a href="{{ url_for('switch_module') }}" class="btn maroon">Choisir un autre module</a></p>
+</div>
+{% endblock %}

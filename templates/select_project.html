@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Choisir un projet - OKAPI Survey Admin</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/logo_small.png') }}">
+</head>
+<body class="auth-body">
+  <div class="auth-wrap">
+    <div class="auth-card select-card">
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="OKAPI logo" class="auth-logo">
+      <h1>Sélectionnez un projet</h1>
+      <p class="auth-subtitle">Connecté en tant que <strong>{{ auth_user.label }}</strong></p>
+
+      <form method="post" class="select-grid">
+        {% for p in projects %}
+        <button type="submit" name="project" value="{{ p.code }}" class="select-tile">
+          {{ p.label }}
+        </button>
+        {% endfor %}
+      </form>
+
+      <form action="{{ url_for('logout') }}" method="post" class="logout-form">
+        <button type="submit" class="btn btn-outline">Se déconnecter</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

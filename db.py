@@ -3,25 +3,88 @@
 Stores the same JSON structures produced by the Flutter mobile app
 (Menage, EnqueteChamp, EnqueteStructure — as sent by the /api/sync endpoint)
 as raw JSON blobs, plus a few indexed columns for fast querying/sorting.
+
+--- Multi-project data isolation (Option B) --------------------------------
+Each project (WCAG, SIMANDOU, SMB) has its own, completely separate SQLite
+database file under data/<project>.db. The "active" project for the current
+request is tracked via a contextvar (set by app.py's before_request hook
+from the Flask session, or forced to "wcag" for the mobile /api/* routes
+since the mobile app only ever targets the WCAG project for now). Every
+get_conn() call transparently opens the correct file for whichever project
+is currently active - no other function in this module needs to change.
 """
 import sqlite3
 import json
 import os
+import shutil
 import threading
+import contextvars
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "data", "okapi.db")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+LEGACY_DB_PATH = os.path.join(DATA_DIR, "okapi.db")
+
+PROJECTS = ["wcag", "simandou", "smb"]
+DEFAULT_PROJECT = "wcag"
+
 _lock = threading.Lock()
+_current_project = contextvars.ContextVar("current_project", default=DEFAULT_PROJECT)
+
+
+def set_current_project(project: str):
+    """Sets the active project (db file) for the current request/thread."""
+    if project not in PROJECTS:
+        project = DEFAULT_PROJECT
+    _current_project.set(project)
+
+
+def get_current_project() -> str:
+    return _current_project.get()
+
+
+def _db_path_for(project: str) -> str:
+    return os.path.join(DATA_DIR, f"{project}.db")
+
+
+def migrate_legacy_db():
+    """One-time migration: the original single-project database was named
+    data/okapi.db. All mobile survey data collected so far belongs to the
+    WCAG project, so on first run with the new multi-project layout we copy
+    it (never move, to keep the original as a safety backup) to
+    data/wcag.db if that file doesn't exist yet."""
+    os.makedirs(DATA_DIR, exist_ok=True)
+    wcag_path = _db_path_for("wcag")
+    if os.path.exists(LEGACY_DB_PATH) and not os.path.exists(wcag_path):
+        shutil.copyfile(LEGACY_DB_PATH, wcag_path)
 
 
 def get_conn():
-    conn = sqlite3.connect(DB_PATH)
+    project = get_current_project()
+    conn = sqlite3.connect(_db_path_for(project))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 
 def init_db():
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+    """Initializes (creates tables in) EVERY project's database, so
+    SIMANDOU and SMB start with the correct empty schema even before any
+    data is synced/imported into them."""
+    migrate_legacy_db()
+    for project in PROJECTS:
+        _init_db_for_project(project)
+
+
+def _init_db_for_project(project: str):
+    os.makedirs(DATA_DIR, exist_ok=True)
+    prev = get_current_project()
+    set_current_project(project)
+    try:
+        _create_tables()
+    finally:
+        set_current_project(prev)
+
+
+def _create_tables():
     conn = get_conn()
     cur = conn.cursor()
     cur.executescript(

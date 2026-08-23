@@ -1,5 +1,8 @@
 __pycache__/
 *.pyc
 data/okapi.db
+data/wcag.db
+data/simandou.db
+data/smb.db
 flask.log
 server.log
