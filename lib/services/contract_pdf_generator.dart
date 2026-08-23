@@ -217,7 +217,8 @@ class ContractData {
       // set yet, fall back to displaying the auto-generated "code de
       // l'enquête" (concat(codeProprietaire, '-', numEnqueteChamp)) instead
       // of a bare "-" placeholder.
-      codePap: (proprietaire.codePap != null && proprietaire.codePap!.isNotEmpty)
+      codePap:
+          (proprietaire.codePap != null && proprietaire.codePap!.isNotEmpty)
           ? proprietaire.codePap!
           : (codeEnquete.isNotEmpty ? codeEnquete : proprietaire.id),
       nomPrenom: proprietaire.nomPrenom,
@@ -735,9 +736,7 @@ class ContractPdfGenerator {
     final art = isCommunautaire ? 'la' : 'le';
 
     return [
-      _paragraph(
-        'Ci-après dénommé${isCommunautaire ? 'e' : ''} « $party ».',
-      ),
+      _paragraph('Ci-après dénommé${isCommunautaire ? 'e' : ''} « $party ».'),
       _paragraph(
         'WCAG et ${isCommunautaire ? 'la' : 'le'} $partyLower étant également désignés ci-après collectivement '
         '« les Parties » et individuellement « la Partie ».',
@@ -1122,15 +1121,20 @@ class ContractPdfGenerator {
       );
     }
 
-    final wcagBox = signatureBox('WCAG', const ['Nom', 'Fonction', 'Signature']);
+    final wcagBox = signatureBox('WCAG', const [
+      'Nom',
+      'Fonction',
+      'Signature',
+    ]);
 
     if (isLignage) {
       // Lignage: row1 = WCAG box | single-slot "Autorités locales" box (NOT
       // the 2-slot "Autorités" box used by Ménage/Collectif).
-      final autLocBox = signatureBox(
-        'Autorités locales',
-        const ['Nom', 'Fonction', 'Signature'],
-      );
+      final autLocBox = signatureBox('Autorités locales', const [
+        'Nom',
+        'Fonction',
+        'Signature',
+      ]);
       pw.Widget temoinCell() => pw.Padding(
         padding: const pw.EdgeInsets.all(4),
         child: pw.Column(
@@ -1144,9 +1148,7 @@ class ContractPdfGenerator {
       );
       final gridRows = <pw.TableRow>[];
       for (int i = 0; i < 3; i++) {
-        gridRows.add(
-          pw.TableRow(children: [temoinCell(), temoinCell()]),
-        );
+        gridRows.add(pw.TableRow(children: [temoinCell(), temoinCell()]));
       }
       return [
         pw.Row(
@@ -1412,7 +1414,19 @@ class ContractPdfGenerator {
         ]);
       }
       final totalRow = [
-        'TOTAUX', '', '', '', '', '', '', '', '', '', '', '', '',
+        'TOTAUX',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
         Formatters.number(totalMontant),
       ];
       widgets.add(
@@ -1479,7 +1493,13 @@ class ContractPdfGenerator {
         ]);
       }
       final totalRow = [
-        'TOTAUX', '', '', '', '', '', '',
+        'TOTAUX',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
         Formatters.number(totalMontant),
       ];
       widgets.add(
@@ -1658,25 +1678,25 @@ class ContractPdfGenerator {
       }
     }
 
-    pw.Widget headerCell(
-      String text, {
-      required int flex,
-      bool bold = true,
-    }) => pw.Expanded(
-      flex: flex,
-      child: pw.Container(
-        alignment: pw.Alignment.center,
-        padding: const pw.EdgeInsets.symmetric(vertical: 2.5, horizontal: 2),
-        child: pw.Text(
-          text,
-          textAlign: pw.TextAlign.center,
-          style: pw.TextStyle(
-            fontSize: headerFontSize,
-            fontWeight: bold ? pw.FontWeight.bold : null,
+    pw.Widget headerCell(String text, {required int flex, bool bold = true}) =>
+        pw.Expanded(
+          flex: flex,
+          child: pw.Container(
+            alignment: pw.Alignment.center,
+            padding: const pw.EdgeInsets.symmetric(
+              vertical: 2.5,
+              horizontal: 2,
+            ),
+            child: pw.Text(
+              text,
+              textAlign: pw.TextAlign.center,
+              style: pw.TextStyle(
+                fontSize: headerFontSize,
+                fontWeight: bold ? pw.FontWeight.bold : null,
+              ),
+            ),
           ),
-        ),
-      ),
-    );
+        );
 
     // Row 0: top-level labels. Solo columns render their label here and
     // occupy both header rows (via a taller container); grouped columns
@@ -1699,7 +1719,10 @@ class ContractPdfGenerator {
               child: pw.Text(
                 c.label,
                 textAlign: pw.TextAlign.center,
-                style: pw.TextStyle(fontSize: headerFontSize, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(
+                  fontSize: headerFontSize,
+                  fontWeight: pw.FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -1729,24 +1752,39 @@ class ContractPdfGenerator {
       ],
     );
 
-    pw.Widget dataCell(String text, {required int flex, required bool isFirst, bool bold = false}) =>
-        pw.Expanded(
-          flex: flex,
-          child: pw.Container(
-            padding: const pw.EdgeInsets.symmetric(vertical: 3, horizontal: 3),
-            decoration: pw.BoxDecoration(border: pw.Border.all(color: greyBorder, width: 0.5)),
-            child: pw.Text(
-              text,
-              textAlign: isFirst ? pw.TextAlign.left : pw.TextAlign.right,
-              style: pw.TextStyle(fontSize: dataFontSize, fontWeight: bold ? pw.FontWeight.bold : null),
-            ),
+    pw.Widget dataCell(
+      String text, {
+      required int flex,
+      required bool isFirst,
+      bool bold = false,
+    }) => pw.Expanded(
+      flex: flex,
+      child: pw.Container(
+        padding: const pw.EdgeInsets.symmetric(vertical: 3, horizontal: 3),
+        decoration: pw.BoxDecoration(
+          border: pw.Border.all(color: greyBorder, width: 0.5),
+        ),
+        child: pw.Text(
+          text,
+          textAlign: isFirst ? pw.TextAlign.left : pw.TextAlign.right,
+          style: pw.TextStyle(
+            fontSize: dataFontSize,
+            fontWeight: bold ? pw.FontWeight.bold : null,
           ),
-        );
+        ),
+      ),
+    );
 
-    pw.Widget buildDataRow(List<String> values, {bool bold = false, PdfColor? bg}) {
+    pw.Widget buildDataRow(
+      List<String> values, {
+      bool bold = false,
+      PdfColor? bg,
+    }) {
       final children = <pw.Widget>[];
       for (var i = 0; i < values.length; i++) {
-        children.add(dataCell(values[i], flex: leafFlex[i], isFirst: i == 0, bold: bold));
+        children.add(
+          dataCell(values[i], flex: leafFlex[i], isFirst: i == 0, bold: bold),
+        );
       }
       return pw.Container(
         color: bg,

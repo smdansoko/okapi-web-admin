@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import '../../models/menage.dart';
 import '../../models/enquete_champ.dart';
 import '../../models/structure.dart';
+import '../../main.dart' show kAllSurveyFormKeys;
 import '../../services/app_data_provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/survey_data_provider.dart';
 import '../../services/sync_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
@@ -148,6 +150,7 @@ class _SyncScreenState extends State<SyncScreen> {
     await _saveServerSettings();
     if (!mounted) return;
     final data = context.read<AppDataProvider>();
+    final surveyData = context.read<SurveyDataProvider>();
 
     final myTablette = _currentUser?.tablette ?? '';
     if (myTablette.isEmpty) {
@@ -165,6 +168,9 @@ class _SyncScreenState extends State<SyncScreen> {
       );
     }
     final toSync = _dataForSync(data);
+    final surveyRecordsToSync = {
+      for (final key in kAllSurveyFormKeys) key: surveyData.recordsFor(key),
+    };
 
     setState(() {
       _syncing = true;
@@ -175,6 +181,7 @@ class _SyncScreenState extends State<SyncScreen> {
       menages: toSync.menages,
       champs: toSync.champs,
       structures: toSync.structures,
+      surveyRecords: surveyRecordsToSync,
     );
 
     if (!mounted) return;
@@ -211,6 +218,7 @@ class _SyncScreenState extends State<SyncScreen> {
     await _saveServerSettings();
     if (!mounted) return;
     final data = context.read<AppDataProvider>();
+    final surveyData = context.read<SurveyDataProvider>();
 
     setState(() {
       _pulling = true;
@@ -225,6 +233,7 @@ class _SyncScreenState extends State<SyncScreen> {
         champs: result.champs,
         structures: result.structures,
       );
+      await surveyData.mergeFromServer(result.surveyRecords);
     }
 
     if (!mounted) return;
@@ -258,6 +267,7 @@ class _SyncScreenState extends State<SyncScreen> {
   @override
   Widget build(BuildContext context) {
     final data = context.watch<AppDataProvider>();
+    final surveyData = context.watch<SurveyDataProvider>();
 
     return Scaffold(
       appBar: AppBar(
@@ -355,6 +365,18 @@ class _SyncScreenState extends State<SyncScreen> {
                               label: 'Enquêtes Structures',
                               count: data.structures.length,
                               color: const Color(0xFF1F5A8F),
+                            ),
+                            _CountChip(
+                              icon: Icons.eco_rounded,
+                              label: 'Biodiversité',
+                              count: surveyData.totalBiodiversiteRecords,
+                              color: OkapiColors.secondary,
+                            ),
+                            _CountChip(
+                              icon: Icons.people_alt_rounded,
+                              label: 'Social',
+                              count: surveyData.totalSocialRecords,
+                              color: OkapiColors.primary,
                             ),
                           ],
                         ),

@@ -49,7 +49,8 @@ class SurveyRecord {
       'formKey': formKey,
       'values': values,
       'repeats': repeats.map(
-        (k, v) => MapEntry(k, v.map((e) => Map<String, dynamic>.from(e)).toList()),
+        (k, v) =>
+            MapEntry(k, v.map((e) => Map<String, dynamic>.from(e)).toList()),
       ),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),

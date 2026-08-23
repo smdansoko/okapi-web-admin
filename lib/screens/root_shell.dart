@@ -7,6 +7,7 @@ import 'champs/champs_list_screen.dart';
 import 'structures/structures_list_screen.dart';
 import 'contracts/contracts_screen.dart';
 import 'sync/sync_screen.dart';
+import 'survey/survey_module_screen.dart';
 
 class RootShell extends StatefulWidget {
   final AppUser currentUser;
@@ -30,6 +31,8 @@ class _RootShellState extends State<RootShell> {
     MenageListScreen(),
     ChampsListScreen(),
     StructuresListScreen(),
+    SurveyModuleScreen(module: 'BIODIVERSITE', moduleTitle: 'Biodiversité'),
+    SurveyModuleScreen(module: 'SOCIAL', moduleTitle: 'Social'),
     ContractsScreen(),
     SyncScreen(),
   ];
@@ -39,6 +42,8 @@ class _RootShellState extends State<RootShell> {
     _NavItem(icon: Icons.groups_rounded, label: 'Ménages'),
     _NavItem(icon: Icons.grass_rounded, label: 'Champs'),
     _NavItem(icon: Icons.home_work_rounded, label: 'Structures'),
+    _NavItem(icon: Icons.eco_rounded, label: 'Biodiversité'),
+    _NavItem(icon: Icons.people_alt_rounded, label: 'Social'),
     _NavItem(icon: Icons.description_rounded, label: 'Contrats'),
     _NavItem(icon: Icons.cloud_upload_rounded, label: 'Synchroniser'),
   ];

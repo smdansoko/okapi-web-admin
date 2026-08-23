@@ -4,7 +4,24 @@ import 'theme/app_theme.dart';
 import 'services/reference_data_service.dart';
 import 'services/storage_service.dart';
 import 'services/app_data_provider.dart';
+import 'services/survey_data_provider.dart';
 import 'screens/auth/auth_gate.dart';
+
+/// All 11 BIODIVERSITE/SOCIAL survey form keys (see lib/data/survey_schema.json),
+/// used to bulk-load SurveyDataProvider at startup.
+const List<String> kAllSurveyFormKeys = [
+  'pose_cameras',
+  'chimpanzes_recce',
+  'poisson',
+  'flore',
+  'oiseaux',
+  'reptiles',
+  'amphibiens',
+  'mammiferes',
+  'infrastructures',
+  'patrimoine_culturel',
+  'socioeconomique',
+];
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,17 +31,28 @@ Future<void> main() async {
   final appData = AppDataProvider();
   await appData.loadAll();
 
-  runApp(OkapiSurveyApp(appData: appData));
+  final surveyData = SurveyDataProvider();
+  await surveyData.loadAll(kAllSurveyFormKeys);
+
+  runApp(OkapiSurveyApp(appData: appData, surveyData: surveyData));
 }
 
 class OkapiSurveyApp extends StatelessWidget {
   final AppDataProvider appData;
-  const OkapiSurveyApp({super.key, required this.appData});
+  final SurveyDataProvider surveyData;
+  const OkapiSurveyApp({
+    super.key,
+    required this.appData,
+    required this.surveyData,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<AppDataProvider>.value(
-      value: appData,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<AppDataProvider>.value(value: appData),
+        ChangeNotifierProvider<SurveyDataProvider>.value(value: surveyData),
+      ],
       child: MaterialApp(
         title: 'Okapi Survey',
         debugShowCheckedModeBanner: false,

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/menage.dart';
 import '../models/enquete_champ.dart';
 import '../models/structure.dart';
+import '../models/survey_record.dart';
 
 /// Result of a synchronization attempt with the OKAPI Web Admin server.
 class SyncResult {
@@ -32,6 +33,9 @@ class PullResult {
   final List<Menage> menages;
   final List<EnqueteChamp> champs;
   final List<EnqueteStructure> structures;
+  // BIODIVERSITE/SOCIAL survey records, keyed by formKey (e.g.
+  // 'pose_cameras', 'socioeconomique').
+  final Map<String, List<SurveyRecord>> surveyRecords;
   final Map<String, dynamic>? serverTotals;
   final DateTime timestamp;
 
@@ -41,6 +45,7 @@ class PullResult {
     this.menages = const [],
     this.champs = const [],
     this.structures = const [],
+    this.surveyRecords = const {},
     this.serverTotals,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
@@ -134,10 +139,15 @@ class SyncService {
   }
 
   /// Sends all provided data to the configured server's /api/sync endpoint.
+  ///
+  /// [surveyRecords] holds the 11 BIODIVERSITE/SOCIAL survey forms' records,
+  /// keyed by formKey (e.g. 'pose_cameras', 'socioeconomique'); sent under a
+  /// single `survey_records` payload key as `{formKey: [record.toMap(), ...]}`.
   Future<SyncResult> syncAll({
     required List<Menage> menages,
     required List<EnqueteChamp> champs,
     required List<EnqueteStructure> structures,
+    Map<String, List<SurveyRecord>> surveyRecords = const {},
   }) async {
     final url = await serverUrl;
     if (url.isEmpty) {
@@ -155,6 +165,10 @@ class SyncService {
       'menages': menages.map((m) => m.toMap()).toList(),
       'champs': champs.map((c) => c.toMap()).toList(),
       'structures': structures.map((s) => s.toMap()).toList(),
+      'survey_records': surveyRecords.map(
+        (formKey, records) =>
+            MapEntry(formKey, records.map((r) => r.toMap()).toList()),
+      ),
     };
 
     try {
@@ -242,6 +256,20 @@ class SyncService {
           } catch (_) {}
         }
 
+        // BIODIVERSITE/SOCIAL survey records: {formKey: [record, ...]}.
+        final surveyRecordsJson =
+            (body['survey_records'] as Map?)?.cast<String, dynamic>() ?? {};
+        final surveyRecords = <String, List<SurveyRecord>>{};
+        surveyRecordsJson.forEach((formKey, list) {
+          final records = <SurveyRecord>[];
+          for (final r in (list as List? ?? [])) {
+            try {
+              records.add(SurveyRecord.fromMap(Map<String, dynamic>.from(r as Map)));
+            } catch (_) {}
+          }
+          surveyRecords[formKey] = records;
+        });
+
         await _setLastSyncAt(DateTime.now());
         return PullResult(
           success: true,
@@ -249,6 +277,7 @@ class SyncService {
           menages: menages,
           champs: champs,
           structures: structures,
+          surveyRecords: surveyRecords,
           serverTotals: body['totals'] as Map<String, dynamic>?,
         );
       } else {

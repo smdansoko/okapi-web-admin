@@ -26,10 +26,12 @@ class SurveyNode {
   final List<SurveyNode> children;
 
   // field-only
-  final String? type; // text/integer/decimal/date/time/geopoint/image/select_one/select_multiple
+  final String?
+  type; // text/integer/decimal/date/time/geopoint/image/select_one/select_multiple
   final String? hint;
   final String? appearance;
-  final String? listName; // key into survey_choices.json, or 'region'/'prefecture'/'sous_prefecture'
+  final String?
+  listName; // key into survey_choices.json, or 'region'/'prefecture'/'sous_prefecture'
   final bool required;
   final String? choiceFilter; // e.g. "filter=${region}" or "type=${region}"
   final String? relevant; // ODK-XPath-lite relevant expression
