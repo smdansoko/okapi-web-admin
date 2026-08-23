@@ -59,6 +59,11 @@ dependencies:
   # Photo capture (profile + ID document photos), Web + Android compatible
   image_picker: ^1.1.2
 
+  # EXIF-aware image decoding (bakes in orientation before PDF embedding,
+  # since the pdf package's MemoryImage does not honour EXIF orientation
+  # the way Flutter's on-screen Image.memory/Skia decoder does)
+  image: 4.9.2
+
   # HTTP client for synchronizing data with the OKAPI Web Admin server
   http: ^1.2.2
 

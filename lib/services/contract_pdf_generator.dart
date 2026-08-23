@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:image/image.dart' as img;
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -492,10 +493,40 @@ class ContractPdfGenerator {
 
   /// Decodes a base64-encoded photo string into a [pw.MemoryImage], or
   /// returns null if [base64Data] is null/empty/invalid.
+  ///
+  /// Photos captured on mobile phones frequently carry an EXIF
+  /// "Orientation" tag instead of having the pixel data itself physically
+  /// rotated. Flutter's on-screen `Image.memory` widget uses the platform's
+  /// Skia JPEG decoder, which automatically honours this tag - so the
+  /// photo looks correctly oriented on the phone screen. The `pdf`
+  /// package's `pw.MemoryImage`, however, does NOT apply this correction,
+  /// so without this fix the same photo appears sideways or upside-down in
+  /// the generated PDF. We use the `image` package to bake the correct
+  /// rotation into the pixel data first (mirroring what Skia already does
+  /// on-screen), matching the behaviour of the mobile app's own preview.
   static pw.MemoryImage? _decodePhoto(String? base64Data) {
     if (base64Data == null || base64Data.isEmpty) return null;
     try {
-      return pw.MemoryImage(base64Decode(base64Data));
+      final Uint8List raw = base64Decode(base64Data);
+      try {
+        final img.Image? decoded = img.decodeImage(raw);
+        if (decoded == null) {
+          return pw.MemoryImage(raw);
+        }
+        // bakeOrientation() physically rotates/flips the pixel data to
+        // match what the EXIF orientation tag says it should look like,
+        // then strips the tag (so no double-rotation can occur downstream).
+        final img.Image oriented = img.bakeOrientation(decoded);
+        final Uint8List reEncoded = Uint8List.fromList(
+          img.encodeJpg(oriented, quality: 90),
+        );
+        return pw.MemoryImage(reEncoded);
+      } catch (_) {
+        // Fallback: if re-encoding fails for any reason, fall back to the
+        // raw bytes so a photo still shows up (possibly mis-oriented)
+        // rather than showing nothing at all.
+        return pw.MemoryImage(raw);
+      }
     } catch (_) {
       return null;
     }

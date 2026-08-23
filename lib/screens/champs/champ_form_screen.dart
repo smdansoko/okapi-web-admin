@@ -90,6 +90,34 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
     super.dispose();
   }
 
+  /// Auto-generates the "N° enquête champs" value: it is the count of
+  /// existing champs records already saved for the same PAP
+  /// (codeProprietaire), plus one for the new record being created.
+  ///
+  /// When editing an existing record, that record itself is excluded from
+  /// the count (so editing doesn't keep incrementing the number), and if it
+  /// already had a number that number is preserved unless the owner has
+  /// changed.
+  int _computeNumEnquete(BuildContext context) {
+    if (_selectedProprietaire == null) return 1;
+    final allChamps = context.read<AppDataProvider>().champs;
+    final existingForOwner = allChamps
+        .where(
+          (c) =>
+              c.codeProprietaire == _selectedProprietaire!.id &&
+              c.id != _enquete.id,
+        )
+        .length;
+    return existingForOwner + 1;
+  }
+
+  /// Recomputes and refreshes the (read-only) "N° enquête champs" display
+  /// whenever the selected propriétaire changes.
+  void _refreshNumEnqueteDisplay() {
+    final n = _computeNumEnquete(context);
+    _numEnqueteCtrl.text = n.toString();
+  }
+
   Future<void> _addOrEditParcelle({
     ParcelleAgricole? existing,
     int? index,
@@ -160,7 +188,12 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
     _enquete.codeMenage = _selectedMenageCode!;
     _enquete.codeProprietaire = _selectedProprietaire!.id;
     _enquete.proprietaireNom = _selectedProprietaire!.nomPrenom;
-    _enquete.numEnqueteChamp = int.tryParse(_numEnqueteCtrl.text) ?? 1;
+    // N° enquête champs is auto-generated (see _computeNumEnquete) based on
+    // how many existing champs records already exist for this same PAP
+    // (codeProprietaire), so that each new field-survey record for the same
+    // PAP gets its own distinct, sequential number - and later, its own
+    // separate (non-merged) contract.
+    _enquete.numEnqueteChamp = _computeNumEnquete(context);
     _enquete.nomPrenomRepondant = _nomRepondantCtrl.text.isEmpty
         ? null
         : _nomRepondantCtrl.text;
@@ -217,9 +250,18 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
             LabeledTextField(label: 'N° de batch', controller: _numBatchCtrl),
             const SizedBox(height: 12),
             LabeledTextField(
-              label: 'N° enquête champs',
+              label: 'N° enquête champs (généré automatiquement)',
               controller: _numEnqueteCtrl,
               keyboardType: TextInputType.number,
+              readOnly: true,
+            ),
+            const Padding(
+              padding: EdgeInsets.only(top: 4, bottom: 4),
+              child: Text(
+                'Basé sur le nombre d\'enquêtes déjà enregistrées pour ce PAP — '
+                'chaque enquête générera son propre contrat (non fusionné).',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
             ),
             const SizedBox(height: 16),
             const SectionHeader(title: 'Localisation', icon: Icons.map_rounded),
@@ -294,6 +336,7 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
                       _selectedProprietaire = individusDisponibles.firstWhere(
                         (i) => i.id == v,
                       );
+                      _refreshNumEnqueteDisplay();
                     }),
               validator: (v) => v == null ? 'Champ requis' : null,
             ),
