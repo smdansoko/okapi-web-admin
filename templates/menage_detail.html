@@ -26,6 +26,7 @@
   <table class="data-table">
     <thead>
       <tr>
+        <th>Photo</th>
         <th>Nom et prénom</th>
         <th>Sexe</th>
         <th>Âge</th>
@@ -37,6 +38,13 @@
     <tbody>
       {% for i in individus %}
       <tr>
+        <td>
+          {% if i.has_photo %}
+            <img src="{{ url_for('individu_photo', code_individu=i.id) }}" alt="Photo" style="width:40px;height:48px;object-fit:cover;border-radius:4px;border:1px solid var(--grey-border);">
+          {% else %}
+            <span class="badge status-pending" title="Photo non retrouvée">Manquante</span>
+          {% endif %}
+        </td>
         <td>{{ i.nomPrenom }}</td>
         <td>{{ i.sexe }}</td>
         <td>{{ i.age if i.age is not none else '—' }}</td>

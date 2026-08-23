@@ -33,6 +33,7 @@ from reportlab.lib.utils import ImageReader
 
 from compensation import compute_for_owner, CompensationSummary
 from contract_rows import code_enquete_for_champ
+import photos as _photos
 
 _FONT_DIR = os.path.join(os.path.dirname(__file__), "fonts")
 _IMG_DIR = os.path.join(os.path.dirname(__file__), "static", "img")
@@ -169,6 +170,23 @@ def has_identity_document(type_de_piece):
     return bool(type_de_piece) and type_de_piece != "Pas de document"
 
 
+def _fallback_photo_b64(project, individu_dict):
+    """Phase 4: for legacy-imported households, the mobile app's own
+    base64 photo capture (photoProfilBase64) is never present - the ONLY
+    photo reference available is the legacy KoboToolbox attachment
+    filename preserved at import time (photoMembreFilenameLegacy). If the
+    admin has since uploaded a matching file to this project's photo
+    directory (see photos.py), use it as the page-1 profile photo instead
+    of falling back to an empty "PHOTO" placeholder box."""
+    legacy_fn = individu_dict.get("photoMembreFilenameLegacy")
+    if not legacy_fn:
+        return None
+    raw = _photos.get_photo_bytes(project, legacy_fn)
+    if not raw:
+        return None
+    return base64.b64encode(raw).decode("ascii")
+
+
 def build_contract_data(menage=None, champ=None, individu=None, contract_type="proprietaire", project="wcag"):
     """Builds a normalized dict of contract fields, mirroring ContractData.
     Either pass `menage` (Propriétaire contract, chef de ménage) or pass
@@ -211,7 +229,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "dateEtablissementPiece": fmt_date(chef.get("dateEtablissementPiece")),
             "telephone": chef.get("telephone", ""),
             "dateEnquete": menage.get("dateEnquete", ""),
-            "photoProfilBase64": chef.get("photoProfilBase64"),
+            "photoProfilBase64": chef.get("photoProfilBase64") or _fallback_photo_b64(project, chef),
             "photoCniRectoBase64": chef.get("photoCniRectoBase64"),
             "photoCniVersoBase64": chef.get("photoCniVersoBase64"),
         }
@@ -243,7 +261,7 @@ def build_contract_data(menage=None, champ=None, individu=None, contract_type="p
             "dateEtablissementPiece": fmt_date(proprietaire.get("dateEtablissementPiece")),
             "telephone": proprietaire.get("telephone", ""),
             "dateEnquete": champ.get("dateEnquete", ""),
-            "photoProfilBase64": proprietaire.get("photoProfilBase64"),
+            "photoProfilBase64": proprietaire.get("photoProfilBase64") or _fallback_photo_b64(project, proprietaire),
             "photoCniRectoBase64": proprietaire.get("photoCniRectoBase64"),
             "photoCniVersoBase64": proprietaire.get("photoCniVersoBase64"),
         }

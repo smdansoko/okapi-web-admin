@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Répertoire photos - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="cards-row">
+  <div class="stat-card">
+    <div class="label">Membres avec référence photo</div>
+    <div class="value">{{ stats.with_legacy_ref }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="label">Photos retrouvées et associées</div>
+    <div class="value">{{ stats.matched }}</div>
+  </div>
+  <div class="stat-card gold">
+    <div class="label">Photos encore manquantes</div>
+    <div class="value">{{ stats.missing_count }}</div>
+  </div>
+  <div class="stat-card blue">
+    <div class="label">Fichiers déposés dans le répertoire</div>
+    <div class="value">{{ stats.uploaded_total }}</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Répertoire photos &mdash; projet {{ project_code|upper }}</h2>
+  <p style="color:#666; font-size: 13px; margin-top:-6px;">
+    Les liens d'origine (KoboToolbox) vers les photos des membres de ménage collectées lors de l'enquête historique
+    ne sont plus accessibles. Pour retrouver ces photos, déposez ici les fichiers images retrouvés dans vos archives
+    de terrain (carte SD, tablette, clé USB) &mdash; soit fichier par fichier, soit sous forme d'une archive ZIP
+    contenant l'ensemble des photos. <strong>Seul le nom du fichier importe</strong> (par ex.
+    <code class="mono">1779771979385.jpg</code>) : il sera automatiquement associé au bon membre grâce au nom de
+    fichier enregistré lors de l'import de l'enquête historique.
+  </p>
+
+  {% if upload_result %}
+    {% if upload_result.error %}
+    <div class="auth-error">{{ upload_result.error }}</div>
+    {% else %}
+    <div class="auth-error" style="background:#eaf7ee; color:#1F4A2E; border-color:#bfe6cc;">
+      {{ upload_result.saved|length }} photo(s) enregistrée(s) avec succès.
+      {% if upload_result.skipped %}
+        {{ upload_result.skipped|length }} fichier(s) ignoré(s) (format non pris en charge) :
+        {{ upload_result.skipped|join(', ') }}
+      {% endif %}
+    </div>
+    {% endif %}
+  {% endif %}
+
+  <div class="stats-grid">
+    <div class="panel">
+      <h2>Déposer des photos individuelles</h2>
+      <form method="post" action="{{ url_for('photos_directory_upload') }}" enctype="multipart/form-data" class="filters">
+        <input type="hidden" name="upload_kind" value="files">
+        <input type="file" name="photo_files" accept=".jpg,.jpeg,.png,.webp" multiple required>
+        <button class="btn small" type="submit">Téléverser</button>
+      </form>
+      <p class="hint">Formats acceptés : JPG, JPEG, PNG, WEBP. Vous pouvez sélectionner plusieurs fichiers à la fois.</p>
+    </div>
+
+    <div class="panel">
+      <h2>Déposer une archive ZIP</h2>
+      <form method="post" action="{{ url_for('photos_directory_upload') }}" enctype="multipart/form-data" class="filters">
+        <input type="hidden" name="upload_kind" value="zip">
+        <input type="file" name="zip_file" accept=".zip" required>
+        <button class="btn small" type="submit">Téléverser l'archive</button>
+      </form>
+      <p class="hint">L'arborescence de dossiers à l'intérieur du ZIP n'a pas d'importance : seuls les noms de fichiers sont utilisés pour l'association.</p>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Photos encore manquantes ({{ stats.missing_count }})</h2>
+  {% if stats.missing %}
+  <table class="data-table compact-table">
+    <thead>
+      <tr>
+        <th>Code ménage</th>
+        <th>Village</th>
+        <th>Nom et prénom</th>
+        <th>Code individu</th>
+        <th>Nom de fichier attendu</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in stats.missing[:200] %}
+      <tr>
+        <td><code class="mono">{{ r.codeMenage }}</code></td>
+        <td>{{ r.village }}</td>
+        <td>{{ r.nomPrenom }}</td>
+        <td><code class="mono">{{ r.codeIndividu }}</code></td>
+        <td><code class="mono">{{ r.filename }}</code></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if stats.missing|length > 200 %}
+  <p class="hint">Affichage limité aux 200 premières lignes ({{ stats.missing|length }} au total).</p>
+  {% endif %}
+  {% else %}
+  <div class="empty-state">Toutes les photos référencées ont été retrouvées pour ce projet.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

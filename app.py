@@ -8,6 +8,7 @@ that:
      OKAPI_WCAG_Tableau d'indemnisation_WCAG2613.xlsm reference format)
   4) Provides a complete, well-structured dashboard.
 """
+import base64
 import io
 import json
 import os
@@ -20,6 +21,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 import db
 import auth
+import photos
 from compensation import (
     compute_for_owner,
     compute_for_champ_record,
@@ -714,6 +716,7 @@ def menage_detail(menage_id):
 
     champs = db.all_champs()
     structures = db.all_structures()
+    project = db.get_current_project()
 
     individus = []
     for ind in menage.get("individus", []):
@@ -724,17 +727,98 @@ def menage_detail(menage_id):
         nb_enquetes_structure = sum(
             1 for s in structures if s.get("proprietaireStructure") == ind.get("id")
         )
+        legacy_fn = ind.get("photoMembreFilenameLegacy")
+        has_photo = bool(ind.get("photoProfilBase64")) or bool(
+            photos.photo_path_for(project, legacy_fn) if legacy_fn else False
+        )
         individus.append({
             **ind,
             "age": age,
             "nb_enquetes_champ": nb_enquetes_champ,
             "nb_enquetes_structure": nb_enquetes_structure,
+            "has_photo": has_photo,
         })
 
     return render_template(
         "menage_detail.html",
         menage=menage,
         individus=individus,
+    )
+
+
+@app.route("/photos/<code_individu>.jpg")
+def individu_photo(code_individu):
+    """Serves a member's profile photo for display in the web admin:
+    prefers the mobile app's own base64 capture (photoProfilBase64) when
+    present, otherwise falls back to the Phase 4 per-project photo
+    directory matched via photoMembreFilenameLegacy - the same fallback
+    logic used by contract_pdf.py for the generated PDF contracts."""
+    project = db.get_current_project()
+    menages = db.all_menages()
+    found = None
+    for m in menages:
+        for ind in m.get("individus", []):
+            if ind.get("id") == code_individu:
+                found = ind
+                break
+        if found:
+            break
+    if not found:
+        abort(404)
+
+    b64 = found.get("photoProfilBase64")
+    if b64:
+        raw = base64.b64decode(b64)
+        return send_file(io.BytesIO(raw), mimetype="image/jpeg")
+
+    legacy_fn = found.get("photoMembreFilenameLegacy")
+    raw = photos.get_photo_bytes(project, legacy_fn) if legacy_fn else None
+    if not raw:
+        abort(404)
+    return send_file(io.BytesIO(raw), mimetype="image/jpeg")
+
+
+# ---------------------------------------------------------------------------
+# Phase 4: Per-project photo directory (member profile photo management)
+# ---------------------------------------------------------------------------
+
+@app.route("/photos-directory")
+def photos_directory():
+    project = db.get_current_project()
+    menages = db.all_menages()
+    stats = photos.stats_for_project(project, menages)
+    return render_template(
+        "photos_directory.html",
+        stats=stats,
+        project_code=project,
+    )
+
+
+@app.route("/photos-directory/upload", methods=["POST"])
+def photos_directory_upload():
+    project = db.get_current_project()
+    upload_kind = request.form.get("upload_kind", "files")
+    result = {"saved": [], "skipped": [], "error": None}
+
+    if upload_kind == "zip":
+        zf = request.files.get("zip_file")
+        if not zf or not zf.filename:
+            result["error"] = "Aucun fichier ZIP sélectionné."
+        else:
+            result = photos.save_zip_archive(project, zf)
+    else:
+        files = [f for f in request.files.getlist("photo_files") if f and f.filename]
+        if not files:
+            result["error"] = "Aucune photo sélectionnée."
+        else:
+            result = photos.save_individual_files(project, files)
+
+    stats = photos.stats_for_project(project, db.all_menages())
+    return render_template(
+        "photos_directory.html",
+        stats=stats,
+        project_code=project,
+        upload_result=result,
     )
 
 

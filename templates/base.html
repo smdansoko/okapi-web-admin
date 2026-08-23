@@ -31,6 +31,7 @@
     <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint in ('dashboard', 'dashboard_stats') else '' }}">Tableau de bord</a>
     <a href="{{ url_for('menages_list') }}" class="{{ 'active' if request.endpoint in ('menages_list', 'menage_detail') else '' }}">Ménages</a>
     <a href="{{ url_for('contracts_list') }}" class="{{ 'active' if request.endpoint == 'contracts_list' else '' }}">Contrats</a>
+    <a href="{{ url_for('photos_directory') }}" class="{{ 'active' if request.endpoint in ('photos_directory', 'photos_directory_upload') else '' }}">Photos</a>
     <a href="{{ url_for('compensation_page') }}" class="{{ 'active' if request.endpoint == 'compensation_page' else '' }}">Indemnisation</a>
     <a href="{{ url_for('facturation_page') }}" class="{{ 'active' if request.endpoint == 'facturation_page' else '' }}">Facturation</a>
     <a href="{{ url_for('rapport_page') }}" class="{{ 'active' if request.endpoint == 'rapport_page' else '' }}">Rapport</a>
