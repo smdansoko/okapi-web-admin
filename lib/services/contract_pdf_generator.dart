@@ -1404,32 +1404,39 @@ class ContractPdfGenerator {
       ];
       widgets.add(
         _annexGroupedTable(
+          // NOTE: widened the "Type d'arbre" and "Montant (GNF)" solo
+          // columns and narrowed the "Nb" sub-columns (mirrors the web
+          // admin's contract_pdf.py col_widths fix) plus shortened labels
+          // and a smaller font size, to prevent text overflow / misaligned
+          // line-wraps reported in this table on both platforms.
           cols: [
-            _AnnexCol.solo('Type d\'arbre', 16),
+            _AnnexCol.solo('Type\nd\'arbre', 22),
             _AnnexCol.group('Plantules', const [
-              _AnnexSubCol('Nombre', 10),
-              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Nb', 8),
+              _AnnexSubCol('P.U.\n(GNF)', 12),
               _AnnexSubCol('Montant\n(GNF)', 13),
             ]),
             _AnnexCol.group('Jeunes pousses\nnon productives', const [
-              _AnnexSubCol('Nombre', 10),
-              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Nb', 8),
+              _AnnexSubCol('P.U.\n(GNF)', 12),
               _AnnexSubCol('Montant\n(GNF)', 13),
             ]),
             _AnnexCol.group('Jeunes pousses\nproductives', const [
-              _AnnexSubCol('Nombre', 10),
-              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Nb', 8),
+              _AnnexSubCol('P.U.\n(GNF)', 12),
               _AnnexSubCol('Montant\n(GNF)', 13),
             ]),
             _AnnexCol.group('Adultes', const [
-              _AnnexSubCol('Nombre', 10),
-              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Nb', 8),
+              _AnnexSubCol('P.U.\n(GNF)', 12),
               _AnnexSubCol('Montant\n(GNF)', 13),
             ]),
-            _AnnexCol.solo('Montant (GNF)', 16),
+            _AnnexCol.solo('Montant\n(GNF)', 20),
           ],
           dataRows: dataRows,
           totalRow: totalRow,
+          headerFontSize: 5.6,
+          dataFontSize: 5.6,
         ),
       );
       widgets.add(pw.SizedBox(height: 10));
@@ -1623,6 +1630,8 @@ class ContractPdfGenerator {
     required List<_AnnexCol> cols,
     required List<List<String>> dataRows,
     required List<String> totalRow,
+    double headerFontSize = 6.3,
+    double dataFontSize = 7.5,
   }) {
     // Flatten to leaf column flex weights (1 per leaf column).
     final leafFlex = <int>[];
@@ -1649,7 +1658,7 @@ class ContractPdfGenerator {
           text,
           textAlign: pw.TextAlign.center,
           style: pw.TextStyle(
-            fontSize: 6.3,
+            fontSize: headerFontSize,
             fontWeight: bold ? pw.FontWeight.bold : null,
           ),
         ),
@@ -1677,7 +1686,7 @@ class ContractPdfGenerator {
               child: pw.Text(
                 c.label,
                 textAlign: pw.TextAlign.center,
-                style: pw.TextStyle(fontSize: 6.3, fontWeight: pw.FontWeight.bold),
+                style: pw.TextStyle(fontSize: headerFontSize, fontWeight: pw.FontWeight.bold),
               ),
             ),
           ),
@@ -1702,8 +1711,8 @@ class ContractPdfGenerator {
 
     final header = pw.Column(
       children: [
-        bordered(pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: row0Children)),
-        bordered(pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: row1Children)),
+        bordered(pw.Row(children: row0Children)),
+        bordered(pw.Row(children: row1Children)),
       ],
     );
 
@@ -1716,7 +1725,7 @@ class ContractPdfGenerator {
             child: pw.Text(
               text,
               textAlign: isFirst ? pw.TextAlign.left : pw.TextAlign.right,
-              style: pw.TextStyle(fontSize: 7.5, fontWeight: bold ? pw.FontWeight.bold : null),
+              style: pw.TextStyle(fontSize: dataFontSize, fontWeight: bold ? pw.FontWeight.bold : null),
             ),
           ),
         );
