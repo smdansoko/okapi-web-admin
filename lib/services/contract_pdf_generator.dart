@@ -1278,50 +1278,9 @@ class ContractPdfGenerator {
       );
     }
 
-    // -------- Cultures annuelles (champs) --------
-    widgets.add(pw.SizedBox(height: 10));
-    widgets.add(_annexSubtitle('CULTURES ANNUELLES (CHAMPS)'));
-    if (s.cultureAnnuelleDetails.isEmpty) {
-      widgets.add(_emptyAnnexNote());
-    } else {
-      double totalSup = 0, totalMontant = 0;
-      final rows = <pw.TableRow>[
-        _annexHeaderRow([
-          'Culture',
-          'Superficie (ha)',
-          'Revenu/ha (GNF)',
-          'Montant (GNF)',
-        ]),
-      ];
-      for (final c in s.cultureAnnuelleDetails) {
-        totalSup += c.superficieHa;
-        totalMontant += c.montant;
-        rows.add(
-          _annexDataRow([
-            c.culture,
-            c.superficieHa.toStringAsFixed(2),
-            Formatters.number(c.revenuHa),
-            Formatters.number(c.montant),
-          ]),
-        );
-      }
-      rows.add(
-        _annexTotalRow([
-          'TOTAL',
-          totalSup.toStringAsFixed(2),
-          '',
-          Formatters.number(totalMontant),
-        ]),
-      );
-      widgets.add(
-        pw.Table(
-          border: pw.TableBorder.all(color: greyBorder, width: 0.5),
-          children: rows,
-        ),
-      );
-    }
-
-    // -------- Bois d'œuvre --------
+    // -------- Bois d'œuvre — column order matches the reference contracts:
+    // Espèce, Circonférence, Hauteur, Volume unitaire, Nombre de pieds,
+    // Coût/m³, Volume total, Montant (GNF). --------
     widgets.add(pw.SizedBox(height: 10));
     widgets.add(_annexSubtitle('BOIS D\'ŒUVRE'));
     if (s.boisDoeuvreDetails.isEmpty) {
@@ -1335,8 +1294,8 @@ class ContractPdfGenerator {
           'Hauteur (m)',
           'Volume\nunitaire (m³)',
           'Nombre\nde pieds',
+          'Coût/m³ (GNF)',
           'Volume\ntotal (m³)',
-          'Prix\nunitaire',
           'Montant (GNF)',
         ]),
       ];
@@ -1347,10 +1306,10 @@ class ContractPdfGenerator {
             b.espece,
             b.circonference.toStringAsFixed(2),
             b.hauteur.toStringAsFixed(2),
-            b.volumeUnitaire.toStringAsFixed(2),
+            b.volumeUnitaire.toStringAsFixed(3),
             b.nombrePieds.toString(),
-            b.volumeTotal.toStringAsFixed(2),
             Formatters.number(b.prixUnitaire),
+            b.volumeTotal.toStringAsFixed(3),
             Formatters.number(b.montant),
           ]),
         );
@@ -1375,97 +1334,121 @@ class ContractPdfGenerator {
       );
     }
 
-    // -------- Cultures pérennes --------
+    // -------- Cultures pérennes — multi-level headers: Type d'arbre |
+    // Plantules {Nombre, Prix unitaire, Montant} | Jeunes pousses non
+    // productives {...} | Jeunes pousses productives {...} | Adultes {...}
+    // | Montant (GNF) total, matching the reference contracts exactly. --------
     if (s.culturePerenneDetails.isNotEmpty) {
       widgets.add(pw.SizedBox(height: 10));
       widgets.add(_annexSubtitle('CULTURES PÉRENNES'));
       double totalMontant = 0;
-      final rows = <pw.TableRow>[
-        _annexHeaderRow([
-          'Type d\'arbre',
-          'Plantules',
-          'Jeunes NP',
-          'Jeunes P',
-          'Matures',
-          'Adulte décl.',
-          'Montant (GNF)',
-        ]),
-      ];
+      final dataRows = <List<String>>[];
       for (final c in s.culturePerenneDetails) {
         totalMontant += c.montant;
-        rows.add(
-          _annexDataRow([
-            c.espece,
-            c.plantules.toString(),
-            c.jeunesNp.toString(),
-            c.jeunesP.toString(),
-            c.matures.toString(),
-            c.adulteDeclinant.toString(),
-            Formatters.number(c.montant),
-          ]),
-        );
+        final mPlantules = c.plantules * c.prixPlante;
+        final mJnp = c.jeunesNp * c.prixJeuneNp;
+        final mJp = c.jeunesP * c.prixJeuneP;
+        final adultesCount = c.matures + c.adulteDeclinant;
+        final mAdultes = adultesCount * c.prixAdulte;
+        dataRows.add([
+          c.espece,
+          c.plantules.toString(),
+          Formatters.number(c.prixPlante),
+          Formatters.number(mPlantules),
+          c.jeunesNp.toString(),
+          Formatters.number(c.prixJeuneNp),
+          Formatters.number(mJnp),
+          c.jeunesP.toString(),
+          Formatters.number(c.prixJeuneP),
+          Formatters.number(mJp),
+          adultesCount.toString(),
+          Formatters.number(c.prixAdulte),
+          Formatters.number(mAdultes),
+          Formatters.number(c.montant),
+        ]);
       }
-      rows.add(
-        _annexTotalRow([
-          'TOTAUX',
-          '',
-          '',
-          '',
-          '',
-          '',
-          Formatters.number(totalMontant),
-        ]),
-      );
+      final totalRow = [
+        'TOTAUX', '', '', '', '', '', '', '', '', '', '', '', '',
+        Formatters.number(totalMontant),
+      ];
       widgets.add(
-        pw.Table(
-          border: pw.TableBorder.all(color: greyBorder, width: 0.5),
-          children: rows,
+        _annexGroupedTable(
+          cols: [
+            _AnnexCol.solo('Type d\'arbre', 16),
+            _AnnexCol.group('Plantules', const [
+              _AnnexSubCol('Nombre', 10),
+              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Montant\n(GNF)', 13),
+            ]),
+            _AnnexCol.group('Jeunes pousses\nnon productives', const [
+              _AnnexSubCol('Nombre', 10),
+              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Montant\n(GNF)', 13),
+            ]),
+            _AnnexCol.group('Jeunes pousses\nproductives', const [
+              _AnnexSubCol('Nombre', 10),
+              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Montant\n(GNF)', 13),
+            ]),
+            _AnnexCol.group('Adultes', const [
+              _AnnexSubCol('Nombre', 10),
+              _AnnexSubCol('Prix unitaire\n(GNF)', 13),
+              _AnnexSubCol('Montant\n(GNF)', 13),
+            ]),
+            _AnnexCol.solo('Montant (GNF)', 16),
+          ],
+          dataRows: dataRows,
+          totalRow: totalRow,
         ),
       );
       widgets.add(pw.SizedBox(height: 10));
     }
 
-    // -------- Espèces sauvages --------
+    // -------- Espèces sauvages — multi-level headers: Type d'arbre |
+    // Jeunes pousses non productives {Prix unitaire, Nombre, Montant} |
+    // Jeunes pousses productives {Prix unitaire, Nombre, Montant} |
+    // Montant (GNF) total. --------
     if (s.especeSauvageDetails.isNotEmpty) {
       widgets.add(_annexSubtitle('ESPÈCES SAUVAGES'));
       double totalMontant = 0;
-      final rows = <pw.TableRow>[
-        _annexHeaderRow([
-          'Type d\'arbre',
-          'Prix NP',
-          'Nombre NP',
-          'Prix P',
-          'Nombre P',
-          'Montant (GNF)',
-        ]),
-      ];
+      final dataRows = <List<String>>[];
       for (final e in s.especeSauvageDetails) {
         totalMontant += e.montant;
-        rows.add(
-          _annexDataRow([
-            e.espece,
-            Formatters.number(e.prixNp),
-            e.jeunesNp.toString(),
-            Formatters.number(e.prixP),
-            e.jeunesP.toString(),
-            Formatters.number(e.montant),
-          ]),
-        );
+        final mNp = e.jeunesNp * e.prixNp;
+        final mP = e.jeunesP * e.prixP;
+        dataRows.add([
+          e.espece,
+          Formatters.number(e.prixNp),
+          e.jeunesNp.toString(),
+          Formatters.number(mNp),
+          Formatters.number(e.prixP),
+          e.jeunesP.toString(),
+          Formatters.number(mP),
+          Formatters.number(e.montant),
+        ]);
       }
-      rows.add(
-        _annexTotalRow([
-          'TOTAUX',
-          '',
-          '',
-          '',
-          '',
-          Formatters.number(totalMontant),
-        ]),
-      );
+      final totalRow = [
+        'TOTAUX', '', '', '', '', '', '',
+        Formatters.number(totalMontant),
+      ];
       widgets.add(
-        pw.Table(
-          border: pw.TableBorder.all(color: greyBorder, width: 0.5),
-          children: rows,
+        _annexGroupedTable(
+          cols: [
+            _AnnexCol.solo('Type d\'arbre', 34),
+            _AnnexCol.group('Jeunes pousses non productives', const [
+              _AnnexSubCol('Prix unitaire\n(GNF)', 24),
+              _AnnexSubCol('Nombre', 18),
+              _AnnexSubCol('Montant\n(GNF)', 24),
+            ]),
+            _AnnexCol.group('Jeunes pousses productives', const [
+              _AnnexSubCol('Prix unitaire\n(GNF)', 24),
+              _AnnexSubCol('Nombre', 18),
+              _AnnexSubCol('Montant\n(GNF)', 24),
+            ]),
+            _AnnexCol.solo('Montant (GNF)', 30),
+          ],
+          dataRows: dataRows,
+          totalRow: totalRow,
         ),
       );
       widgets.add(pw.SizedBox(height: 10));
@@ -1597,6 +1580,136 @@ class ContractPdfGenerator {
         .toList(),
   );
 
+  /// Renders a multi-level-header ANNEXE 1 table where some top-level
+  /// columns are "solo" (single column, vertically centered label spanning
+  /// both header rows, e.g. "Type d'arbre") and others are "grouped" (one
+  /// top-level label spanning several sub-columns, e.g. "Plantules" over
+  /// "Nombre / Prix unitaire (GNF) / Montant (GNF)"). Since [pw.Table] has
+  /// no native colSpan/rowSpan support, the header is built with stacked
+  /// [pw.Row]s using flex weights that match the underlying data table's
+  /// column widths exactly, so both align pixel-perfectly.
+  static pw.Widget _annexGroupedTable({
+    required List<_AnnexCol> cols,
+    required List<List<String>> dataRows,
+    required List<String> totalRow,
+  }) {
+    // Flatten to leaf column flex weights (1 per leaf column).
+    final leafFlex = <int>[];
+    for (final c in cols) {
+      if (c.subCols == null) {
+        leafFlex.add(c.flex);
+      } else {
+        for (final sc in c.subCols!) {
+          leafFlex.add(sc.flex);
+        }
+      }
+    }
+
+    pw.Widget headerCell(
+      String text, {
+      required int flex,
+      bool bold = true,
+    }) => pw.Expanded(
+      flex: flex,
+      child: pw.Container(
+        alignment: pw.Alignment.center,
+        padding: const pw.EdgeInsets.symmetric(vertical: 2.5, horizontal: 2),
+        child: pw.Text(
+          text,
+          textAlign: pw.TextAlign.center,
+          style: pw.TextStyle(
+            fontSize: 6.3,
+            fontWeight: bold ? pw.FontWeight.bold : null,
+          ),
+        ),
+      ),
+    );
+
+    // Row 0: top-level labels. Solo columns render their label here and
+    // occupy both header rows (via a taller container); grouped columns
+    // render their group label spanning the group's total flex width.
+    final row0Children = <pw.Widget>[];
+    final row1Children = <pw.Widget>[];
+    for (final c in cols) {
+      if (c.subCols == null) {
+        // Solo column: label centered vertically across both header rows.
+        row0Children.add(
+          pw.Expanded(
+            flex: c.flex,
+            child: pw.Container(
+              alignment: pw.Alignment.center,
+              padding: const pw.EdgeInsets.symmetric(
+                vertical: 2.5,
+                horizontal: 2,
+              ),
+              constraints: const pw.BoxConstraints(minHeight: 26),
+              child: pw.Text(
+                c.label,
+                textAlign: pw.TextAlign.center,
+                style: pw.TextStyle(fontSize: 6.3, fontWeight: pw.FontWeight.bold),
+              ),
+            ),
+          ),
+        );
+        row1Children.add(pw.Expanded(flex: c.flex, child: pw.SizedBox()));
+      } else {
+        final groupFlex = c.subCols!.fold<int>(0, (a, sc) => a + sc.flex);
+        row0Children.add(headerCell(c.label, flex: groupFlex));
+        for (final sc in c.subCols!) {
+          row1Children.add(headerCell(sc.label, flex: sc.flex));
+        }
+      }
+    }
+
+    pw.Widget bordered(pw.Widget child) => pw.Container(
+      decoration: pw.BoxDecoration(
+        color: greyLight,
+        border: pw.Border.all(color: greyBorder, width: 0.5),
+      ),
+      child: child,
+    );
+
+    final header = pw.Column(
+      children: [
+        bordered(pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: row0Children)),
+        bordered(pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: row1Children)),
+      ],
+    );
+
+    pw.Widget dataCell(String text, {required int flex, required bool isFirst, bool bold = false}) =>
+        pw.Expanded(
+          flex: flex,
+          child: pw.Container(
+            padding: const pw.EdgeInsets.symmetric(vertical: 3, horizontal: 3),
+            decoration: pw.BoxDecoration(border: pw.Border.all(color: greyBorder, width: 0.5)),
+            child: pw.Text(
+              text,
+              textAlign: isFirst ? pw.TextAlign.left : pw.TextAlign.right,
+              style: pw.TextStyle(fontSize: 7.5, fontWeight: bold ? pw.FontWeight.bold : null),
+            ),
+          ),
+        );
+
+    pw.Widget buildDataRow(List<String> values, {bool bold = false, PdfColor? bg}) {
+      final children = <pw.Widget>[];
+      for (var i = 0; i < values.length; i++) {
+        children.add(dataCell(values[i], flex: leafFlex[i], isFirst: i == 0, bold: bold));
+      }
+      return pw.Container(
+        color: bg,
+        child: pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.stretch, children: children),
+      );
+    }
+
+    return pw.Column(
+      children: [
+        header,
+        ...dataRows.map((r) => buildDataRow(r)),
+        buildDataRow(totalRow, bold: true, bg: greyLight),
+      ],
+    );
+  }
+
   // ---------------- ANNEXE 2 ----------------
 
   static List<pw.Widget> _annexe2Text(ContractData d) {
@@ -1684,4 +1797,28 @@ class ContractPdfGenerator {
       ),
     ];
   }
+}
+
+/// A sub-column within a grouped ANNEXE 1 header column (e.g. "Nombre",
+/// "Prix unitaire (GNF)", "Montant (GNF)" inside the "Plantules" group).
+class _AnnexSubCol {
+  final String label;
+  final int flex;
+  const _AnnexSubCol(this.label, this.flex);
+}
+
+/// A top-level ANNEXE 1 header column: either "solo" (single leaf column,
+/// [subCols] is null, [flex] is used directly) or "grouped" (a label
+/// spanning several leaf [subCols]).
+class _AnnexCol {
+  final String label;
+  final int flex;
+  final List<_AnnexSubCol>? subCols;
+  const _AnnexCol._(this.label, this.flex, this.subCols);
+
+  factory _AnnexCol.solo(String label, int flex) =>
+      _AnnexCol._(label, flex, null);
+
+  factory _AnnexCol.group(String label, List<_AnnexSubCol> subCols) =>
+      _AnnexCol._(label, 0, subCols);
 }
