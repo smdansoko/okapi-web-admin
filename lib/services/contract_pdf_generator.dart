@@ -1716,34 +1716,124 @@ class ContractPdfGenerator {
     if (d.type == ContractType.communautaire) {
       return [
         _sectionTitle('ANNEXE 2 : MODALITÉS D\'INDEMNISATION'),
+        _paragraph(
+          'La Communauté Affectée, signataire de l\'Accord, accepte de quitter la ou les parcelles dont la liste '
+          'figure en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il appartient '
+          'donc à la Communauté Affectée de prendre toutes les dispositions utiles afin de retirer les éléments '
+          'meubles et immeubles qui s\'y trouvent avant cette échéance.',
+        ),
+        _paragraph(
+          'En contrepartie, WCAG s\'engage, conformément au PARC, à indemniser la Communauté Affectée des '
+          'conséquences du Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par lui '
+          'du fait de ce Projet, de la manière et dans les conditions décrites ci-après :',
+        ),
         _articleTitle('1. CONSTITUTION D\'UN BUDGET PROJET'),
         _paragraph(
-          'Conformément au PARC, le montant total de l\'indemnisation due à la Communauté Affectée, indiqué en Annexe '
-          '1 du présent Accord (soit ${Formatters.gnf(d.summary.total)}), est affecté à la constitution d\'un budget '
-          'destiné au financement de projets collectifs au bénéfice de la Communauté Affectée.',
+          'Conformément aux modalités d\'indemnisation prévues dans le PARC, les biens détenus par la Communauté '
+          'Affectée seront compensés par le biais d\'un ou plusieurs projets d\'intérêt général réalisés au profit '
+          'de la Communauté Affectée.',
+        ),
+        _paragraph(
+          'Le budget dévolu à ce ou ces projets est fonction de la superficie totale des parcelles impactées par '
+          'le projet et des biens qui s\'y trouvent, tel qu\'énumérés en Annexe 1.',
+        ),
+        _paragraph(
+          'La Communauté Affectée considère ce budget comme étant suffisant, satisfaisant et de nature à '
+          'compenser intégralement les pertes occasionnées par le Projet.',
+        ),
+        _paragraph(
+          'Sur cette base, le budget total disponible s\'élève ainsi à ${Formatters.gnf(d.summary.total)}.',
         ),
         _articleTitle('2. IDENTIFICATION DES PROJETS COLLECTIFS'),
         _paragraph(
-          'Les projets collectifs financés par ce budget sont co-identifiés par la Communauté Affectée, représentée par '
-          'un comité désigné à cet effet, et par AMC. Les catégories de projets éligibles incluent notamment : les '
-          'aménagements agricoles collectifs, les puits communautaires, l\'amélioration des marchés, les écoles et '
-          'centres de santé, ainsi que les pistes d\'accès.',
+          'Conformément aux dispositions du PARC, les projets communautaires seront identifiés conjointement '
+          'par :',
+        ),
+        _paragraph(
+          '- La Communauté Affectée, représentée par un comité constitué à cet effet ; et\n'
+          '- WCAG ou son représentant désigné,',
+        ),
+        _paragraph(
+          'L\'appui des Services Techniques Déconcentrés compétents en la matière sera également sollicité, et '
+          'une cohérence recherchée avec le Plan de Développement Local et le Plan Annuel d\'Investissement de la '
+          'Commune concernée.',
+        ),
+        _paragraph(
+          'Les Parties s\'engagent à prendre toutes les mesures requises afin que le ou les projets soient '
+          'identifiés et démarrés dans un délai maximum de trois (3) mois à compter de la signature du présent '
+          'Accord.',
+        ),
+        _paragraph(
+          'Les projets seront sélectionnés parmi la liste de projets-types proposés ci-dessous :',
+        ),
+        _paragraph(
+          '- Aménagement agricole collectif ;\n'
+          '- Puits (pastoral, maraîcher, ou domestique) ;\n'
+          '- Marché (amélioration d\'une structure existante) ;\n'
+          '- École, centre de santé (amélioration et équipement d\'une structure existante) ;\n'
+          '- Voies d\'accès à partir de la voie nouvellement créée ou en direction des axes principaux existants '
+          '(cette création ne pourra pas donner lieu à de nouvelle compensation et leur tracé doit donc faire '
+          'l\'objet d\'un consentement mutuel avec les parties concernées) ;\n'
+          '- Autre projet identifié par la communauté et dans les limites du budget disponible.',
+        ),
+        _paragraph(
+          'À l\'issue de ce processus de concertation, une fiche d\'identification sommaire sera corédigée par '
+          'WCAG et le comité établi par la Communauté Affectée en vue de leur mise en œuvre. La fiche comprendra '
+          'la sélection des projets à mettre en œuvre (plusieurs peuvent être prévus), et une estimation '
+          'budgétaire par composante ainsi que le montant total.',
+        ),
+        _paragraph(
+          'Seuls les projets pouvant être exécutés intégralement dans les limites du budget défini au point 1 '
+          'ci-dessus pourront être entrepris dans le cadre du présent Accord.',
         ),
         _articleTitle('3. MISE EN ŒUVRE DES PROJETS'),
         _paragraph(
-          'Les projets retenus sont mis en œuvre par des prestataires tiers sélectionnés par appel d\'offres, en '
-          'coopération avec le comité communautaire désigné par la Communauté Affectée.',
+          'Conformément aux dispositions du PARC, les projets seront mis en œuvre par des prestataires '
+          'sélectionnés par appel d\'offres ou directement par leur soin (cas des voies d\'accès notamment), selon '
+          'leurs capacités techniques, leurs expériences et les prix proposés. À qualité et à prix comparables, '
+          'la préférence sera accordée aux prestataires installés dans la préfecture d\'implantation du projet.',
+        ),
+        _paragraph('À cet effet :'),
+        _paragraph(
+          '- Un dossier d\'appel d\'offres sera développé par le maître d\'œuvre, sur base de la fiche '
+          'd\'identification sommaire ;\n'
+          '- Les offres seront ouvertes à l\'occasion d\'une réunion convoquée par le maître d\'œuvre, en présence '
+          'du comité constitué par la Communauté Affectée.',
+        ),
+        _paragraph(
+          'Les marchés seront attribués par WCAG, qui reste seule responsable de la sélection finale du ou des '
+          'prestataires, sur base des critères énoncés dans le dossier d\'appel d\'offres, puis de la réalisation '
+          'des travaux.',
+        ),
+        _paragraph(
+          'Les travaux seront réalisés sous la supervision du maître d\'œuvre et du comité constitué par la '
+          'Communauté Affectée. La réception provisoire du projet sera accordée à l\'achèvement des travaux, '
+          'moyennant l\'accord du maître d\'œuvre et dudit comité.',
         ),
         _articleTitle('4. RÉTROCESSION DES PROJETS'),
         _paragraph(
-          'À l\'achèvement de chaque projet, celui-ci fait l\'objet d\'une rétrocession formelle à la Communauté '
-          'Affectée, matérialisée par un procès-verbal de remise signé par les représentants des deux Parties.',
+          'À la suite de la réception provisoire des projets, il sera procédé à leur rétrocession formelle à la '
+          'Communauté Affectée. À cet effet, un acte de rétrocession sera dressé dans lequel la Communauté '
+          'Affectée s\'engage à utiliser le projet selon sa destination convenue jusqu\'à l\'achèvement de la '
+          'période de garantie et le versement, par WCAG, de la retenue de garantie.',
+        ),
+        _paragraph(
+          'La signature de l\'acte de rétrocession marque également la fin du processus de compensation.',
         ),
         _articleTitle('5. GESTION DES FONDS'),
         _paragraph(
-          'Le budget alloué est provisionné dans la comptabilité d\'AMC et décaissé progressivement au fur et à mesure '
-          'de l\'avancement des projets. Des points d\'étape financiers sont partagés trimestriellement avec le comité '
-          'formé par la Communauté Affectée.',
+          'Le budget défini au point 1 ci-dessus sera provisionné sur les livres de WCAG en vue de son '
+          'décaissement progressif, au bénéfice des prestataires désignés pour assurer l\'exécution des projets.',
+        ),
+        _paragraph(
+          'Une situation financière détaillée sera dressée par WCAG à la fin de chaque trimestre et transmise '
+          'au comité constitué par la Communauté Affectée, avec copie au Préfet, afin qu\'à tout moment, la '
+          'Communauté Affectée dispose d\'une information complète quant à la gestion des fonds.',
+        ),
+        _paragraph(
+          'Conformément au PARC, les reliquats éventuels seront soit mis à la disposition de la Communauté '
+          'Affectée, soit engagés sur un nouveau projet au bénéfice de la Communauté Affectée, selon leur '
+          'montant. Dans tous les cas, ces reliquats éventuels restent acquis à la Communauté Affectée.',
         ),
       ];
     }
