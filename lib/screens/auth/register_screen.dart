@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/common_fields.dart';
 
 /// Self-registration screen. New accounts are created with a "pending"
 /// approval status and cannot log in until an administrator approves them
@@ -23,6 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   String _sexe = 'Masculin';
   String _statut = 'Enquêteur';
+  String? _tablette;
   bool _obscurePassword = true;
   bool _loading = false;
   String? _errorMessage;
@@ -54,6 +56,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       password: _passwordCtrl.text,
       sexe: _sexe,
       statut: _statut,
+      tablette: _tablette ?? '',
     );
     if (!mounted) return;
     setState(() => _loading = false);
@@ -215,6 +218,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ],
                           onChanged: (v) =>
                               setState(() => _statut = v ?? _statut),
+                        ),
+                        const SizedBox(height: 14),
+                        ChoiceDropdown(
+                          listName: 'tablette',
+                          label: 'Tablette assignée',
+                          value: _tablette,
+                          required: true,
+                          onChanged: (v) => setState(() => _tablette = v),
+                          validator: (v) => (v == null || v.isEmpty)
+                              ? 'Sélectionnez la tablette utilisée'
+                              : null,
                         ),
                         const SizedBox(height: 14),
                         TextFormField(

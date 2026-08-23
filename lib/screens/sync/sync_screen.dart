@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../models/menage.dart';
+import '../../models/enquete_champ.dart';
+import '../../models/structure.dart';
 import '../../services/app_data_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/sync_service.dart';
@@ -97,6 +100,38 @@ class _SyncScreenState extends State<SyncScreen> {
     });
   }
 
+  /// Restricts the data about to be pushed to the server to ONLY the
+  /// records that belong to the current "Chef d'équipe" account's own
+  /// tablette (device/tablet number), per the "chef ne synchronise que sa
+  /// tablette" requirement. Each Menage/EnqueteChamp/EnqueteStructure
+  /// record carries its own `tablette` field (filled in via the
+  /// "Tablette" dropdown on the survey forms). If the logged-in chef has
+  /// no tablette assigned to their account (older accounts created before
+  /// this field existed), sync is not restricted (backward compatibility)
+  /// but a warning is shown so the issue can be corrected.
+  ({
+    List<Menage> menages,
+    List<EnqueteChamp> champs,
+    List<EnqueteStructure> structures,
+  })
+  _dataForSync(AppDataProvider data) {
+    final myTablette = _currentUser?.tablette ?? '';
+    if (myTablette.isEmpty) {
+      return (
+        menages: data.menages,
+        champs: data.champs,
+        structures: data.structures,
+      );
+    }
+    return (
+      menages: data.menages.where((m) => m.tablette == myTablette).toList(),
+      champs: data.champs.where((c) => c.tablette == myTablette).toList(),
+      structures: data.structures
+          .where((s) => s.tablette == myTablette)
+          .toList(),
+    );
+  }
+
   Future<void> _synchronize() async {
     if (!_canSynchronize) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,15 +149,32 @@ class _SyncScreenState extends State<SyncScreen> {
     if (!mounted) return;
     final data = context.read<AppDataProvider>();
 
+    final myTablette = _currentUser?.tablette ?? '';
+    if (myTablette.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            'Attention : aucune tablette n\'est associée à votre compte — '
+            'toutes les données locales seront synchronisées (mode '
+            'compatibilité). Recréez votre compte pour restreindre la '
+            'synchronisation à votre tablette.',
+          ),
+          backgroundColor: Colors.orange.shade800,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+    final toSync = _dataForSync(data);
+
     setState(() {
       _syncing = true;
       _lastResult = null;
     });
 
     final result = await SyncService.instance.syncAll(
-      menages: data.menages,
-      champs: data.champs,
-      structures: data.structures,
+      menages: toSync.menages,
+      champs: toSync.champs,
+      structures: toSync.structures,
     );
 
     if (!mounted) return;
@@ -592,6 +644,32 @@ class _SyncScreenState extends State<SyncScreen> {
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.red.shade700,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (_canSynchronize) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        size: 16,
+                        color: OkapiColors.textLight,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          (_currentUser?.tablette.isNotEmpty == true)
+                              ? 'Seules les données de votre tablette (Tablette '
+                                    '${_currentUser!.tablette}) seront envoyées au serveur.'
+                              : 'Aucune tablette associée à votre compte : toutes '
+                                    'les données locales seront envoyées (non filtré).',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade700,
                           ),
                         ),
                       ),

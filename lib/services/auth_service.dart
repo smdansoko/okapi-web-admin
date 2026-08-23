@@ -12,6 +12,8 @@ class AppUser {
   final String username;
   final String sexe;
   final String statut;
+  final String tablette; // assigned tablet number (e.g. "1".. "7"), used to
+  // restrict a "Chef d'équipe" account's sync to their own tablet's data.
   final String approvalStatus; // pending / approved / rejected
 
   AppUser({
@@ -21,6 +23,7 @@ class AppUser {
     required this.username,
     required this.sexe,
     required this.statut,
+    this.tablette = '',
     required this.approvalStatus,
   });
 
@@ -35,6 +38,7 @@ class AppUser {
     username: json['username'] as String? ?? '',
     sexe: json['sexe'] as String? ?? '',
     statut: json['statut'] as String? ?? '',
+    tablette: json['tablette'] as String? ?? '',
     approvalStatus: json['approvalStatus'] as String? ?? 'pending',
   );
 
@@ -45,6 +49,7 @@ class AppUser {
     'username': username,
     'sexe': sexe,
     'statut': statut,
+    'tablette': tablette,
     'approvalStatus': approvalStatus,
   };
 }
@@ -102,6 +107,7 @@ class AuthService {
     required String password,
     required String sexe,
     required String statut,
+    String tablette = '',
   }) async {
     final url = await SyncService.instance.serverUrl;
     if (url.isEmpty) {
@@ -123,6 +129,7 @@ class AuthService {
               'password': password,
               'sexe': sexe,
               'statut': statut,
+              'tablette': tablette,
             }),
           )
           .timeout(const Duration(seconds: 20));
