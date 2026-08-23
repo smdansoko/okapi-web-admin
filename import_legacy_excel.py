@@ -18,15 +18,16 @@ these are skipped by requiring the key column (code_menage / id_individu)
 to be non-empty.
 
 Village names: the legacy "village" column stores short internal Kobo
-choice-list VALUES (e.g. "WI", "KT"), not the full village name. For WCAG,
-the original XLSForm ("WCAG_Enquête des ménages.xlsx", 'choices' sheet)
-provides a complete code->name lookup table, embedded below as
-WCAG_VILLAGE_MAP (100% coverage verified against the 3 communes present in
-the WCAG legacy export: Boké-centre, Kanfarandé, Dabis).
-
-For SIMANDOU, no such lookup table has been provided/found yet, so the
-short code is kept as-is for both `village` and `district` (clearly logged
-so this can be corrected later if a SIMANDOU village code list surfaces).
+choice-list VALUES (e.g. "WI", "KT"), not the full village name.
+  - For WCAG, the original XLSForm ("WCAG_Enquête des ménages.xlsx",
+    'choices' sheet) provides a complete code->name lookup table, embedded
+    below as WCAG_VILLAGE_MAP (100% coverage verified against the 3
+    communes present in the WCAG legacy export: Boké-centre, Kanfarandé,
+    Dabis).
+  - For SIMANDOU, the user provided "Liste_village.xlsx" (code/village
+    columns), embedded below as SIMANDOU_VILLAGE_MAP (100% coverage
+    verified against the 15 village codes present in the SIMANDOU legacy
+    export).
 
 Region/Préfecture: derived from the `commune` column via
 backend/../data/guinea_admin.json, using a normalization+prefix match
@@ -104,6 +105,46 @@ WCAG_VILLAGE_MAP = {
     "WI": "Weissin",
     "ND": "N'Diarédi",
     "NY": "N'Yamayara",
+}
+
+# ---------------------------------------------------------------------------
+# SIMANDOU village code -> full village name, provided by the user as
+# "Liste_village.xlsx" (single sheet 'Feuil1', columns N°/code/village).
+# 100% coverage verified against the 15 distinct village codes actually
+# present in the legacy SIMANDOU ménage export.
+# ---------------------------------------------------------------------------
+SIMANDOU_VILLAGE_MAP = {
+    "KS": "Kosseno",
+    "GB": "Gbaranokoro",
+    "GK": "Gbaranokoura",
+    "FR": "Férédou",
+    "BK": "Banankoro",
+    "FE": "Fréssédou",
+    "TW": "Ténémawoussoudou",
+    "FB": "Foyer-Barry",
+    "FK": "Founounkouroudou",
+    "MR": "Mamaridou",
+    "BF": "Bafouro",
+    "DJ": "Djeridou",
+    "MT": "Matenin-moridou",
+    "NB": "Nabaladou",
+    "NF": "Naniferedou",
+    "SM": "Semissadou",
+    "DF": "Djaforodou",
+    "FG": "Famougnedou",
+    "FD": "Foudou",
+    "MN": "Manabri",
+    "SG": "Samiédou",
+    "TM": "Tary-moussoudou",
+    "WR": "Waradala",
+    "WS": "Worosoukoro",
+    "KY": "Koyola",
+    "FF": "Farafina",
+    "SK": "Sokodou",
+    "CU": "Damaro-cu",
+    "Dk": "Djarakedou",
+    "KK": "Konsankoro",
+    "CUK": "Kérouané Centre",
 }
 
 
@@ -409,11 +450,8 @@ def main():
             "wcag", WCAG_XLSX, WCAG_VILLAGE_MAP, resolver, dry_run=args.dry_run
         )
     if args.only in (None, "simandou"):
-        # No village code->name lookup table available yet for SIMANDOU:
-        # pass village_map=None so build_menage_record keeps the raw short
-        # code as-is for both village/district (flagged for follow-up).
         results["simandou"] = import_project(
-            "simandou", SIMANDOU_XLSX, None, resolver, dry_run=args.dry_run
+            "simandou", SIMANDOU_XLSX, SIMANDOU_VILLAGE_MAP, resolver, dry_run=args.dry_run
         )
 
     print("\n=== Summary ===")
