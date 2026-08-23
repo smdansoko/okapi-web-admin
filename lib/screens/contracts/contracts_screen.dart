@@ -41,6 +41,7 @@ class ContractsScreen extends StatelessWidget {
         village: c.village,
         dateEnquete: c.dateEnquete,
         numBatch: c.numBatch,
+        codeEnquete: c.codeEnquete,
       );
       if (c.typeDePropriete == 'Propriétaire') {
         proprietaireOwners[key] = ref;
@@ -238,6 +239,7 @@ class ContractsScreen extends StatelessWidget {
       proprietaire: proprietaire,
       dateEnquete: ref.dateEnquete,
       summary: summary,
+      codeEnquete: ref.codeEnquete,
     );
     await _previewContract(context, contractData);
   }
@@ -284,6 +286,7 @@ class _OwnerRef {
   final String village;
   final DateTime dateEnquete;
   final String numBatch;
+  final String codeEnquete;
   _OwnerRef({
     required this.codeMenage,
     required this.codeProprietaire,
@@ -295,6 +298,7 @@ class _OwnerRef {
     required this.village,
     required this.dateEnquete,
     required this.numBatch,
+    this.codeEnquete = '',
   });
 }
 

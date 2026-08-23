@@ -163,7 +163,13 @@ class ContractData {
       village: menage.village,
       codeMenage: menage.codeMenage,
       codeIndividu: chef?.id ?? menage.codeMenage,
-      codePap: chef?.codePap ?? '',
+      // "Code PAP" is normally attributed manually; when it hasn't been
+      // set yet, fall back to displaying the auto-generated survey code
+      // (same value "Code de l'individu" already carries here) instead of
+      // a bare "-" placeholder.
+      codePap: (chef?.codePap != null && chef!.codePap!.isNotEmpty)
+          ? chef.codePap!
+          : (chef?.id ?? menage.codeMenage),
       nomPrenom: chef?.nomPrenom ?? menage.nomChefMenage,
       sexe: chef?.sexe ?? '',
       dateNaissance: Formatters.date(Formatters.isoToDate(chef?.dateNaissance)),
@@ -195,6 +201,7 @@ class ContractData {
     required Individu proprietaire,
     required DateTime dateEnquete,
     required CompensationSummary summary,
+    String codeEnquete = '',
   }) {
     return ContractData(
       type: type,
@@ -206,7 +213,13 @@ class ContractData {
       village: village,
       codeMenage: codeMenage,
       codeIndividu: proprietaire.id,
-      codePap: proprietaire.codePap ?? '',
+      // "Code PAP" is normally attributed manually; when it hasn't been
+      // set yet, fall back to displaying the auto-generated "code de
+      // l'enquête" (concat(codeProprietaire, '-', numEnqueteChamp)) instead
+      // of a bare "-" placeholder.
+      codePap: (proprietaire.codePap != null && proprietaire.codePap!.isNotEmpty)
+          ? proprietaire.codePap!
+          : (codeEnquete.isNotEmpty ? codeEnquete : proprietaire.id),
       nomPrenom: proprietaire.nomPrenom,
       sexe: proprietaire.sexe,
       dateNaissance: Formatters.date(
