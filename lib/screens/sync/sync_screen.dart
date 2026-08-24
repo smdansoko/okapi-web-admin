@@ -6,15 +6,24 @@ import '../../models/structure.dart';
 import '../../main.dart' show kAllSurveyFormKeys;
 import '../../services/app_data_provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/session_service.dart';
 import '../../services/survey_data_provider.dart';
 import '../../services/sync_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 
-/// Only users with this exact "statut" are allowed to push data to the
-/// server via "Synchroniser" (PUSH). All users (regardless of statut) may
-/// still pull via "Actualiser".
+/// Only users with one of these exact "statut" values are allowed to push
+/// data to the server via "Synchroniser" (PUSH). All users (regardless of
+/// statut) may still pull via "Actualiser". "Chef d'équipe" pushes the
+/// PARC team's ménages/champs/structures; "Expert Biodiversité"/"Expert
+/// Social" push their own module's survey records (there is no separate
+/// "chef" role for those modules).
 const String _kChefDEquipeStatut = "Chef d'équipe";
+const Set<String> _kAllowedPushStatuts = {
+  _kChefDEquipeStatut,
+  SessionService.kExpertBiodiversite,
+  SessionService.kExpertSocial,
+};
 
 /// "Synchroniser" tab: lets the field team push all locally collected data
 /// (Ménages, Enquêtes Champs, Enquêtes Structures — including the recent
@@ -42,7 +51,8 @@ class _SyncScreenState extends State<SyncScreen> {
   PullResult? _lastPullResult;
 
   AppUser? _currentUser;
-  bool get _canSynchronize => _currentUser?.statut == _kChefDEquipeStatut;
+  bool get _canSynchronize =>
+      _currentUser != null && _kAllowedPushStatuts.contains(_currentUser!.statut);
 
   @override
   void initState() {
@@ -139,8 +149,10 @@ class _SyncScreenState extends State<SyncScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Seuls les utilisateurs avec le statut "$_kChefDEquipeStatut" '
-            'peuvent effectuer la synchronisation (envoi vers le serveur).',
+            'Seuls les utilisateurs avec le statut "$_kChefDEquipeStatut", '
+            '"${SessionService.kExpertBiodiversite}" ou '
+            '"${SessionService.kExpertSocial}" peuvent effectuer la '
+            'synchronisation (envoi vers le serveur).',
           ),
           backgroundColor: Colors.red.shade700,
         ),

@@ -7,6 +7,7 @@ import '../models/menage.dart';
 import '../models/enquete_champ.dart';
 import '../models/structure.dart';
 import '../models/survey_record.dart';
+import 'session_service.dart';
 
 /// Result of a synchronization attempt with the OKAPI Web Admin server.
 class SyncResult {
@@ -143,11 +144,18 @@ class SyncService {
   /// [surveyRecords] holds the 11 BIODIVERSITE/SOCIAL survey forms' records,
   /// keyed by formKey (e.g. 'pose_cameras', 'socioeconomique'); sent under a
   /// single `survey_records` payload key as `{formKey: [record.toMap(), ...]}`.
+  ///
+  /// The target project (SIMANDOU/WCAG/SMB) is always included as a
+  /// `project` field so the server binds this sync to the correct
+  /// project-specific database (see okapi_web_admin/auth.py
+  /// mobile_request_project()). Falls back to the session's currently
+  /// selected project if [project] isn't explicitly passed.
   Future<SyncResult> syncAll({
     required List<Menage> menages,
     required List<EnqueteChamp> champs,
     required List<EnqueteStructure> structures,
     Map<String, List<SurveyRecord>> surveyRecords = const {},
+    String? project,
   }) async {
     final url = await serverUrl;
     if (url.isEmpty) {
@@ -158,10 +166,13 @@ class SyncService {
       );
     }
 
+    final targetProject = project ?? await SessionService.instance.project;
+
     final endpoint = Uri.parse('$url/api/sync');
     final payload = {
       'deviceId': await deviceId,
       'deviceName': await deviceName,
+      'project': targetProject ?? 'wcag',
       'menages': menages.map((m) => m.toMap()).toList(),
       'champs': champs.map((c) => c.toMap()).toList(),
       'structures': structures.map((s) => s.toMap()).toList(),
@@ -211,7 +222,10 @@ class SyncService {
   /// OTHER tablets) via GET /api/pull. Used by the "Actualiser" button so
   /// that a household registered on one tablet immediately becomes
   /// available in this tablet's own Champs/Structures survey forms.
-  Future<PullResult> pullFromServer() async {
+  ///
+  /// [project] selects which project's database to pull from (defaults to
+  /// the current session's selected project).
+  Future<PullResult> pullFromServer({String? project}) async {
     final url = await serverUrl;
     if (url.isEmpty) {
       return PullResult(
@@ -221,7 +235,9 @@ class SyncService {
       );
     }
 
-    final endpoint = Uri.parse('$url/api/pull');
+    final targetProject =
+        (project ?? await SessionService.instance.project) ?? 'wcag';
+    final endpoint = Uri.parse('$url/api/pull?project=$targetProject');
     try {
       final response = await http
           .get(endpoint)

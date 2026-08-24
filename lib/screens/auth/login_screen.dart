@@ -61,14 +61,27 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Container(
-                    width: 84,
-                    height: 84,
-                    decoration: const BoxDecoration(
-                      color: OkapiColors.primary,
-                      shape: BoxShape.circle,
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      'assets/logo/okapi_logo_full.png',
+                      width: 108,
+                      height: 108,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => Container(
+                        width: 84,
+                        height: 84,
+                        decoration: const BoxDecoration(
+                          color: OkapiColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.eco,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                      ),
                     ),
-                    child: const Icon(Icons.eco, color: Colors.white, size: 40),
                   ),
                   const SizedBox(height: 16),
                   const Text(

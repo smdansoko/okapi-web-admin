@@ -215,6 +215,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               value: 'Enquêteur',
                               child: Text('Enquêteur'),
                             ),
+                            DropdownMenuItem(
+                              value: 'Expert Biodiversité',
+                              child: Text('Expert Biodiversité'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'Expert Social',
+                              child: Text('Expert Social'),
+                            ),
                           ],
                           onChanged: (v) =>
                               setState(() => _statut = v ?? _statut),
