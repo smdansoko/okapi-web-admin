@@ -37,12 +37,42 @@ PROJECTS = [
 
 MODULES = [
     {"code": "parc", "label": "PARC", "available": True},
-    {"code": "social", "label": "SOCIAL", "available": False},
-    {"code": "biodiversite", "label": "BIODIVERSITÉ", "available": False},
+    {"code": "social", "label": "SOCIAL", "available": True},
+    {"code": "biodiversite", "label": "BIODIVERSITÉ", "available": True},
 ]
 
 PROJECT_LABELS = {p["code"]: p["label"] for p in PROJECTS}
 MODULE_LABELS = {m["code"]: m["label"] for m in MODULES}
+
+# Endpoints that belong to each module. Contracts/compensation/facturation/
+# rapport/ménages/photos are ALL compensation-contract-related and must
+# stay exclusively under PARC (per user requirement: "tout ce qui est lié
+# aux contrats de compensation doivent rester dans PARC"). BIODIVERSITÉ and
+# SOCIAL each only expose their own dashboard + form record browsing.
+_PARC_ENDPOINTS = {
+    "dashboard", "dashboard_stats", "menages_list", "menage_detail",
+    "contracts_list", "export_contract", "preview_contract",
+    "photos_directory", "photos_directory_upload", "individu_photo",
+    "compensation_page", "compensation_export",
+    "facturation_page", "facturation_export_superficie", "facturation_export",
+    "rapport_page", "rapport_export_pdf", "rapport_export_docx",
+}
+_BIODIVERSITE_ENDPOINTS = {"biodiversite_dashboard", "biodiversite_form_records"}
+_SOCIAL_ENDPOINTS = {"social_dashboard", "social_form_records"}
+# Endpoints reachable regardless of the selected module (admin user mgmt).
+_SHARED_ENDPOINTS = {"users_list", "user_approve", "user_reject", "user_delete"}
+
+_MODULE_ENDPOINTS = {
+    "parc": _PARC_ENDPOINTS,
+    "biodiversite": _BIODIVERSITE_ENDPOINTS,
+    "social": _SOCIAL_ENDPOINTS,
+}
+
+_MODULE_HOME_ENDPOINT = {
+    "parc": "dashboard",
+    "biodiversite": "biodiversite_dashboard",
+    "social": "social_dashboard",
+}
 
 # Routes that must remain reachable WITHOUT a session (login page, static
 # assets, and the mobile app's JSON API which authenticates its own way and
@@ -55,6 +85,34 @@ _MOBILE_API_PREFIXES = ("/api/",)
 
 def is_mobile_api_request() -> bool:
     return request.path.startswith(_MOBILE_API_PREFIXES)
+
+
+# Mobile endpoints that deal with USER ACCOUNTS (register/login/status
+# checks) always operate on the shared "wcag" database, regardless of
+# which project the user later chooses to survey - the `users` table is
+# effectively a single shared directory of field agents, independent of
+# project. Only DATA endpoints (/api/sync, /api/pull, /api/status) are
+# project-aware and read the target project from the mobile app's request.
+_MOBILE_USER_ACCOUNT_PATHS = ("/api/register", "/api/login", "/api/users/")
+
+
+def mobile_request_project() -> str:
+    """Determines which project's database a mobile /api/* data request
+    (sync/pull/status) should be bound to. The Flutter app sends the
+    user-selected project (SIMANDOU/WCAG/SMB) either as a `project` field
+    in the JSON body (POST /api/sync), a `project` query string parameter
+    (GET /api/pull, /api/status), or an `X-Project` header. Falls back to
+    "wcag" for older app builds that don't send it yet, so nothing breaks
+    for already-deployed APKs."""
+    project = request.args.get("project") or request.headers.get("X-Project")
+    if not project:
+        payload = request.get_json(silent=True) or {}
+        if isinstance(payload, dict):
+            project = payload.get("project")
+    project = (project or "").strip().lower()
+    if project not in db.PROJECTS:
+        project = db.DEFAULT_PROJECT
+    return project
 
 
 def current_user():
@@ -123,9 +181,15 @@ def register_auth_routes(app):
     @app.before_request
     def _route_project_and_enforce_auth():
         if is_mobile_api_request():
-            # Mobile app always syncs to WCAG for now, regardless of any
-            # concurrent web-admin session/project selection.
-            db.set_current_project("wcag")
+            # User-account endpoints (register/login/status) always use the
+            # shared "wcag" database (single directory of field agents).
+            # Data endpoints (sync/pull/status) are project-aware: they use
+            # whichever project the mobile app says it is currently
+            # operating on (falls back to "wcag" for older app builds).
+            if request.path.startswith(_MOBILE_USER_ACCOUNT_PATHS):
+                db.set_current_project("wcag")
+            else:
+                db.set_current_project(mobile_request_project())
             return None
 
         # Web-admin pages: bind the active database to whatever project is
@@ -147,11 +211,18 @@ def register_auth_routes(app):
         if request.endpoint not in _selection_endpoints:
             if not has_project_and_module():
                 return redirect(url_for("select_project"))
-            # Only the PARC module is implemented today - SOCIAL/
-            # BIODIVERSITÉ must never reach the main app pages (which are
-            # all PARC-specific), even if a project+module are both set.
-            if session.get("module") != "parc":
-                return redirect(url_for("module_coming_soon"))
+            module = session.get("module")
+            # Total separation between modules: PARC endpoints are ALL
+            # compensation-contract related and must never be reachable
+            # from BIODIVERSITÉ/SOCIAL sessions, and vice-versa. Any
+            # endpoint not explicitly listed for the CURRENT module (and
+            # not in the always-shared set) is redirected to that
+            # module's own home page.
+            if request.endpoint not in _SHARED_ENDPOINTS:
+                allowed = _MODULE_ENDPOINTS.get(module, set())
+                if request.endpoint not in allowed:
+                    home = _MODULE_HOME_ENDPOINT.get(module, "select_project")
+                    return redirect(url_for(home))
 
         return None
 
@@ -161,6 +232,7 @@ def register_auth_routes(app):
             "auth_user": current_user(),
             "current_project_label": PROJECT_LABELS.get(session.get("project"), ""),
             "current_module_label": MODULE_LABELS.get(session.get("module"), ""),
+            "current_module": session.get("module") or "",
         }
 
     @app.route("/login", methods=["GET", "POST"])
@@ -209,10 +281,10 @@ def register_auth_routes(app):
             chosen = next((m for m in MODULES if m["code"] == module), None)
             if chosen and chosen["available"]:
                 session["module"] = module
-                return redirect(url_for("dashboard"))
+                return redirect(url_for(_MODULE_HOME_ENDPOINT.get(module, "dashboard")))
             elif chosen:
-                # Not yet available (SOCIAL / BIODIVERSITÉ) - show a
-                # "coming soon" placeholder instead of the main app.
+                # Not yet available - show a "coming soon" placeholder
+                # instead of the main app.
                 session["module"] = module
                 return redirect(url_for("module_coming_soon"))
 

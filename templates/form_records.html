@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}{{ form_title }} - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <p><a href="{{ url_for(dashboard_endpoint) }}">&larr; Retour au tableau de bord {{ module_title }}</a></p>
+  <h2>{{ form_title }}</h2>
+  <p style="font-size:13px; color:#666; margin-top:-6px;">
+    <strong>{{ records|length }}</strong> fiche(s) synchronisée(s) pour ce formulaire.
+  </p>
+</div>
+
+<div class="panel">
+  {% if records %}
+  <table class="data-table compact-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Région</th>
+        <th>Préfecture</th>
+        <th>Sous-préfecture</th>
+        <th>Mis à jour le</th>
+        <th>Détails</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in records %}
+      {% set v = r.values or {} %}
+      <tr>
+        <td><code class="mono">{{ r.id[:8] }}…</code></td>
+        <td>{{ v.region or '—' }}</td>
+        <td>{{ v.prefecture or '—' }}</td>
+        <td>{{ v.sous_prefecture or '—' }}</td>
+        <td>{{ r.updatedAt or r.createdAt or '—' }}</td>
+        <td>
+          <button type="button" class="btn small js-toggle-details" data-target="details-{{ loop.index }}">Voir</button>
+        </td>
+      </tr>
+      <tr id="details-{{ loop.index }}" class="details-row" style="display:none;">
+        <td colspan="6">
+          <table class="data-table compact-table" style="margin:0;">
+            <tbody>
+              {% for key, val in v.items() %}
+              <tr>
+                <td style="width:220px; font-weight:600; color:#666;">{{ key }}</td>
+                <td>{{ val }}</td>
+              </tr>
+              {% endfor %}
+              {% if r.repeats %}
+                {% for rep_key, rep_list in (r.repeats or {}).items() %}
+                <tr>
+                  <td style="font-weight:600; color:#666;">{{ rep_key }} ({{ rep_list|length }})</td>
+                  <td>
+                    {% for item in rep_list %}
+                      <div style="margin-bottom:6px; padding:6px; background:#f7f4f2; border-radius:6px;">
+                        {% for ik, iv in item.items() %}
+                          <span style="margin-right:10px;"><strong>{{ ik }}:</strong> {{ iv }}</span>
+                        {% endfor %}
+                      </div>
+                    {% endfor %}
+                  </td>
+                </tr>
+                {% endfor %}
+              {% endif %}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune fiche synchronisée pour ce formulaire pour le moment.</div>
+  {% endif %}
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('click', function (e) {
+  const btn = e.target.closest('.js-toggle-details');
+  if (!btn) return;
+  const row = document.getElementById(btn.dataset.target);
+  if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+});
+</script>
+{% endblock %}

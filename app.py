@@ -42,6 +42,7 @@ from rapport_data import build_full_report_data, build_indemnisation_rows
 from rapport_pdf import generate_rapport_pdf
 from rapport_docx import generate_rapport_docx
 from facturation_data import build_lot_superficie_rows, build_invoice_workbook
+from survey_forms import FORM_DEFS, FORMS_BY_MODULE, FORM_TITLES, forms_for_module
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
@@ -403,6 +404,99 @@ def dashboard_stats():
         contracts_per_batch=contracts_per_batch,
         multi_record_owners=multi_record_owners,
         codes_summary=codes_summary,
+        now=datetime.now(),
+    )
+
+
+# ---------------------------------------------------------------------------
+# BIODIVERSITÉ / SOCIAL dashboards (generic, driven by survey_forms.py) —
+# totally separate from PARC: only show record counts per form + a région
+# breakdown, no ménages/contrats/compensation involved whatsoever.
+# ---------------------------------------------------------------------------
+
+def _module_dashboard_context(module: str):
+    forms = forms_for_module(module)
+    by_form = db.all_survey_records()  # {formKey: [record,...]}
+    form_rows = []
+    total = 0
+    region_counts = {}
+    for f in forms:
+        records = by_form.get(f["key"], [])
+        n = len(records)
+        total += n
+        form_rows.append({**f, "count": n})
+        for r in records:
+            region = ((r.get("values") or {}).get("region") or "").strip()
+            if region:
+                region_counts[region] = region_counts.get(region, 0) + 1
+    region_rows = sorted(
+        [{"region": k, "count": v} for k, v in region_counts.items()],
+        key=lambda x: -x["count"],
+    )
+    return {
+        "form_rows": form_rows,
+        "total_records": total,
+        "region_rows": region_rows,
+        "now": datetime.now(),
+    }
+
+
+@app.route("/biodiversite")
+def biodiversite_dashboard():
+    ctx = _module_dashboard_context("biodiversite")
+    return render_template(
+        "module_dashboard.html",
+        module_code="biodiversite",
+        module_title="BIODIVERSITÉ",
+        records_endpoint="biodiversite_form_records",
+        **ctx,
+    )
+
+
+@app.route("/biodiversite/formulaire/<form_key>")
+def biodiversite_form_records(form_key):
+    if form_key not in {f["key"] for f in FORMS_BY_MODULE["biodiversite"]}:
+        abort(404)
+    by_form = db.all_survey_records(form_key)
+    records = by_form.get(form_key, [])
+    return render_template(
+        "form_records.html",
+        module_code="biodiversite",
+        module_title="BIODIVERSITÉ",
+        dashboard_endpoint="biodiversite_dashboard",
+        form_key=form_key,
+        form_title=FORM_TITLES.get(form_key, form_key),
+        records=records,
+        now=datetime.now(),
+    )
+
+
+@app.route("/social")
+def social_dashboard():
+    ctx = _module_dashboard_context("social")
+    return render_template(
+        "module_dashboard.html",
+        module_code="social",
+        module_title="SOCIAL",
+        records_endpoint="social_form_records",
+        **ctx,
+    )
+
+
+@app.route("/social/formulaire/<form_key>")
+def social_form_records(form_key):
+    if form_key not in {f["key"] for f in FORMS_BY_MODULE["social"]}:
+        abort(404)
+    by_form = db.all_survey_records(form_key)
+    records = by_form.get(form_key, [])
+    return render_template(
+        "form_records.html",
+        module_code="social",
+        module_title="SOCIAL",
+        dashboard_endpoint="social_dashboard",
+        form_key=form_key,
+        form_title=FORM_TITLES.get(form_key, form_key),
+        records=records,
         now=datetime.now(),
     )
 

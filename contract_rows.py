@@ -119,24 +119,11 @@ def contract_rows_for_batch(menages, champs, structures, num_batch=""):
         })
         existing_codes_no_champ.add(code)
 
-    if not num_batch:
-        known_codes = codes_with_champ_rows | existing_codes_no_champ
-        for m in menages:
-            chef = chef_of(m)
-            if chef and chef.get("id") not in known_codes:
-                rows.append({
-                    "code": chef.get("id"),
-                    "champ_id": "",
-                    "nom": chef.get("nomPrenom", ""),
-                    "type_contrat": "Propriétaire",
-                    "village": m.get("village", ""),
-                    "numBatch": m.get("codeMenage", ""),
-                    "codeMenage": m.get("codeMenage", ""),
-                    "source": "menage",
-                    "num_enquete": None,
-                    "code_enquete": "",
-                })
-                known_codes.add(chef.get("id"))
+    # NOTE: there is intentionally NO ménage-only fallback here. A contract
+    # is generated ONLY for a PAP who has at least one "enquête champs" or
+    # "enquête structure" record - simply being registered as a household
+    # member (ménage imported from Excel for SIMANDOU/WCAG, many of which
+    # have no associated champs/structures) must NOT produce a contract.
 
     # Mark, per owner code, which row is the FIRST one encountered so that
     # exactly one contract per PAP carries their structures/habitation.

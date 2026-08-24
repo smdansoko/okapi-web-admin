@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ module_title }} - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <h2>Tableau de bord {{ module_title }}</h2>
+  <p style="font-size:13px; color:#666; margin-top:-6px;">
+    Statistiques des fiches d'enquête {{ module_title|lower }} synchronisées depuis l'application mobile.
+    Ce module est totalement indépendant du module PARC (aucun contrat ni indemnisation n'est calculé ici).
+  </p>
+</div>
+
+<div class="cards-row">
+  <div class="stat-card {{ 'green' if module_code == 'biodiversite' else 'blue' }}">
+    <div class="icon">{{ '🌿' if module_code == 'biodiversite' else '👥' }}</div>
+    <div class="label">Total des fiches {{ module_title|lower }}</div>
+    <div class="value">{{ total_records }}</div>
+  </div>
+  <div class="stat-card gold">
+    <div class="icon">📋</div>
+    <div class="label">Formulaires disponibles</div>
+    <div class="value">{{ form_rows|length }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">🗺️</div>
+    <div class="label">Régions couvertes</div>
+    <div class="value">{{ region_rows|length }}</div>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Répartition par formulaire</h2>
+  {% if form_rows %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Formulaire</th>
+        <th>Fiches synchronisées</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for f in form_rows %}
+      <tr>
+        <td style="font-size:20px;">{{ f.emoji }}</td>
+        <td>{{ f.title }}</td>
+        <td><strong>{{ f.count }}</strong></td>
+        <td>
+          <a class="btn small" href="{{ url_for(records_endpoint, form_key=f.key) }}">Voir les fiches</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune fiche synchronisée pour le moment.</div>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h2>Répartition par région</h2>
+  {% if region_rows %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Région</th>
+        <th>Nombre de fiches</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in region_rows %}
+      <tr>
+        <td>{{ r.region }}</td>
+        <td><strong>{{ r.count }}</strong></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">Aucune donnée de région disponible pour le moment.</div>
+  {% endif %}
+</div>
+
+{% endblock %}

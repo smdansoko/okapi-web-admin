@@ -28,6 +28,7 @@
     {% endif %}
   </div>
   <nav class="mainnav">
+    {% if current_module == 'parc' %}
     <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint in ('dashboard', 'dashboard_stats') else '' }}">Tableau de bord</a>
     <a href="{{ url_for('menages_list') }}" class="{{ 'active' if request.endpoint in ('menages_list', 'menage_detail') else '' }}">Ménages</a>
     <a href="{{ url_for('contracts_list') }}" class="{{ 'active' if request.endpoint == 'contracts_list' else '' }}">Contrats</a>
@@ -35,6 +36,11 @@
     <a href="{{ url_for('compensation_page') }}" class="{{ 'active' if request.endpoint == 'compensation_page' else '' }}">Indemnisation</a>
     <a href="{{ url_for('facturation_page') }}" class="{{ 'active' if request.endpoint == 'facturation_page' else '' }}">Facturation</a>
     <a href="{{ url_for('rapport_page') }}" class="{{ 'active' if request.endpoint == 'rapport_page' else '' }}">Rapport</a>
+    {% elif current_module == 'biodiversite' %}
+    <a href="{{ url_for('biodiversite_dashboard') }}" class="{{ 'active' if request.endpoint in ('biodiversite_dashboard', 'biodiversite_form_records') else '' }}">Tableau de bord</a>
+    {% elif current_module == 'social' %}
+    <a href="{{ url_for('social_dashboard') }}" class="{{ 'active' if request.endpoint in ('social_dashboard', 'social_form_records') else '' }}">Tableau de bord</a>
+    {% endif %}
     {% if auth_user and auth_user.role == 'admin' %}
     <a href="{{ url_for('users_list') }}" class="{{ 'active' if request.endpoint == 'users_list' else '' }}">
       Utilisateurs
