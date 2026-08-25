@@ -56,10 +56,14 @@ FULL_WIDTH_MM = 186.0
 
 OKAPI_LOGO_PATH = os.path.join(_IMG_DIR, "okapi_header_logo.png")
 WCAG_LOGO_PATH = os.path.join(_IMG_DIR, "wcag_header_logo.png")
+KALAO_LOGO_PATH = os.path.join(_IMG_DIR, "kalao_logo.png")
+SMB_LOGO_PATH = os.path.join(_IMG_DIR, "smb_logo.png")
 # Hardcoded aspect ratios (width/height) of the trimmed logo assets, avoiding
 # a runtime image-library dependency just to measure them.
 OKAPI_LOGO_ASPECT = 644.0 / 324.0
 WCAG_LOGO_ASPECT = 1023.0 / 784.0
+KALAO_LOGO_ASPECT = 116.0 / 45.0
+SMB_LOGO_ASPECT = 1024.0 / 1024.0
 
 
 def _scale_widths(widths_mm, total_mm=FULL_WIDTH_MM):
@@ -1989,22 +1993,36 @@ def _header_footer(canvas, doc, d):
     canvas.saveState()
     w, h = A4
     # Header: brand logos (replaces the former text-based OKAPI / WCAG header)
+    # Per-project logo dispatch:
+    #   simandou -> KALAO logo on the left, NOTHING on the right (no WCAG)
+    #   smb      -> OKAPI logo on the left (unchanged), SMB logo on the right
+    #   wcag     -> unchanged (OKAPI left, WCAG right)
     logo_h = 13 * mm
     top_y = h - 22
+    header_project = d.get("project", "wcag")
+    if header_project == "simandou":
+        left_path, left_aspect = KALAO_LOGO_PATH, KALAO_LOGO_ASPECT
+        right_path, right_aspect = None, None
+    elif header_project == "smb":
+        left_path, left_aspect = OKAPI_LOGO_PATH, OKAPI_LOGO_ASPECT
+        right_path, right_aspect = SMB_LOGO_PATH, SMB_LOGO_ASPECT
+    else:
+        left_path, left_aspect = OKAPI_LOGO_PATH, OKAPI_LOGO_ASPECT
+        right_path, right_aspect = WCAG_LOGO_PATH, WCAG_LOGO_ASPECT
     try:
-        if os.path.exists(OKAPI_LOGO_PATH):
-            okapi_w = logo_h * OKAPI_LOGO_ASPECT
+        if left_path and os.path.exists(left_path):
+            left_w = logo_h * left_aspect
             canvas.drawImage(
-                OKAPI_LOGO_PATH, 32, top_y - logo_h, width=okapi_w, height=logo_h,
+                left_path, 32, top_y - logo_h, width=left_w, height=logo_h,
                 preserveAspectRatio=True, mask="auto",
             )
     except Exception:
         pass
     try:
-        if os.path.exists(WCAG_LOGO_PATH):
-            wcag_w = logo_h * WCAG_LOGO_ASPECT
+        if right_path and os.path.exists(right_path):
+            right_w = logo_h * right_aspect
             canvas.drawImage(
-                WCAG_LOGO_PATH, w - 32 - wcag_w, top_y - logo_h, width=wcag_w, height=logo_h,
+                right_path, w - 32 - right_w, top_y - logo_h, width=right_w, height=logo_h,
                 preserveAspectRatio=True, mask="auto",
             )
     except Exception:

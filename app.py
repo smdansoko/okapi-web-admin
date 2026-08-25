@@ -1328,6 +1328,30 @@ def api_register():
     })
 
 
+def _mobile_admin_user(username: str):
+    """The OKAPI Web Admin's own hardcoded "Administrateur principal"
+    account (dsmariame) can also log into the MOBILE app directly, with
+    full access to all 3 modules (PARC + BIODIVERSITÉ + SOCIAL) -
+    regardless of statut restrictions applied to regular field-agent
+    accounts. Returns a synthetic, always-approved AppUser-shaped dict, or
+    None if `username` doesn't match this special account."""
+    account = auth.USERS.get(username)
+    if not account or account.get("role") != "admin":
+        return None
+    return {
+        "id": f"webadmin-{username}",
+        "nom_prenom": account.get("label", "Administrateur principal"),
+        "telephone": "",
+        "username": username,
+        "sexe": "",
+        "statut": "Administrateur principal",
+        "tablette": "",
+        "approval_status": "approved",
+        "created_at": None,
+        "approved_at": None,
+    }
+
+
 @app.route("/api/login", methods=["POST", "OPTIONS"])
 def api_login():
     if request.method == "OPTIONS":
@@ -1335,6 +1359,17 @@ def api_login():
     payload = request.get_json(force=True, silent=True) or {}
     username = (payload.get("username") or "").strip().lower()
     password = payload.get("password") or ""
+
+    # Special-case: the web admin's own "Administrateur principal" account
+    # can log into the mobile app too, with full PARC+BIODIVERSITÉ+SOCIAL
+    # access, bypassing the regular field-agent users table entirely.
+    admin_account = auth.USERS.get(username)
+    if admin_account and admin_account.get("password") == password:
+        return jsonify({
+            "status": "ok",
+            "message": "Connexion réussie.",
+            "user": _user_public(_mobile_admin_user(username)),
+        })
 
     user = db.get_user_by_username(username)
     if not user or not check_password_hash(user["password_hash"], password):
