@@ -1,0 +1,819 @@
+{
+  "terrains": [
+    {
+      "type": "Terres non cultivables",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 1000,
+      "prix_compensation": 1000
+    },
+    {
+      "type": "Coteaux et autres terres cultivables hors bas-fonds",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 3000,
+      "prix_compensation": 3000
+    },
+    {
+      "type": "Jacheres (hors arbres productifs)",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 3000,
+      "prix_compensation": 3000
+    },
+    {
+      "type": "Jacheres (hors arbres productifs) >10 ans",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 3000,
+      "prix_compensation": 3000
+    },
+    {
+      "type": "Bas-fonds non amenage",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 3500,
+      "prix_compensation": 3500
+    },
+    {
+      "type": "Bas-fonds amenage",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 4000,
+      "prix_compensation": 4000
+    },
+    {
+      "type": "Terrain de mangrove amenage",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 2500,
+      "prix_compensation": 2500
+    },
+    {
+      "type": "Terroir d’habitation villageois",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 10000,
+      "prix_compensation": 10000
+    },
+    {
+      "type": "Terrain construit et/ou constructible en zone urbaine ou periurbaine",
+      "allocation_defrichement": 0,
+      "prix_terre_nue": 80000,
+      "prix_compensation": 80000
+    }
+  ],
+  "cultures_annuelles": [
+    {
+      "culture": "Arachide",
+      "revenu_annuel_ha": 12300000
+    },
+    {
+      "culture": "Fonio",
+      "revenu_annuel_ha": 14650000
+    },
+    {
+      "culture": "Haricot",
+      "revenu_annuel_ha": 24310000
+    },
+    {
+      "culture": "Igname",
+      "revenu_annuel_ha": 89150000
+    },
+    {
+      "culture": "Maïs",
+      "revenu_annuel_ha": 12725000
+    },
+    {
+      "culture": "Manioc",
+      "revenu_annuel_ha": 94150000
+    },
+    {
+      "culture": "Mil",
+      "revenu_annuel_ha": 12706000
+    },
+    {
+      "culture": "Niébé",
+      "revenu_annuel_ha": 9400000
+    },
+    {
+      "culture": "Patate",
+      "revenu_annuel_ha": 61050000
+    },
+    {
+      "culture": "Riz",
+      "revenu_annuel_ha": 12830000
+    },
+    {
+      "culture": "Sésame",
+      "revenu_annuel_ha": 14022000
+    },
+    {
+      "culture": "Sorgho",
+      "revenu_annuel_ha": 14856000
+    },
+    {
+      "culture": "Taro",
+      "revenu_annuel_ha": 93550000
+    },
+    {
+      "culture": "Voandzou",
+      "revenu_annuel_ha": 9940000
+    },
+    {
+      "culture": "Aubergine longue",
+      "revenu_annuel_ha": 167726800
+    },
+    {
+      "culture": "Aubergine ronde",
+      "revenu_annuel_ha": 175226800
+    },
+    {
+      "culture": "Carotte",
+      "revenu_annuel_ha": 178756000
+    },
+    {
+      "culture": "Chou",
+      "revenu_annuel_ha": 122729600
+    },
+    {
+      "culture": "Concombre",
+      "revenu_annuel_ha": 41748000
+    },
+    {
+      "culture": "Gombo",
+      "revenu_annuel_ha": 70735200
+    },
+    {
+      "culture": "Laitue",
+      "revenu_annuel_ha": 138807500
+    },
+    {
+      "culture": "Oignon",
+      "revenu_annuel_ha": 72748000
+    },
+    {
+      "culture": "Petit piment",
+      "revenu_annuel_ha": 178772500
+    },
+    {
+      "culture": "Petite aubergine",
+      "revenu_annuel_ha": 157976375
+    },
+    {
+      "culture": "Poivron",
+      "revenu_annuel_ha": 170726000
+    },
+    {
+      "culture": "Tomate",
+      "revenu_annuel_ha": 127747000
+    },
+    {
+      "culture": "Aucun",
+      "revenu_annuel_ha": 0
+    },
+    {
+      "culture": "Autre",
+      "revenu_annuel_ha": 0
+    }
+  ],
+  "cultures_perennes": [
+    {
+      "nom_usuel": "Anacardier ordinaire",
+      "nom_scientifique": "Anacardier ordinaire",
+      "prix_jeune_non_prod": 110250,
+      "prix_jeune_prod": 196000,
+      "prix_adulte": 245000
+    },
+    {
+      "nom_usuel": "Avocatier ordinaire",
+      "nom_scientifique": "Avocatier ordinaire",
+      "prix_jeune_non_prod": 1000350,
+      "prix_jeune_prod": 1778400,
+      "prix_adulte": 2223000
+    },
+    {
+      "nom_usuel": "Bananier ordinaire",
+      "nom_scientifique": "Bananier ordinaire",
+      "prix_jeune_non_prod": 41175,
+      "prix_jeune_prod": 73200,
+      "prix_adulte": 91500
+    },
+    {
+      "nom_usuel": "Bananier plantain",
+      "nom_scientifique": "Bananier plantain",
+      "prix_jeune_non_prod": 121500,
+      "prix_jeune_prod": 216000,
+      "prix_adulte": 270000
+    },
+    {
+      "nom_usuel": "Citronnier ordinaire",
+      "nom_scientifique": "Citronnier ordinaire",
+      "prix_jeune_non_prod": 839700,
+      "prix_jeune_prod": 1492800,
+      "prix_adulte": 1866000
+    },
+    {
+      "nom_usuel": "Cocotier",
+      "nom_scientifique": "Cocotier",
+      "prix_jeune_non_prod": 1143450,
+      "prix_jeune_prod": 2032800,
+      "prix_adulte": 2541000
+    },
+    {
+      "nom_usuel": "Colatier",
+      "nom_scientifique": "Colatier",
+      "prix_jeune_non_prod": 860625,
+      "prix_jeune_prod": 1530000,
+      "prix_adulte": 1912500
+    },
+    {
+      "nom_usuel": "Karité",
+      "nom_scientifique": "Karité",
+      "prix_jeune_non_prod": 712800,
+      "prix_jeune_prod": 1267200,
+      "prix_adulte": 1584000
+    },
+    {
+      "nom_usuel": "Manguier greffée",
+      "nom_scientifique": "Manguier greffée",
+      "prix_jeune_non_prod": 822375,
+      "prix_jeune_prod": 1462000,
+      "prix_adulte": 1827500
+    },
+    {
+      "nom_usuel": "Manguier ordinaire",
+      "nom_scientifique": "Manguier ordinaire",
+      "prix_jeune_non_prod": 783900,
+      "prix_jeune_prod": 1393600,
+      "prix_adulte": 1742000
+    },
+    {
+      "nom_usuel": "Néré",
+      "nom_scientifique": "Néré",
+      "prix_jeune_non_prod": 742500,
+      "prix_jeune_prod": 1320000,
+      "prix_adulte": 1650000
+    },
+    {
+      "nom_usuel": "Oranger ordinaire",
+      "nom_scientifique": "Oranger ordinaire",
+      "prix_jeune_non_prod": 899100,
+      "prix_jeune_prod": 1598400,
+      "prix_adulte": 1998000
+    },
+    {
+      "nom_usuel": "Palmier amélioré",
+      "nom_scientifique": "Palmier amélioré",
+      "prix_jeune_non_prod": 168075,
+      "prix_jeune_prod": 298800,
+      "prix_adulte": 373500
+    },
+    {
+      "nom_usuel": "Palmier local planté",
+      "nom_scientifique": "Palmier local planté",
+      "prix_jeune_non_prod": 152438,
+      "prix_jeune_prod": 271000,
+      "prix_adulte": 338750
+    },
+    {
+      "nom_usuel": "Papayer",
+      "nom_scientifique": "Papayer",
+      "prix_jeune_non_prod": 209250,
+      "prix_jeune_prod": 372000,
+      "prix_adulte": 465000
+    },
+    {
+      "nom_usuel": "Tamarinier",
+      "nom_scientifique": "Tamarinier",
+      "prix_jeune_non_prod": 368156,
+      "prix_jeune_prod": 654500,
+      "prix_adulte": 818125
+    }
+  ],
+  "especes_sauvages": [
+    {
+      "nom_usuel": "Doundakhè",
+      "nom_scientifique": "Doundakhè (Sarcocephalus esculentus)",
+      "indemnisation_plant_non_productif": 15688,
+      "revenu_brut_annuel_plant_productif": 313760
+    },
+    {
+      "nom_usuel": "Foré D",
+      "nom_scientifique": "Foré D (Landolphia dulcis)",
+      "indemnisation_plant_non_productif": 10526,
+      "revenu_brut_annuel_plant_productif": 210520
+    },
+    {
+      "nom_usuel": "Gbamgba",
+      "nom_scientifique": "Gbamgba (Cassia siberiana)",
+      "indemnisation_plant_non_productif": 11112,
+      "revenu_brut_annuel_plant_productif": 222240
+    },
+    {
+      "nom_usuel": "Mèkhèmèkhènyi",
+      "nom_scientifique": "Mèkhèmèkhènyi (Craterispermum laurinum)",
+      "indemnisation_plant_non_productif": 16130,
+      "revenu_brut_annuel_plant_productif": 322600
+    },
+    {
+      "nom_usuel": "Mokè",
+      "nom_scientifique": "Mokè (Dialium guinnense)",
+      "indemnisation_plant_non_productif": 10667,
+      "revenu_brut_annuel_plant_productif": 213342
+    },
+    {
+      "nom_usuel": "Moronda",
+      "nom_scientifique": "Moronda (Uvaria chamae)",
+      "indemnisation_plant_non_productif": 14098,
+      "revenu_brut_annuel_plant_productif": 281951
+    },
+    {
+      "nom_usuel": "Sikhignè",
+      "nom_scientifique": "Sikhignè (Gardenia aquala)",
+      "indemnisation_plant_non_productif": 12070,
+      "revenu_brut_annuel_plant_productif": 241395
+    },
+    {
+      "nom_usuel": "Siminye",
+      "nom_scientifique": "Siminye (Xylopia ethiopica)",
+      "indemnisation_plant_non_productif": 33911,
+      "revenu_brut_annuel_plant_productif": 678216
+    },
+    {
+      "nom_usuel": "Tolinyi",
+      "nom_scientifique": "Tolinyi (Bridelia ferrugenia)",
+      "indemnisation_plant_non_productif": 10294,
+      "revenu_brut_annuel_plant_productif": 205870
+    },
+    {
+      "nom_usuel": "Tola",
+      "nom_scientifique": "Tola (Beilschmedia mannii)",
+      "indemnisation_plant_non_productif": 16667,
+      "revenu_brut_annuel_plant_productif": 333330
+    },
+    {
+      "nom_usuel": "Kinkirissi",
+      "nom_scientifique": "Kinkirissi (Salacia senegalensis)",
+      "indemnisation_plant_non_productif": 8250,
+      "revenu_brut_annuel_plant_productif": 165000
+    },
+    {
+      "nom_usuel": "Boulen",
+      "nom_scientifique": "Boulen (Entanda africana)",
+      "indemnisation_plant_non_productif": 8250,
+      "revenu_brut_annuel_plant_productif": 165000
+    },
+    {
+      "nom_usuel": "Kolokolo",
+      "nom_scientifique": "Kolokolo (Pericopsis laxiflora)",
+      "indemnisation_plant_non_productif": 8250,
+      "revenu_brut_annuel_plant_productif": 165000
+    },
+    {
+      "nom_usuel": "Gobi",
+      "nom_scientifique": "Gobi (Carapa procera)",
+      "indemnisation_plant_non_productif": 8250,
+      "revenu_brut_annuel_plant_productif": 165000
+    }
+  ],
+  "bois_doeuvre": [
+    {
+      "nom_usuel": "Yala",
+      "nom_scientifique": "Yala (Khaya senegalensis)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Faux Kapokier",
+      "nom_scientifique": "Faux Kapokier (Bombax costatum)",
+      "valeur_bois_m3": 220000
+    },
+    {
+      "nom_usuel": "Fromager",
+      "nom_scientifique": "Fromager (Ceiba pentendra)",
+      "valeur_bois_m3": 220000
+    },
+    {
+      "nom_usuel": "Lingké",
+      "nom_scientifique": "Lingké (Afzelia africana)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Mélina (Gmelina)",
+      "nom_scientifique": "Mélina (Gmelina) (Gmelina arborea)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Sau Rouge",
+      "nom_scientifique": "Sau Rouge (Isoberlinia doka)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Teck",
+      "nom_scientifique": "Teck (Tectona Grandis)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Gben",
+      "nom_scientifique": "Gben (Pterocarpus erinaceus)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Woli",
+      "nom_scientifique": "Woli (Terminalia ivorensis)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Sana",
+      "nom_scientifique": "Sana (Daniellia oliveri)",
+      "valeur_bois_m3": 220000
+    },
+    {
+      "nom_usuel": "Sougué",
+      "nom_scientifique": "Sougué (Parinari excelsa)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Mana",
+      "nom_scientifique": "Mana (Lophira lanceolata)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "fartanidjiri",
+      "nom_scientifique": "fartanidjiri (Anthocieista procera)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Mell",
+      "nom_scientifique": "Mell (Erythrophleum suaveolen)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Iroko",
+      "nom_scientifique": "Iroko (Chlorophora excelsa)",
+      "valeur_bois_m3": 220000
+    },
+    {
+      "nom_usuel": "Dissa Woury",
+      "nom_scientifique": "Dissa Woury (Anthocieista procera)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Gbelen",
+      "nom_scientifique": "Gbelen (Prosopis africana)",
+      "valeur_bois_m3": 175000
+    },
+    {
+      "nom_usuel": "Popo",
+      "nom_scientifique": "Popo (Mytragina stipulosa)",
+      "valeur_bois_m3": 175000
+    }
+  ],
+  "structures": [
+    {
+      "categorie": "Carrelage",
+      "designation": "Céramique",
+      "unite": "m²",
+      "prix_unitaire": 115000
+    },
+    {
+      "categorie": "Carrelage",
+      "designation": "Vitrifié",
+      "unite": "m²",
+      "prix_unitaire": 220000
+    },
+    {
+      "categorie": "Carrelage",
+      "designation": "Faïences",
+      "unite": "m²",
+      "prix_unitaire": 120000
+    },
+    {
+      "categorie": "Carrelage",
+      "designation": "Plinthes",
+      "unite": "m²",
+      "prix_unitaire": 22000
+    },
+    {
+      "categorie": "Fermeture",
+      "designation": "En bois",
+      "unite": "m²",
+      "prix_unitaire": 340000
+    },
+    {
+      "categorie": "Fermeture",
+      "designation": "En métallique",
+      "unite": "m²",
+      "prix_unitaire": 440000
+    },
+    {
+      "categorie": "Fermeture",
+      "designation": "En aluminium",
+      "unite": "m²",
+      "prix_unitaire": 730000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en banco",
+      "unite": "m²",
+      "prix_unitaire": 55000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en planche de bois",
+      "unite": "m²",
+      "prix_unitaire": 57000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en petit bois",
+      "unite": "m²",
+      "prix_unitaire": 35000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en brique crue non crépi",
+      "unite": "m²",
+      "prix_unitaire": 55000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en brique crue crépi",
+      "unite": "m²",
+      "prix_unitaire": 65000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en brique cuite crépi",
+      "unite": "m²",
+      "prix_unitaire": 125000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en brique cuite non crépi",
+      "unite": "m²",
+      "prix_unitaire": 85000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en parpaing crépi",
+      "unite": "m²",
+      "prix_unitaire": 330000
+    },
+    {
+      "categorie": "Mur",
+      "designation": "Mur en parpaing non crépi",
+      "unite": "m²",
+      "prix_unitaire": 140000
+    },
+    {
+      "categorie": "Peinture",
+      "designation": "A huile",
+      "unite": "m²",
+      "prix_unitaire": 20000
+    },
+    {
+      "categorie": "Peinture",
+      "designation": "Fom lavable",
+      "unite": "m²",
+      "prix_unitaire": 15000
+    },
+    {
+      "categorie": "Peinture",
+      "designation": "Fom simple",
+      "unite": "m²",
+      "prix_unitaire": 8000
+    },
+    {
+      "categorie": "Sol",
+      "designation": "Fondation en terre crue",
+      "unite": "m²",
+      "prix_unitaire": 13000
+    },
+    {
+      "categorie": "Sol",
+      "designation": "Fondation en cyclopéen",
+      "unite": "m²",
+      "prix_unitaire": 165000
+    },
+    {
+      "categorie": "Sol",
+      "designation": "Fondation en brique pleine",
+      "unite": "m²",
+      "prix_unitaire": 280000
+    },
+    {
+      "categorie": "Toit",
+      "designation": "Chaume",
+      "unite": "m²",
+      "prix_unitaire": 65000
+    },
+    {
+      "categorie": "Toit",
+      "designation": "Tôles ordinaire",
+      "unite": "m²",
+      "prix_unitaire": 165000
+    },
+    {
+      "categorie": "Toit",
+      "designation": "Tuiles métallique",
+      "unite": "m²",
+      "prix_unitaire": 195000
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Cuisines",
+      "unite": "m²",
+      "prix_unitaire": 850000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Latrines améliorées",
+      "unite": "m²",
+      "prix_unitaire": 855000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Grenier",
+      "unite": "m²",
+      "prix_unitaire": 55000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Magasin",
+      "unite": "m²",
+      "prix_unitaire": 520000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Abri temporaire (champ)",
+      "unite": "m²",
+      "prix_unitaire": 14000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Paillote",
+      "unite": "m²",
+      "prix_unitaire": 470000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Hangar en semi dur",
+      "unite": "m²",
+      "prix_unitaire": 75000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Poulailler",
+      "unite": "m²",
+      "prix_unitaire": 60000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Hangar",
+      "unite": "m²",
+      "prix_unitaire": 45000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Boulangerie",
+      "unite": "m²",
+      "prix_unitaire": 100000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Boutique",
+      "unite": "m²",
+      "prix_unitaire": 580000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Kiosque",
+      "unite": "m²",
+      "prix_unitaire": 350000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Magasin de vente",
+      "unite": "m²",
+      "prix_unitaire": 550000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Atelier de couture",
+      "unite": "m²",
+      "prix_unitaire": 120000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Fondation et dallage abris Kiosque",
+      "unite": "m²",
+      "prix_unitaire": 130000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Puits simple",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 75625,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Puits étaye",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 670000,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Puits amélioré",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 700000,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Forage avec pompe vergnet",
+      "unite": "unité",
+      "prix_unitaire": 47500000,
+      "_base": "nombre"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Forage avec pompe cardia",
+      "unite": "unité",
+      "prix_unitaire": 50000000,
+      "_base": "nombre"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Fosse septique",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 125000,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Clôture en haie morte",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 112000,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Clôture en haie vive",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 170000,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Clôture en barbelé",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 75000,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Clôture en secco (Karta, matériel végétal )",
+      "unite": "mètre linéaire",
+      "prix_unitaire": 12500,
+      "_base": "longueur"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Latrines traditionnelles",
+      "unite": "m²",
+      "prix_unitaire": 500000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Cases traditionnelles",
+      "unite": "m²",
+      "prix_unitaire": 510000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Autre",
+      "unite": "m²",
+      "prix_unitaire": 112000,
+      "_base": "superficie"
+    },
+    {
+      "categorie": "Annexe",
+      "designation": "Bassin d'eau",
+      "unite": "m²",
+      "prix_unitaire": 75000,
+      "_base": "superficie"
+    }
+  ]
+}
