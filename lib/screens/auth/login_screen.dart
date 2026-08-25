@@ -61,16 +61,16 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                  ClipOval(
                     child: Image.asset(
-                      'assets/logo/okapi_logo_full.png',
-                      width: 108,
-                      height: 108,
-                      fit: BoxFit.contain,
+                      'assets/logo/app_icon_square.png',
+                      width: 140,
+                      height: 140,
+                      fit: BoxFit.cover,
+                      filterQuality: FilterQuality.high,
                       errorBuilder: (_, __, ___) => Container(
-                        width: 84,
-                        height: 84,
+                        width: 140,
+                        height: 140,
                         decoration: const BoxDecoration(
                           color: OkapiColors.primary,
                           shape: BoxShape.circle,
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: const Icon(
                           Icons.eco,
                           color: Colors.white,
-                          size: 40,
+                          size: 60,
                         ),
                       ),
                     ),

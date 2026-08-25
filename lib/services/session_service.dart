@@ -29,6 +29,9 @@ class ModuleOption {
 ///   - "Chef d'équipe" / "Enquêteur"      -> PARC only
 ///   - "Expert Biodiversité"              -> BIODIVERSITÉ only
 ///   - "Expert Social"                    -> SOCIAL only
+///   - "Administrateur principal"         -> all 3 (the web admin's main
+///                                          account, also usable from the
+///                                          mobile app - see AuthService)
 ///   - any other/unknown statut (legacy)  -> all 3 (safe fallback)
 class SessionService {
   SessionService._();
@@ -56,6 +59,10 @@ class SessionService {
   static const String kEnqueteur = 'Enquêteur';
   static const String kExpertBiodiversite = 'Expert Biodiversité';
   static const String kExpertSocial = 'Expert Social';
+  // Statut assigned to the OKAPI Web Admin's main administrator account
+  // (dsmariame) when it logs in from the mobile app - see AuthService.login.
+  // Grants full access to all 3 modules (PARC + BIODIVERSITÉ + SOCIAL).
+  static const String kAdministrateurPrincipal = 'Administrateur principal';
 
   /// Which module codes ('parc' / 'biodiversite' / 'social') the given
   /// account "statut" is allowed to select/use.
@@ -68,6 +75,8 @@ class SessionService {
         return {'biodiversite'};
       case kExpertSocial:
         return {'social'};
+      case kAdministrateurPrincipal:
+        return {'parc', 'biodiversite', 'social'};
       default:
         // Legacy/unknown statut: don't lock the user out of the app.
         return {'parc', 'biodiversite', 'social'};

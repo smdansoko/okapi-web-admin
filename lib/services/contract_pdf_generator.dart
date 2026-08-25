@@ -107,6 +107,11 @@ class ContractData {
   final DateTime dateEnquete;
   final CompensationSummary summary;
 
+  /// Project code driving the header logos ('wcag' / 'simandou' / 'smb').
+  /// Defaults to 'wcag' for backward compatibility. See
+  /// [ContractPdfGenerator._pageHeader].
+  final String project;
+
   /// Photos of the compensation beneficiary, stored as base64 strings on
   /// [Individu] and passed through here for embedding in the PDF (page 1):
   /// profile photo always shown when present; CNI recto/verso shown only
@@ -135,6 +140,7 @@ class ContractData {
     required this.telephone,
     required this.dateEnquete,
     required this.summary,
+    this.project = 'wcag',
     this.photoProfilBase64,
     this.photoCniRectoBase64,
     this.photoCniVersoBase64,
@@ -151,10 +157,12 @@ class ContractData {
   factory ContractData.fromMenage({
     required Menage menage,
     required CompensationSummary summary,
+    String project = 'wcag',
   }) {
     final chef = menage.chefDeMenage;
     return ContractData(
       type: ContractType.proprietaire,
+      project: project,
       numeroLot: menage.codeMenage,
       region: menage.region,
       prefecture: menage.prefecture,
@@ -202,9 +210,11 @@ class ContractData {
     required DateTime dateEnquete,
     required CompensationSummary summary,
     String codeEnquete = '',
+    String project = 'wcag',
   }) {
     return ContractData(
       type: type,
+      project: project,
       numeroLot: numeroLot,
       region: region,
       prefecture: prefecture,
@@ -281,6 +291,24 @@ class ContractPdfGenerator {
     } catch (_) {
       _wcagLogo = null;
     }
+    try {
+      _kalaoLogo = pw.MemoryImage(
+        (await rootBundle.load(
+          'assets/logo/kalao_logo.png',
+        )).buffer.asUint8List(),
+      );
+    } catch (_) {
+      _kalaoLogo = null;
+    }
+    try {
+      _smbLogo = pw.MemoryImage(
+        (await rootBundle.load(
+          'assets/logo/smb_logo.png',
+        )).buffer.asUint8List(),
+      );
+    } catch (_) {
+      _smbLogo = null;
+    }
   }
 
   // NOTE: Per client request, contracts no longer use branded colors (maroon
@@ -294,6 +322,8 @@ class ContractPdfGenerator {
 
   static pw.MemoryImage? _okapiLogo;
   static pw.MemoryImage? _wcagLogo;
+  static pw.MemoryImage? _kalaoLogo;
+  static pw.MemoryImage? _smbLogo;
 
   static Future<Uint8List> generate(ContractData d) async {
     await _ensureFonts();
@@ -329,7 +359,7 @@ class ContractPdfGenerator {
       pw.MultiPage(
         pageFormat: PdfPageFormat.a4,
         margin: const pw.EdgeInsets.fromLTRB(32, 24, 32, 36),
-        header: (context) => _pageHeader(),
+        header: (context) => _pageHeader(d.project),
         footer: (context) =>
             _pageFooter(d, context.pageNumber, context.pagesCount),
         build: (context) => pages,
@@ -341,20 +371,19 @@ class ContractPdfGenerator {
 
   // ---------------- Shared header/footer ----------------
 
-  static pw.Widget _pageHeader() {
-    return pw.Container(
-      padding: const pw.EdgeInsets.only(bottom: 8),
-      margin: const pw.EdgeInsets.only(bottom: 10),
-      decoration: const pw.BoxDecoration(
-        border: pw.Border(
-          bottom: pw.BorderSide(color: greyBorder, width: 0.75),
-        ),
-      ),
-      child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: pw.CrossAxisAlignment.center,
-        children: [
-          _okapiLogo != null
+  static pw.Widget _pageHeader(String project) {
+    // Left logo: KALAO for SIMANDOU, OKAPI otherwise.
+    final pw.Widget leftLogo = project == 'simandou'
+        ? (_kalaoLogo != null
+              ? pw.Image(_kalaoLogo!, height: 34)
+              : pw.Text(
+                  'KALAO',
+                  style: pw.TextStyle(
+                    fontSize: 13,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ))
+        : (_okapiLogo != null
               ? pw.Image(_okapiLogo!, height: 34)
               : pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -371,25 +400,57 @@ class ContractPdfGenerator {
                       style: pw.TextStyle(fontSize: 7),
                     ),
                   ],
+                ));
+
+    // Right logo: nothing for SIMANDOU, SMB for smb project, WCAG otherwise.
+    pw.Widget? rightLogo;
+    if (project == 'simandou') {
+      rightLogo = null;
+    } else if (project == 'smb') {
+      rightLogo = _smbLogo != null
+          ? pw.Image(_smbLogo!, height: 34)
+          : pw.Text(
+              'SMB',
+              style: pw.TextStyle(
+                fontSize: 13,
+                fontWeight: pw.FontWeight.bold,
+              ),
+            );
+    } else {
+      rightLogo = _wcagLogo != null
+          ? pw.Image(_wcagLogo!, height: 34)
+          : pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              children: [
+                pw.Text(
+                  'WCAG',
+                  style: pw.TextStyle(
+                    fontSize: 13,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
                 ),
-          _wcagLogo != null
-              ? pw.Image(_wcagLogo!, height: 34)
-              : pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.end,
-                  children: [
-                    pw.Text(
-                      'WCAG',
-                      style: pw.TextStyle(
-                        fontSize: 13,
-                        fontWeight: pw.FontWeight.bold,
-                      ),
-                    ),
-                    pw.Text(
-                      'Winning Consortium Alumina Guinea',
-                      style: pw.TextStyle(fontSize: 7),
-                    ),
-                  ],
+                pw.Text(
+                  'Winning Consortium Alumina Guinea',
+                  style: pw.TextStyle(fontSize: 7),
                 ),
+              ],
+            );
+    }
+
+    return pw.Container(
+      padding: const pw.EdgeInsets.only(bottom: 8),
+      margin: const pw.EdgeInsets.only(bottom: 10),
+      decoration: const pw.BoxDecoration(
+        border: pw.Border(
+          bottom: pw.BorderSide(color: greyBorder, width: 0.75),
+        ),
+      ),
+      child: pw.Row(
+        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: pw.CrossAxisAlignment.center,
+        children: [
+          leftLogo,
+          rightLogo ?? pw.SizedBox(),
         ],
       ),
     );

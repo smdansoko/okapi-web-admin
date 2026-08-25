@@ -75,13 +75,13 @@ class _RootShellState extends State<RootShell> {
           SyncScreen(),
         ];
       default: // 'parc'
-        return const [
-          DashboardScreen(),
-          MenageListScreen(),
-          ChampsListScreen(),
-          StructuresListScreen(),
-          ContractsScreen(),
-          SyncScreen(),
+        return [
+          const DashboardScreen(),
+          const MenageListScreen(),
+          const ChampsListScreen(),
+          const StructuresListScreen(),
+          ContractsScreen(projectCode: widget.projectCode),
+          const SyncScreen(),
         ];
     }
   }

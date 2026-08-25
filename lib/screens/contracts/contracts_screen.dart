@@ -14,7 +14,8 @@ import '../sync/sync_screen.dart';
 /// Generates the "Accord de compensation" PDF matching the official
 /// WCAG/AMC agreement templates, using [ContractPdfGenerator].
 class ContractsScreen extends StatelessWidget {
-  const ContractsScreen({super.key});
+  final String projectCode;
+  const ContractsScreen({super.key, this.projectCode = 'wcag'});
 
   @override
   Widget build(BuildContext context) {
@@ -195,6 +196,7 @@ class ContractsScreen extends StatelessWidget {
     final contractData = ContractData.fromMenage(
       menage: menage,
       summary: summary,
+      project: projectCode,
     );
     await _previewContract(context, contractData);
   }
@@ -240,6 +242,7 @@ class ContractsScreen extends StatelessWidget {
       dateEnquete: ref.dateEnquete,
       summary: summary,
       codeEnquete: ref.codeEnquete,
+      project: projectCode,
     );
     await _previewContract(context, contractData);
   }
