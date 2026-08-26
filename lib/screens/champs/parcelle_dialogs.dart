@@ -17,6 +17,7 @@ Future<ChampAgricole?> showChampDialog(
   ChampAgricole? existing,
   String codeParcelle = '',
   int nextNumOrdre = 1,
+  String project = 'wcag',
 }) {
   final superficieCtrl = TextEditingController(
     text: existing?.superficieChamps.toString() ?? '',
@@ -77,7 +78,7 @@ Future<ChampAgricole?> showChampDialog(
                   ),
                   const SizedBox(height: 12),
                   ChoiceDropdown(
-                    listName: 'etat_champs',
+                    listName: projectListName('etat_champs', project),
                     label: 'État du champs',
                     value: etatChamps.isEmpty ? null : etatChamps,
                     required: true,
@@ -86,13 +87,18 @@ Future<ChampAgricole?> showChampDialog(
                   ),
                   const SizedBox(height: 12),
                   ChoiceDropdown(
-                    listName: 'culture',
+                    listName: projectListName('culture', project),
                     label: 'Culture principale',
                     value: culture.isEmpty ? null : culture,
                     required: true,
                     onChanged: (v) => setDialogState(() => culture = v ?? ''),
                   ),
-                  if (culture == 'Aucun') ...[
+                  // WCAG's culture list uses 'Aucun' as the escape value
+                  // ("préciser la culture") while SIMANDOU's XLSForm uses
+                  // 'Autre' (relevant: ${culture}='Autre').
+                  if (project == 'simandou'
+                      ? culture == 'Autre'
+                      : culture == 'Aucun') ...[
                     const SizedBox(height: 12),
                     LabeledTextField(
                       label: 'Précisez la culture',
@@ -189,6 +195,7 @@ Future<ChampAgricole?> showChampDialog(
 Future<ArbreParcelle?> showArbreDialog(
   BuildContext context, {
   ArbreParcelle? existing,
+  String project = 'wcag',
 }) {
   final autreTypeCtrl = TextEditingController(
     text: existing?.autreTypeArbre ?? '',
@@ -254,7 +261,7 @@ Future<ArbreParcelle?> showArbreDialog(
                   ),
                   const SizedBox(height: 12),
                   ChoiceDropdown(
-                    listName: 'espece_arbre',
+                    listName: projectListName('espece_arbre', project),
                     label: 'Espèce',
                     value: especeArbre.isEmpty ? null : especeArbre,
                     filterType: typeArbre.isEmpty ? null : typeArbre,
@@ -263,12 +270,19 @@ Future<ArbreParcelle?> showArbreDialog(
                         setDialogState(() => especeArbre = v ?? ''),
                   ),
                   if (typeArbre == 'cultures_perennes') ...[
-                    const SizedBox(height: 12),
-                    LabeledTextField(
-                      label: 'Nombre de plantules',
-                      controller: nombrePlanteCtrl,
-                      keyboardType: TextInputType.number,
-                    ),
+                    // SIMANDOU's XLSForm has no "nombre_plante" / "nombre
+                    // adulte declinant" fields for cultures_perennes - only
+                    // nombre_jeune_np / nombre_jeune_p / nombre_mature are
+                    // relevant (see Formulaire enquête champs BWCS
+                    // (SIMANDOU).xlsx, rows 58-61).
+                    if (project != 'simandou') ...[
+                      const SizedBox(height: 12),
+                      LabeledTextField(
+                        label: 'Nombre de plantules',
+                        controller: nombrePlanteCtrl,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
                     const SizedBox(height: 12),
                     LabeledTextField(
                       label: 'Nombre de jeunes non productifs',
@@ -287,12 +301,14 @@ Future<ArbreParcelle?> showArbreDialog(
                       controller: nombreMatureCtrl,
                       keyboardType: TextInputType.number,
                     ),
-                    const SizedBox(height: 12),
-                    LabeledTextField(
-                      label: 'Nombre d\'adultes déclinants',
-                      controller: nombreAdulteDeclCtrl,
-                      keyboardType: TextInputType.number,
-                    ),
+                    if (project != 'simandou') ...[
+                      const SizedBox(height: 12),
+                      LabeledTextField(
+                        label: 'Nombre d\'adultes déclinants',
+                        controller: nombreAdulteDeclCtrl,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
                   ],
                   if (typeArbre == 'especes_sauvages') ...[
                     const SizedBox(height: 12),
@@ -413,6 +429,7 @@ Future<ArbreParcelle?> showArbreDialog(
 Future<RessourceNaturelle?> showRessourceDialog(
   BuildContext context, {
   RessourceNaturelle? existing,
+  String project = 'wcag',
 }) {
   final autreRessourceCtrl = TextEditingController(
     text: existing?.autreRessource ?? '',
@@ -445,7 +462,7 @@ Future<RessourceNaturelle?> showRessourceDialog(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ChoiceDropdown(
-                    listName: 'type_ressource',
+                    listName: projectListName('type_ressource', project),
                     label: 'Type de ressource naturelle',
                     value: typeRessource.isEmpty ? null : typeRessource,
                     required: true,
@@ -457,7 +474,7 @@ Future<RessourceNaturelle?> showRessourceDialog(
                   if (typeRessource != 'Aucun' && typeRessource.isNotEmpty) ...[
                     const SizedBox(height: 12),
                     ChoiceDropdown(
-                      listName: 'ressource',
+                      listName: projectListName('ressource', project),
                       label: 'Ressource',
                       value: ressource,
                       filterType: typeRessource,
@@ -473,7 +490,7 @@ Future<RessourceNaturelle?> showRessourceDialog(
                     ],
                     const SizedBox(height: 12),
                     ChoiceDropdown(
-                      listName: 'unite',
+                      listName: projectListName('unite', project),
                       label: 'Unité de mesure',
                       value: uniteMesure,
                       onChanged: (v) => setDialogState(() => uniteMesure = v),
@@ -547,6 +564,7 @@ Future<ParcelleAgricole?> showParcelleDialog(
   ParcelleAgricole? existing,
   String codeEnquete = '',
   int nextNumOrdre = 1,
+  String project = 'wcag',
 }) {
   final superficieCtrl = TextEditingController(
     text: existing?.superficieParcelle.toString() ?? '',
@@ -602,7 +620,7 @@ Future<ParcelleAgricole?> showParcelleDialog(
                   ),
                   const SizedBox(height: 12),
                   ChoiceDropdown(
-                    listName: 'type_terrain',
+                    listName: projectListName('type_terrain', project),
                     label: 'Type de terrain',
                     value: typeDeTerrain.isEmpty ? null : typeDeTerrain,
                     required: true,
@@ -634,6 +652,7 @@ Future<ParcelleAgricole?> showParcelleDialog(
                         ctx,
                         codeParcelle: currentCodeParcelle,
                         nextNumOrdre: champs.length + 1,
+                        project: project,
                       );
                       if (r != null) setDialogState(() => champs.add(r));
                     },
@@ -642,6 +661,7 @@ Future<ParcelleAgricole?> showParcelleDialog(
                         ctx,
                         existing: champs[i],
                         codeParcelle: currentCodeParcelle,
+                        project: project,
                       );
                       if (r != null) setDialogState(() => champs[i] = r);
                     },
@@ -664,13 +684,17 @@ Future<ParcelleAgricole?> showParcelleDialog(
                       itemTitle: (item, i) => '${i + 1}. ${item.especeArbre}',
                       itemSubtitle: (item, i) => item.typeArbre,
                       onAdd: () async {
-                        final r = await showArbreDialog(ctx);
+                        final r = await showArbreDialog(
+                          ctx,
+                          project: project,
+                        );
                         if (r != null) setDialogState(() => arbres.add(r));
                       },
                       onEdit: (i) async {
                         final r = await showArbreDialog(
                           ctx,
                           existing: arbres[i],
+                          project: project,
                         );
                         if (r != null) setDialogState(() => arbres[i] = r);
                       },

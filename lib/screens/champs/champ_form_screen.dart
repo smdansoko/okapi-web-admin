@@ -17,7 +17,12 @@ import 'parcelle_dialogs.dart';
 /// picked dynamically from the household's own members (individusForMenage).
 class ChampFormScreen extends StatefulWidget {
   final EnqueteChamp? existing;
-  const ChampFormScreen({super.key, this.existing});
+  final String projectCode;
+  const ChampFormScreen({
+    super.key,
+    this.existing,
+    this.projectCode = 'wcag',
+  });
 
   @override
   State<ChampFormScreen> createState() => _ChampFormScreenState();
@@ -138,6 +143,7 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
       existing: existing,
       codeEnquete: previewCodeEnquete,
       nextNumOrdre: _enquete.parcelles.length + 1,
+      project: widget.projectCode,
     );
     if (result != null) {
       setState(() {
@@ -168,7 +174,11 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
     RessourceNaturelle? existing,
     int? index,
   }) async {
-    final result = await showRessourceDialog(context, existing: existing);
+    final result = await showRessourceDialog(
+      context,
+      existing: existing,
+      project: widget.projectCode,
+    );
     if (result != null) {
       setState(() {
         if (index != null) {
@@ -310,7 +320,7 @@ class _ChampFormScreenState extends State<ChampFormScreen> {
             ),
             const SizedBox(height: 16),
             ChoiceDropdown(
-              listName: 'type_propriete',
+              listName: projectListName('type_propriete', widget.projectCode),
               label: 'Type de propriété',
               value: _enquete.typeDePropriete.isEmpty
                   ? null

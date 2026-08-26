@@ -2,6 +2,22 @@ import 'package:flutter/material.dart';
 import '../models/choice_item.dart';
 import '../services/reference_data_service.dart';
 
+/// Resolves a project-aware choices.json list name: when [project] is
+/// 'simandou' and a '<base>_simandou' list exists, that list is used
+/// instead of the default (WCAG/SMB) '<base>' list. Falls back to [base]
+/// otherwise (including when no SIMANDOU-specific variant was defined,
+/// e.g. lists that are identical across projects such as materiaux_mur,
+/// etat_structure, type_propriete, type_ressource, ressource, unite).
+String projectListName(String base, String? project) {
+  if (project == 'simandou') {
+    final suffixed = '${base}_simandou';
+    if (ReferenceDataService.instance.choices(suffixed).isNotEmpty) {
+      return suffixed;
+    }
+  }
+  return base;
+}
+
 /// select_one style dropdown backed by a choices.json list, with optional
 /// choice_filter equivalent (filterType).
 class ChoiceDropdown extends StatelessWidget {

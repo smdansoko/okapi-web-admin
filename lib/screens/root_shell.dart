@@ -78,8 +78,8 @@ class _RootShellState extends State<RootShell> {
         return [
           const DashboardScreen(),
           const MenageListScreen(),
-          const ChampsListScreen(),
-          const StructuresListScreen(),
+          ChampsListScreen(projectCode: widget.projectCode),
+          StructuresListScreen(projectCode: widget.projectCode),
           ContractsScreen(projectCode: widget.projectCode),
           const SyncScreen(),
         ];

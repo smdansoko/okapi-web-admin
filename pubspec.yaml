@@ -98,6 +98,7 @@ flutter:
   # https://flutter.dev/to/resolution-aware-images
   assets:
     - lib/data/price_matrix.json
+    - lib/data/price_matrix_simandou.json
     - lib/data/choices.json
     - lib/data/guinea_admin.json
     - lib/data/survey_schema.json

@@ -192,6 +192,7 @@ class ContractsScreen extends StatelessWidget {
       champsEnquetes: data.champs,
       structureEnquetes: data.structures,
       codeProprietaire: chef.id,
+      project: projectCode,
     );
     final contractData = ContractData.fromMenage(
       menage: menage,
@@ -228,6 +229,7 @@ class ContractsScreen extends StatelessWidget {
       champsEnquetes: data.champs,
       structureEnquetes: data.structures,
       codeProprietaire: ref.codeProprietaire,
+      project: projectCode,
     );
     final contractData = ContractData.fromChampOwner(
       type: type,

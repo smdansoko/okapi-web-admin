@@ -6,7 +6,8 @@ import '../../utils/formatters.dart';
 import 'champ_form_screen.dart';
 
 class ChampsListScreen extends StatelessWidget {
-  const ChampsListScreen({super.key});
+  final String projectCode;
+  const ChampsListScreen({super.key, this.projectCode = 'wcag'});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +26,11 @@ class ChampsListScreen extends StatelessWidget {
             );
             return;
           }
-          Navigator.of(
-            context,
-          ).push(MaterialPageRoute(builder: (_) => const ChampFormScreen()));
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (_) => ChampFormScreen(projectCode: projectCode),
+            ),
+          );
         },
         icon: const Icon(Icons.add),
         label: const Text('Nouvelle enquête'),
@@ -61,7 +64,10 @@ class ChampsListScreen extends StatelessWidget {
                           icon: const Icon(Icons.edit, color: OkapiColors.info),
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => ChampFormScreen(existing: c),
+                              builder: (_) => ChampFormScreen(
+                                existing: c,
+                                projectCode: projectCode,
+                              ),
                             ),
                           ),
                         ),

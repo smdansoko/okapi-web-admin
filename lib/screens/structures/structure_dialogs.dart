@@ -6,10 +6,13 @@ import '../../widgets/common_fields.dart';
 const _uuid = Uuid();
 
 /// Dialog to add/edit a "Structure" (WCAG_Enquête_Structures_V1 — section 2
-/// "Identification des structures du ménage").
+/// "Identification des structures du ménage"). [project] selects the
+/// project-specific choice lists ('type_structure_simandou', etc. for
+/// 'simandou'; default WCAG/SMB lists otherwise).
 Future<StructureItem?> showStructureDialog(
   BuildContext context, {
   StructureItem? existing,
+  String project = 'wcag',
 }) {
   final autreStructureCtrl = TextEditingController(
     text: existing?.autreStructure ?? '',
@@ -47,10 +50,14 @@ Future<StructureItem?> showStructureDialog(
   String? materiauxCarrelage = existing?.materiauxCarrelage;
   String etatStructure = existing?.etatStructure ?? '';
 
-  bool usesMateriaux(String type) =>
-      type == 'Habitation et bien immobiliers' ||
-      type == 'Case Traditionnelle' ||
-      type == 'Batiment rectangulaire';
+  bool usesMateriaux(String type) {
+    if (project == 'simandou') {
+      return type == 'Case Traditionnelle' || type == 'Batiment rectangulaire';
+    }
+    return type == 'Habitation et bien immobiliers' ||
+        type == 'Case Traditionnelle' ||
+        type == 'Batiment rectangulaire';
+  }
 
   return showDialog<StructureItem>(
     context: context,
@@ -71,7 +78,7 @@ Future<StructureItem?> showStructureDialog(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   ChoiceDropdown(
-                    listName: 'type_structure',
+                    listName: projectListName('type_structure', project),
                     label: 'Type de structure',
                     value: typeDeStructure.isEmpty ? null : typeDeStructure,
                     required: true,
@@ -125,28 +132,31 @@ Future<StructureItem?> showStructureDialog(
                       icon: Icons.construction,
                     ),
                     ChoiceDropdown(
-                      listName: 'materiaux_toit',
+                      listName: projectListName('materiaux_toit', project),
                       label: 'Matériaux du toit',
                       value: materiauxToit,
                       onChanged: (v) => setDialogState(() => materiauxToit = v),
                     ),
                     const SizedBox(height: 12),
                     ChoiceDropdown(
-                      listName: 'materiaux_mur',
+                      listName: projectListName('materiaux_mur', project),
                       label: 'Matériaux du mur',
                       value: materiauxMur,
                       onChanged: (v) => setDialogState(() => materiauxMur = v),
                     ),
                     const SizedBox(height: 12),
                     ChoiceDropdown(
-                      listName: 'materiaux_sol',
+                      listName: projectListName('materiaux_sol', project),
                       label: 'Matériaux du sol',
                       value: materiauxSol,
                       onChanged: (v) => setDialogState(() => materiauxSol = v),
                     ),
                     const SizedBox(height: 12),
                     ChoiceDropdown(
-                      listName: 'materiaux_carrelage',
+                      listName: projectListName(
+                        'materiaux_carrelage',
+                        project,
+                      ),
                       label: 'Carrelage',
                       value: materiauxCarrelage,
                       onChanged: (v) =>
@@ -154,7 +164,10 @@ Future<StructureItem?> showStructureDialog(
                     ),
                     const SizedBox(height: 12),
                     ChoiceDropdown(
-                      listName: 'materiaux_fermeture',
+                      listName: projectListName(
+                        'materiaux_fermeture',
+                        project,
+                      ),
                       label: 'Matériaux de fermeture (portes/fenêtres)',
                       value: materiauxFermeture,
                       onChanged: (v) =>
@@ -162,7 +175,10 @@ Future<StructureItem?> showStructureDialog(
                     ),
                     const SizedBox(height: 12),
                     ChoiceDropdown(
-                      listName: 'materiaux_peinture',
+                      listName: projectListName(
+                        'materiaux_peinture',
+                        project,
+                      ),
                       label: 'Peinture',
                       value: materiauxPeinture,
                       onChanged: (v) =>
@@ -219,7 +235,7 @@ Future<StructureItem?> showStructureDialog(
                   ),
                   const SizedBox(height: 12),
                   ChoiceDropdown(
-                    listName: 'etat_structure',
+                    listName: projectListName('etat_structure', project),
                     label: 'État de la structure',
                     value: etatStructure.isEmpty ? null : etatStructure,
                     required: true,

@@ -102,6 +102,23 @@ class StructureItem {
       typeDeStructure == 'Habitation et bien immobiliers' ||
       typeDeStructure == 'Case Traditionnelle' ||
       typeDeStructure == 'Batiment rectangulaire';
+
+  /// Project-aware variant of [usesMateriaux]. The SIMANDOU PARC form's
+  /// "type_structure" choice list does not include "Habitation et bien
+  /// immobiliers" or "Case Traditionnelle" (only "Batiment rectangulaire"
+  /// triggers the "matériaux de construction" group), while WCAG/SMB keep
+  /// the original 3-value set.
+  bool usesMateriauxForProject(String project) {
+    if (project == 'simandou') {
+      // SIMANDOU's type_structure choice list has no "Case Traditionnelle"
+      // entry (only "Batiment rectangulaire" is selectable), but the
+      // relevant condition is kept identical to the XLSForm source for
+      // parity in case the choice list is extended later.
+      return typeDeStructure == 'Case Traditionnelle' ||
+          typeDeStructure == 'Batiment rectangulaire';
+    }
+    return usesMateriaux;
+  }
 }
 
 /// Enquête structures (Formulaire 3: WCAG_Enquête_Structures_V1)

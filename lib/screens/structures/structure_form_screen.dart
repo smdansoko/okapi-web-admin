@@ -16,7 +16,12 @@ import 'structure_dialogs.dart';
 /// (individusForMenage), exactly like the Champs form.
 class StructureFormScreen extends StatefulWidget {
   final EnqueteStructure? existing;
-  const StructureFormScreen({super.key, this.existing});
+  final String projectCode;
+  const StructureFormScreen({
+    super.key,
+    this.existing,
+    this.projectCode = 'wcag',
+  });
 
   @override
   State<StructureFormScreen> createState() => _StructureFormScreenState();
@@ -94,7 +99,11 @@ class _StructureFormScreenState extends State<StructureFormScreen> {
     StructureItem? existing,
     int? index,
   }) async {
-    final result = await showStructureDialog(context, existing: existing);
+    final result = await showStructureDialog(
+      context,
+      existing: existing,
+      project: widget.projectCode,
+    );
     if (result != null) {
       setState(() {
         if (index != null) {

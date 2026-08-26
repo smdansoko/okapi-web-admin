@@ -6,7 +6,8 @@ import '../../utils/formatters.dart';
 import 'structure_form_screen.dart';
 
 class StructuresListScreen extends StatelessWidget {
-  const StructuresListScreen({super.key});
+  final String projectCode;
+  const StructuresListScreen({super.key, this.projectCode = 'wcag'});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +27,9 @@ class StructuresListScreen extends StatelessWidget {
             return;
           }
           Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const StructureFormScreen()),
+            MaterialPageRoute(
+              builder: (_) => StructureFormScreen(projectCode: projectCode),
+            ),
           );
         },
         icon: const Icon(Icons.add),
@@ -60,7 +63,10 @@ class StructuresListScreen extends StatelessWidget {
                           icon: const Icon(Icons.edit, color: OkapiColors.info),
                           onPressed: () => Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (_) => StructureFormScreen(existing: s),
+                              builder: (_) => StructureFormScreen(
+                                existing: s,
+                                projectCode: projectCode,
+                              ),
                             ),
                           ),
                         ),

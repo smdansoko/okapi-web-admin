@@ -1301,5 +1301,583 @@
       "name": "Ruine",
       "label": "Ruine"
     }
+  ],
+  "culture_simandou": [
+    {
+      "name": "Aucun",
+      "label": "Aucun"
+    },
+    {
+      "name": "Arachide",
+      "label": "Arachide"
+    },
+    {
+      "name": "Fonio",
+      "label": "Fonio"
+    },
+    {
+      "name": "Haricot",
+      "label": "Haricot"
+    },
+    {
+      "name": "Igname",
+      "label": "Igname"
+    },
+    {
+      "name": "Maïs",
+      "label": "Maïs"
+    },
+    {
+      "name": "Manioc",
+      "label": "Manioc"
+    },
+    {
+      "name": "Mil",
+      "label": "Mil"
+    },
+    {
+      "name": "Niébé",
+      "label": "Niébé"
+    },
+    {
+      "name": "Patate",
+      "label": "Patate"
+    },
+    {
+      "name": "Riz",
+      "label": "Riz"
+    },
+    {
+      "name": "Sésame",
+      "label": "Sésame"
+    },
+    {
+      "name": "Sorgho",
+      "label": "Sorgho"
+    },
+    {
+      "name": "Taro",
+      "label": "Taro"
+    },
+    {
+      "name": "Voandzou",
+      "label": "Voandzou"
+    },
+    {
+      "name": "Aubergine longue",
+      "label": "Aubergine longue"
+    },
+    {
+      "name": "Aubergine ronde",
+      "label": "Aubergine ronde"
+    },
+    {
+      "name": "Carotte",
+      "label": "Carotte"
+    },
+    {
+      "name": "Chou",
+      "label": "Chou"
+    },
+    {
+      "name": "Concombre",
+      "label": "Concombre"
+    },
+    {
+      "name": "Gombo",
+      "label": "Gombo"
+    },
+    {
+      "name": "Laitue",
+      "label": "Laitue"
+    },
+    {
+      "name": "Oignon",
+      "label": "Oignon"
+    },
+    {
+      "name": "Petit piment",
+      "label": "Petit piment"
+    },
+    {
+      "name": "Petite aubergine",
+      "label": "Petite aubergine"
+    },
+    {
+      "name": "Poivron",
+      "label": "Poivron"
+    },
+    {
+      "name": "Tomate",
+      "label": "Tomate"
+    },
+    {
+      "name": "Autre",
+      "label": "Autre"
+    }
+  ],
+  "type_terrain_simandou": [
+    {
+      "name": "Terres non cultivables",
+      "label": "Terres non cultivables"
+    },
+    {
+      "name": "Coteaux et autres terres cultivables hors bas-fonds",
+      "label": "Coteaux et autres terres cultivables hors bas-fonds"
+    },
+    {
+      "name": "Jacheres (hors arbres productifs) <10 ans",
+      "label": "Jachères (hors arbres productifs) <10 ans"
+    },
+    {
+      "name": "Jacheres (hors arbres productifs) >10 ans",
+      "label": "Jachères (hors arbres productifs) >10 ans"
+    },
+    {
+      "name": "Bas-fonds non amenage",
+      "label": "Bas-fonds non aménagé"
+    },
+    {
+      "name": "Bas-fonds amenage",
+      "label": "Bas-fonds aménagé"
+    },
+    {
+      "name": "Terrain de mangrove amenage",
+      "label": "Terrain de mangrove aménagé"
+    },
+    {
+      "name": "Terroir d’habitation villageois",
+      "label": "Terroir d’habitation villageois"
+    },
+    {
+      "name": "Terrain construit et/ou constructible en zone urbaine ou periurbaine",
+      "label": "Terrain construit et/ou constructible en zone urbaine ou périurbaine"
+    }
+  ],
+  "espece_arbre_simandou": [
+    {
+      "name": "Anacardier ordinaire",
+      "label": "Anacardier ordinaire",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Avocatier ordinaire",
+      "label": "Avocatier ordinaire",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Bananier ordinaire",
+      "label": "Bananier ordinaire",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Bananier plantain",
+      "label": "Bananier plantain",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Citronnier ordinaire",
+      "label": "Citronnier ordinaire",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Cocotier",
+      "label": "Cocotier",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Colatier",
+      "label": "Colatier",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Karité",
+      "label": "Karité",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Manguier greffée",
+      "label": "Manguier greffée",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Manguier ordinaire",
+      "label": "Manguier ordinaire",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Néré",
+      "label": "Néré",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Oranger ordinaire",
+      "label": "Oranger ordinaire",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Palmier amélioré",
+      "label": "Palmier amélioré",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Palmier local planté",
+      "label": "Palmier local planté",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Papayer",
+      "label": "Papayer",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Tamarinier",
+      "label": "Tamarinier",
+      "type": "cultures_perennes"
+    },
+    {
+      "name": "Yala",
+      "label": "Yala (Khaya senegalensis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Faux Kapokier",
+      "label": "Faux Kapokier (Bombax costatum)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Fromager",
+      "label": "Fromager (Ceiba pentendra)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Lingké",
+      "label": "Lingké (Afzelia africana)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Mélina (Gmelina)",
+      "label": "Mélina (Gmelina) (Gmelina arborea)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Sau Rouge",
+      "label": "Sau Rouge (Isoberlinia doka)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Teck",
+      "label": "Teck (Tectona Grandis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Gben",
+      "label": "Gben (Pterocarpus erinaceus)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Woli",
+      "label": "Woli  (Terminalia ivorensis)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Sana",
+      "label": "Sana (Daniellia oliveri)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Sougué",
+      "label": "Sougué (Parinari excelsa)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Mana",
+      "label": "Mana (Lophira lanceolata)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "fartanidjiri",
+      "label": "fartanidjiri (Anthocieista procera)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Mell",
+      "label": "Mell (Erythrophleum suaveolen)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Iroko",
+      "label": "Iroko (Chlorophora excelsa)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Dissa Woury",
+      "label": "Dissa Woury (Anthocieista procera)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Gbelen",
+      "label": "Gbelen (Prosopis africana)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Popo",
+      "label": "Popo (Mytragina stipulosa)",
+      "type": "bois_doeuvre"
+    },
+    {
+      "name": "Doundakhè",
+      "label": "Doundakhè (Sarcocephalus esculentus)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Foré D",
+      "label": "Foré D (Landolphia dulcis)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Gbamgba",
+      "label": "Gbamgba (Cassia siberiana)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Mèkhèmèkhènyi",
+      "label": "Mèkhèmèkhènyi (Craterispermum laurinum)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Mokè",
+      "label": "Mokè  (Dialium guinnense)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Moronda",
+      "label": "Moronda  (Uvaria chamae)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Sikhignè",
+      "label": "Sikhignè (Gardenia aquala)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Siminye",
+      "label": "Siminye (Xylopia ethiopica)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Tolinyi",
+      "label": "Tolinyi (Bridelia ferrugenia)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Tola",
+      "label": "Tola (Beilschmedia mannii)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Kinkirissi",
+      "label": "Kinkirissi (Salacia senegalensis)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Boulen",
+      "label": "Boulen (Entanda africana)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Kolokolo",
+      "label": "Kolokolo (Pericopsis laxiflora)",
+      "type": "especes_sauvages"
+    },
+    {
+      "name": "Gobi",
+      "label": "Gobi (Carapa procera)",
+      "type": "especes_sauvages"
+    }
+  ],
+  "type_structure_simandou": [
+    {
+      "name": "Batiment rectangulaire",
+      "label": "Batiment rectangulaire"
+    },
+    {
+      "name": "Cuisines",
+      "label": "Cuisines"
+    },
+    {
+      "name": "Latrines améliorées",
+      "label": "Latrines améliorées"
+    },
+    {
+      "name": "Grenier",
+      "label": "Grenier"
+    },
+    {
+      "name": "Magasin",
+      "label": "Magasin"
+    },
+    {
+      "name": "Abri temporaire (champ)",
+      "label": "Abri temporaire (champ)"
+    },
+    {
+      "name": "Paillote",
+      "label": "Paillote"
+    },
+    {
+      "name": "Hangar en semi dur",
+      "label": "Hangar en semi dur"
+    },
+    {
+      "name": "Poulailler",
+      "label": "Poulailler"
+    },
+    {
+      "name": "Hangar",
+      "label": "Hangar"
+    },
+    {
+      "name": "Boulangerie",
+      "label": "Boulangerie"
+    },
+    {
+      "name": "Boutique",
+      "label": "Boutique"
+    },
+    {
+      "name": "Kiosque",
+      "label": "Kiosque"
+    },
+    {
+      "name": "Magasin de vente",
+      "label": "Magasin de vente"
+    },
+    {
+      "name": "Atelier de couture",
+      "label": "Atelier de couture"
+    },
+    {
+      "name": "Fondation et dallage abris Kiosque",
+      "label": "Fondation et dallage abris Kiosque"
+    },
+    {
+      "name": "Puits simple",
+      "label": "Puits simple"
+    },
+    {
+      "name": "Puits étaye",
+      "label": "Puits étaye"
+    },
+    {
+      "name": "Puits amélioré",
+      "label": "Puits amélioré"
+    },
+    {
+      "name": "Forage avec pompe vergnet",
+      "label": "Forage avec pompe vergnet"
+    },
+    {
+      "name": "Forage avec pompe cardia",
+      "label": "Forage avec pompe cardia"
+    },
+    {
+      "name": "Fosse septique",
+      "label": "Fosse septique"
+    },
+    {
+      "name": "Clôture en haie morte",
+      "label": "Clôture en haie morte"
+    },
+    {
+      "name": "Clôture en haie vive",
+      "label": "Clôture en haie vive"
+    },
+    {
+      "name": "Clôture en barbelé",
+      "label": "Clôture en barbelé"
+    },
+    {
+      "name": "Clôture en secco (Karta, matériel végétal )",
+      "label": "Clôture en secco (Karta, matériel végétal )"
+    },
+    {
+      "name": "Autre",
+      "label": "Autre"
+    }
+  ],
+  "materiaux_toit_simandou": [
+    {
+      "name": "Chaume",
+      "label": "Chaume"
+    },
+    {
+      "name": "Tôles ordinaire",
+      "label": "Tôles ordinaire"
+    },
+    {
+      "name": "Tuiles métallique",
+      "label": "Tuiles métallique"
+    }
+  ],
+  "materiaux_sol_simandou": [
+    {
+      "name": "Fondation en terre crue",
+      "label": "Fondation en terre crue"
+    },
+    {
+      "name": "Fondation en cyclopéen",
+      "label": "Fondation en cyclopéen"
+    },
+    {
+      "name": "Fondation en brique pleine",
+      "label": "Fondation en brique pleine"
+    }
+  ],
+  "materiaux_fermeture_simandou": [
+    {
+      "name": "En bois",
+      "label": "En bois"
+    },
+    {
+      "name": "En métallique",
+      "label": "En métallique"
+    },
+    {
+      "name": "En aluminium",
+      "label": "En aluminium"
+    }
+  ],
+  "materiaux_peinture_simandou": [
+    {
+      "name": "A huile",
+      "label": "A huile"
+    },
+    {
+      "name": "Fom lavable",
+      "label": "Fom lavable"
+    },
+    {
+      "name": "Fom simple",
+      "label": "Fom simple"
+    }
+  ],
+  "materiaux_carrelage_simandou": [
+    {
+      "name": "Céramique",
+      "label": "Céramique"
+    },
+    {
+      "name": "Vitrifié",
+      "label": "Vitrifié"
+    },
+    {
+      "name": "Faïences",
+      "label": "Faïences"
+    },
+    {
+      "name": "Plinthes",
+      "label": "Plinthes"
+    }
   ]
 }

@@ -152,19 +152,20 @@ class CompensationCalculator {
     required List<EnqueteChamp> champsEnquetes,
     required List<es.EnqueteStructure> structureEnquetes,
     required String codeProprietaire,
+    String project = 'wcag',
   }) {
     final summary = CompensationSummary();
 
     for (final enquete in champsEnquetes.where(
       (e) => e.codeProprietaire == codeProprietaire,
     )) {
-      _accumulateChampsEnquete(summary, enquete);
+      _accumulateChampsEnquete(summary, enquete, project);
     }
 
     for (final enquete in structureEnquetes.where(
       (e) => e.proprietaireStructure == codeProprietaire,
     )) {
-      _accumulateStructureEnquete(summary, enquete);
+      _accumulateStructureEnquete(summary, enquete, project);
     }
 
     return summary;
@@ -176,13 +177,14 @@ class CompensationCalculator {
   static CompensationSummary computeGlobal({
     required List<EnqueteChamp> champsEnquetes,
     required List<es.EnqueteStructure> structureEnquetes,
+    String project = 'wcag',
   }) {
     final summary = CompensationSummary();
     for (final enquete in champsEnquetes) {
-      _accumulateChampsEnquete(summary, enquete);
+      _accumulateChampsEnquete(summary, enquete, project);
     }
     for (final enquete in structureEnquetes) {
-      _accumulateStructureEnquete(summary, enquete);
+      _accumulateStructureEnquete(summary, enquete, project);
     }
     return summary;
   }
@@ -190,10 +192,14 @@ class CompensationCalculator {
   static void _accumulateChampsEnquete(
     CompensationSummary summary,
     EnqueteChamp enquete,
+    String project,
   ) {
     for (final parcelle in enquete.parcelles) {
       // ---- Foncier (parcelle) ----
-      final terrain = _ref.terrainByType(parcelle.typeDeTerrain);
+      final terrain = _ref.terrainByType(
+        parcelle.typeDeTerrain,
+        project: project,
+      );
       final coutM2 = (terrain?['prix_compensation'] as num?)?.toDouble() ?? 0;
       final montantParcelle = coutM2 * parcelle.superficieParcelle;
       summary.parcelles += montantParcelle;
@@ -210,9 +216,9 @@ class CompensationCalculator {
 
       // ---- Cultures annuelles (champs) ----
       for (final champ in parcelle.champs) {
-        final culture = _ref.culturesAnnuelles.firstWhereOrNull(
-          (c) => c['culture'] == champ.culture,
-        );
+        final culture = _ref
+            .culturesAnnuelles(project: project)
+            .firstWhereOrNull((c) => c['culture'] == champ.culture);
         if (culture != null) {
           final revenuHa =
               (culture['revenu_annuel_ha'] as num?)?.toDouble() ?? 0;
@@ -236,13 +242,23 @@ class CompensationCalculator {
       for (final arbre in parcelle.arbres) {
         switch (arbre.typeArbre) {
           case 'cultures_perennes':
-            _accumulateCulturePerenne(summary, arbre.especeArbre, arbre);
+            _accumulateCulturePerenne(
+              summary,
+              arbre.especeArbre,
+              arbre,
+              project,
+            );
             break;
           case 'especes_sauvages':
-            _accumulateEspeceSauvage(summary, arbre.especeArbre, arbre);
+            _accumulateEspeceSauvage(
+              summary,
+              arbre.especeArbre,
+              arbre,
+              project,
+            );
             break;
           case 'bois_doeuvre':
-            _accumulateBoisDoeuvre(summary, arbre.especeArbre, arbre);
+            _accumulateBoisDoeuvre(summary, arbre.especeArbre, arbre, project);
             break;
         }
       }
@@ -255,8 +271,9 @@ class CompensationCalculator {
     CompensationSummary summary,
     String espece,
     dynamic arbre,
+    String project,
   ) {
-    final data = _ref.culturePerenneByName(espece);
+    final data = _ref.culturePerenneByName(espece, project: project);
     if (data == null) return;
     final prixPlante = (data['prix_plante'] as num?)?.toDouble() ?? 0;
     final prixJeuneNp = (data['prix_jeune_non_prod'] as num?)?.toDouble() ?? 0;
@@ -303,8 +320,9 @@ class CompensationCalculator {
     CompensationSummary summary,
     String espece,
     dynamic arbre,
+    String project,
   ) {
-    final data = _ref.especeSauvageByName(espece);
+    final data = _ref.especeSauvageByName(espece, project: project);
     if (data == null) return;
     final prixNp =
         (data['indemnisation_plant_non_productif'] as num?)?.toDouble() ?? 0;
@@ -334,8 +352,9 @@ class CompensationCalculator {
     CompensationSummary summary,
     String espece,
     dynamic arbre,
+    String project,
   ) {
-    final data = _ref.boisDoeuvreByName(espece);
+    final data = _ref.boisDoeuvreByName(espece, project: project);
     if (data == null) return;
     final valeurM3 = (data['valeur_bois_m3'] as num?)?.toDouble() ?? 0;
 
@@ -412,14 +431,20 @@ class CompensationCalculator {
   static void _accumulateStructureEnquete(
     CompensationSummary summary,
     es.EnqueteStructure enquete,
+    String project,
   ) {
     for (final s in enquete.structures) {
-      if (s.usesMateriaux) {
-        _accumulateHabitation(summary, s);
+      if (s.usesMateriauxForProject(project)) {
+        _accumulateHabitation(summary, s, project);
+      } else if (project == 'simandou') {
+        _accumulateAutreStructureSimandou(summary, s);
       } else {
         final mapping = _autresStructuresMap[s.typeDeStructure];
         if (mapping == null) continue;
-        final priceRow = _ref.structureByDesignation(mapping.designation);
+        final priceRow = _ref.structureByDesignation(
+          mapping.designation,
+          project: project,
+        );
         if (priceRow == null) continue;
         final prixUnitaire =
             (priceRow['prix_unitaire'] as num?)?.toDouble() ?? 0;
@@ -452,9 +477,57 @@ class CompensationCalculator {
     }
   }
 
+  /// SIMANDOU-specific "autres structures" (non-Batiment/Case) computation.
+  /// Unlike WCAG, the SIMANDOU XLSForm's `type_structure` choice names match
+  /// the price matrix's "Annexe" row designations 1:1 (see
+  /// lib/data/price_matrix_simandou.json), so no hardcoded name-mapping
+  /// table is needed - the quantity base (superficie/longueur/nombre) is
+  /// read directly from each row's `_base` field.
+  static void _accumulateAutreStructureSimandou(
+    CompensationSummary summary,
+    es.StructureItem s,
+  ) {
+    final designation = s.typeDeStructure;
+    if (designation.isEmpty) return;
+    final priceRow = _ref.structureByDesignation(
+      designation,
+      project: 'simandou',
+    );
+    if (priceRow == null) return;
+    final prixUnitaire = (priceRow['prix_unitaire'] as num?)?.toDouble() ?? 0;
+    final base = (priceRow['_base'] as String?) ?? 'superficie';
+    double quantite;
+    switch (base) {
+      case 'longueur':
+        quantite = s.longueurProfondeur;
+        break;
+      case 'nombre':
+        quantite = 1;
+        break;
+      case 'superficie':
+      default:
+        quantite = s.superficieSol;
+        break;
+    }
+    final montant = prixUnitaire * quantite;
+    summary.structures += montant;
+    if (montant > 0) {
+      summary.structureDetails.add(
+        StructureDetail(
+          designation: designation,
+          unite: (priceRow['unite'] as String?) ?? '',
+          quantite: quantite,
+          prixUnitaire: prixUnitaire,
+          montant: montant,
+        ),
+      );
+    }
+  }
+
   static void _accumulateHabitation(
     CompensationSummary summary,
     es.StructureItem s,
+    String project,
   ) {
     double montantTotal = 0;
 
@@ -464,7 +537,10 @@ class CompensationCalculator {
           materiauLabel == 'Aucun') {
         return;
       }
-      final priceRow = _ref.structureByDesignation(materiauLabel);
+      final priceRow = _ref.structureByDesignation(
+        materiauLabel,
+        project: project,
+      );
       if (priceRow == null) return;
       final prixUnitaire = (priceRow['prix_unitaire'] as num?)?.toDouble() ?? 0;
       final montant = prixUnitaire * superficie;

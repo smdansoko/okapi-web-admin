@@ -15,6 +15,7 @@ class ReferenceDataService {
 
   Map<String, List<ChoiceItem>> _choices = {};
   Map<String, dynamic> _priceMatrix = {};
+  Map<String, dynamic> _priceMatrixSimandou = {};
   Map<String, Map<String, List<String>>> _adminDivisions = {};
   Map<String, SurveySchema> _surveyForms = {};
 
@@ -35,6 +36,11 @@ class ReferenceDataService {
 
     final priceRaw = await rootBundle.loadString('lib/data/price_matrix.json');
     _priceMatrix = jsonDecode(priceRaw) as Map<String, dynamic>;
+
+    final priceSimandouRaw = await rootBundle.loadString(
+      'lib/data/price_matrix_simandou.json',
+    );
+    _priceMatrixSimandou = jsonDecode(priceSimandouRaw) as Map<String, dynamic>;
 
     final adminRaw = await rootBundle.loadString('lib/data/guinea_admin.json');
     final adminJson = jsonDecode(adminRaw) as Map<String, dynamic>;
@@ -131,66 +137,104 @@ class ReferenceDataService {
   }
 
   // ---------------- Price matrix ----------------
-  Map<String, dynamic> get priceMatrix => _priceMatrix;
+  // The app currently ships two price matrices:
+  //  - lib/data/price_matrix.json           (default, used by WCAG and SMB)
+  //  - lib/data/price_matrix_simandou.json  (used by SIMANDOU project)
+  // All lookup methods below accept an optional [project] argument
+  // ('wcag' | 'simandou' | 'smb'); anything other than 'simandou' resolves
+  // to the default (WCAG/SMB) price matrix.
+  Map<String, dynamic> _matrixFor(String? project) =>
+      project == 'simandou' ? _priceMatrixSimandou : _priceMatrix;
 
-  List<Map<String, dynamic>> get terrains =>
-      List<Map<String, dynamic>>.from(_priceMatrix['terrains'] ?? []);
+  Map<String, dynamic> priceMatrix({String? project}) => _matrixFor(project);
 
-  List<Map<String, dynamic>> get culturesAnnuelles =>
-      List<Map<String, dynamic>>.from(_priceMatrix['cultures_annuelles'] ?? []);
+  List<Map<String, dynamic>> terrains({String? project}) =>
+      List<Map<String, dynamic>>.from(
+        _matrixFor(project)['terrains'] ?? [],
+      );
 
-  List<Map<String, dynamic>> get culturesPerennes =>
-      List<Map<String, dynamic>>.from(_priceMatrix['cultures_perennes'] ?? []);
+  List<Map<String, dynamic>> culturesAnnuelles({String? project}) =>
+      List<Map<String, dynamic>>.from(
+        _matrixFor(project)['cultures_annuelles'] ?? [],
+      );
 
-  List<Map<String, dynamic>> get especesSauvages =>
-      List<Map<String, dynamic>>.from(_priceMatrix['especes_sauvages'] ?? []);
+  List<Map<String, dynamic>> culturesPerennes({String? project}) =>
+      List<Map<String, dynamic>>.from(
+        _matrixFor(project)['cultures_perennes'] ?? [],
+      );
 
-  List<Map<String, dynamic>> get boisDoeuvre =>
-      List<Map<String, dynamic>>.from(_priceMatrix['bois_doeuvre'] ?? []);
+  List<Map<String, dynamic>> especesSauvages({String? project}) =>
+      List<Map<String, dynamic>>.from(
+        _matrixFor(project)['especes_sauvages'] ?? [],
+      );
 
-  List<Map<String, dynamic>> get structuresPrix =>
-      List<Map<String, dynamic>>.from(_priceMatrix['structures'] ?? []);
+  List<Map<String, dynamic>> boisDoeuvre({String? project}) =>
+      List<Map<String, dynamic>>.from(
+        _matrixFor(project)['bois_doeuvre'] ?? [],
+      );
 
-  Map<String, dynamic>? terrainByType(String? type) {
+  List<Map<String, dynamic>> structuresPrix({String? project}) =>
+      List<Map<String, dynamic>>.from(
+        _matrixFor(project)['structures'] ?? [],
+      );
+
+  Map<String, dynamic>? terrainByType(String? type, {String? project}) {
     if (type == null) return null;
     try {
-      return terrains.firstWhere((e) => e['type'] == type);
+      return terrains(project: project).firstWhere((e) => e['type'] == type);
     } catch (_) {
       return null;
     }
   }
 
-  Map<String, dynamic>? culturePerenneByName(String? nomUsuel) {
+  Map<String, dynamic>? culturePerenneByName(
+    String? nomUsuel, {
+    String? project,
+  }) {
     if (nomUsuel == null) return null;
     try {
-      return culturesPerennes.firstWhere((e) => e['nom_usuel'] == nomUsuel);
+      return culturesPerennes(
+        project: project,
+      ).firstWhere((e) => e['nom_usuel'] == nomUsuel);
     } catch (_) {
       return null;
     }
   }
 
-  Map<String, dynamic>? especeSauvageByName(String? nomUsuel) {
+  Map<String, dynamic>? especeSauvageByName(
+    String? nomUsuel, {
+    String? project,
+  }) {
     if (nomUsuel == null) return null;
     try {
-      return especesSauvages.firstWhere((e) => e['nom_usuel'] == nomUsuel);
+      return especesSauvages(
+        project: project,
+      ).firstWhere((e) => e['nom_usuel'] == nomUsuel);
     } catch (_) {
       return null;
     }
   }
 
-  Map<String, dynamic>? boisDoeuvreByName(String? nomUsuel) {
+  Map<String, dynamic>? boisDoeuvreByName(String? nomUsuel, {String? project}) {
     if (nomUsuel == null) return null;
     try {
-      return boisDoeuvre.firstWhere((e) => e['nom_usuel'] == nomUsuel);
+      return boisDoeuvre(
+        project: project,
+      ).firstWhere((e) => e['nom_usuel'] == nomUsuel);
     } catch (_) {
       return null;
     }
   }
 
-  Map<String, dynamic>? structureByDesignation(String? designation) {
+  Map<String, dynamic>? structureByDesignation(
+    String? designation, {
+    String? project,
+  }) {
     if (designation == null) return null;
     try {
-      return structuresPrix.firstWhere((e) => e['designation'] == designation);
+      return structuresPrix(
+        project: project,
+      ).firstWhere((e) => e['designation'] == designation);
     } catch (_) {
       return null;
     }
