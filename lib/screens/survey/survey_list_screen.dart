@@ -5,6 +5,7 @@ import '../../models/survey_field.dart';
 import '../../services/survey_data_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+import 'patrimoine_culturel_report_screen.dart';
 import 'survey_form_screen.dart';
 
 /// Generic list/browse screen for ANY of the 11 BIODIVERSITE/SOCIAL survey
@@ -53,7 +54,23 @@ class SurveyListScreen extends StatelessWidget {
     final icon = surveyIconFor(schema.icon);
 
     return Scaffold(
-      appBar: AppBar(title: Text(schema.title)),
+      appBar: AppBar(
+        title: Text(schema.title),
+        actions: [
+          if (schema.key == 'patrimoine_culturel' && records.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.menu_book),
+              tooltip: 'Voir l\'annuaire (rapport formaté)',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PatrimoineCulturelReportScreen(),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.of(context).push(

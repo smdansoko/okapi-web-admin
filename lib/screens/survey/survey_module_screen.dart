@@ -4,6 +4,7 @@ import '../../data/survey_icons.dart';
 import '../../services/reference_data_service.dart';
 import '../../services/survey_data_provider.dart';
 import '../../theme/app_theme.dart';
+import 'patrimoine_culturel_report_screen.dart';
 import 'survey_list_screen.dart';
 
 /// Module landing screen listing the forms belonging to one module
@@ -27,7 +28,23 @@ class SurveyModuleScreen extends StatelessWidget {
     final provider = context.watch<SurveyDataProvider>();
 
     return Scaffold(
-      appBar: AppBar(title: Text(moduleTitle)),
+      appBar: AppBar(
+        title: Text(moduleTitle),
+        actions: [
+          if (module == 'SOCIAL')
+            IconButton(
+              icon: const Icon(Icons.temple_buddhist),
+              tooltip: 'Annuaire Patrimoine culturel',
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PatrimoineCulturelReportScreen(),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
