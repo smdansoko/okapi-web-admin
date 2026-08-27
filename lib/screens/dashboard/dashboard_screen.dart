@@ -21,12 +21,12 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+            ClipOval(
               child: Image.asset(
-                'assets/logo/okapi_logo_full.png',
+                'assets/logo/okapi_icon_circular.png',
                 height: 36,
-                fit: BoxFit.contain,
+                width: 36,
+                fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
@@ -51,11 +51,14 @@ class DashboardScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
-                    Image.asset(
-                      'assets/logo/okapi_logo_full.png',
-                      height: 64,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    ClipOval(
+                      child: Image.asset(
+                        'assets/logo/okapi_icon_circular.png',
+                        height: 64,
+                        width: 64,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                      ),
                     ),
                     const SizedBox(width: 16),
                     const Expanded(

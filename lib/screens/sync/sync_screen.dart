@@ -285,12 +285,12 @@ class _SyncScreenState extends State<SyncScreen> {
       appBar: AppBar(
         title: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
+            ClipOval(
               child: Image.asset(
-                'assets/logo/okapi_logo_full.png',
+                'assets/logo/okapi_icon_circular.png',
                 height: 32,
-                fit: BoxFit.contain,
+                width: 32,
+                fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
@@ -311,11 +311,14 @@ class _SyncScreenState extends State<SyncScreen> {
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
-                        Image.asset(
-                          'assets/logo/okapi_logo_full.png',
-                          height: 56,
-                          fit: BoxFit.contain,
-                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                        ClipOval(
+                          child: Image.asset(
+                            'assets/logo/okapi_icon_circular.png',
+                            height: 56,
+                            width: 56,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                          ),
                         ),
                         const SizedBox(width: 16),
                         const Expanded(

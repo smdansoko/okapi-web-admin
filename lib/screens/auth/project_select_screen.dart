@@ -37,12 +37,12 @@ class ProjectSelectScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                  ClipOval(
                     child: Image.asset(
-                      'assets/logo/okapi_logo_full.png',
+                      'assets/logo/okapi_icon_circular.png',
                       height: 80,
-                      fit: BoxFit.contain,
+                      width: 80,
+                      fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                     ),
                   ),
