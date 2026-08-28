@@ -1277,11 +1277,12 @@ class ContractPdfGenerator {
     final bool isLignage = d.type == ContractType.lignage;
     // party.split()[0]: "Ménage" / "Lignage" / "Communauté"
     final partyFirstWord = d.type.partyLabel.split(' ').first;
+    final oralLang = _brandFor(d.project).oralLang;
     final consentText =
         'Je, soussigné, ${isCommunautaire ? '' : 'Monsieur '}$chefName, en ma qualité de ${d.type.chefLabel}, '
         'certifie, en plein accord avec les membres du${isCommunautaire ? 'e' : ''} $partyFirstWord, donner mon '
         'consentement à l\'ensemble des termes et conditions du présent Accord qui m\'ont été traduits oralement '
-        'du français en sousou, et ce, en présence d\'un représentant des autorités locales dont la fonction est '
+        'du français en $oralLang, et ce, en présence d\'un représentant des autorités locales dont la fonction est '
         '............................................................................';
 
     // Consent-box header: corrected per-type (see contract_pdf.py _page5())
@@ -1376,7 +1377,7 @@ class ContractPdfGenerator {
       );
     }
 
-    final wcagBox = signatureBox('WCAG', const [
+    final companyBox = signatureBox(_brandFor(d.project).short, const [
       'Nom',
       'Fonction',
       'Signature',
@@ -1409,7 +1410,7 @@ class ContractPdfGenerator {
         pw.Row(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Expanded(child: wcagBox),
+            pw.Expanded(child: companyBox),
             pw.SizedBox(width: 10),
             pw.Expanded(child: autLocBox),
           ],
@@ -1454,7 +1455,7 @@ class ContractPdfGenerator {
       pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Expanded(child: wcagBox),
+          pw.Expanded(child: companyBox),
           pw.SizedBox(width: 10),
           pw.Expanded(child: autoritesBox),
         ],
@@ -2059,6 +2060,19 @@ class ContractPdfGenerator {
   // ---------------- ANNEXE 2 ----------------
 
   static List<pw.Widget> _annexe2Text(ContractData d) {
+    switch (d.project) {
+      case 'simandou':
+        return _annexe2Simandou(d);
+      case 'smb':
+        return _annexe2Smb(d);
+      default:
+        return _annexe2Wcag(d);
+    }
+  }
+
+  /// WCAG/AMC Annexe 2 (default/legacy behaviour, unchanged - mirrors
+  /// contract_pdf.py's _annexe2_wcag()).
+  static List<pw.Widget> _annexe2Wcag(ContractData d) {
     if (d.type == ContractType.communautaire) {
       return [
         _sectionTitle('ANNEXE 2 : MODALITÉS D\'INDEMNISATION'),
@@ -2230,6 +2244,465 @@ class ContractPdfGenerator {
         'Pour faire valoir ses droits et être payé, le $party devra obligatoirement se munir de l\'Annexe 1 (montant et '
         'désignation du bénéficiaire) signée et validée par toutes les parties lors des inventaires des biens et de la '
         'carte d\'identité nationale à son nom renseignée sur l\'accord de compensation.',
+      ),
+    ];
+  }
+
+  /// SIMANDOU/BWCS SA Annexe 2, mirroring contract_pdf.py's
+  /// _annexe2_simandou() exactly:
+  ///   - proprietaire (Ménage): single cash-only section (like WCAG's
+  ///     default), branded BWCS SA / malinké.
+  ///   - lignage: TWO sub-annexes - "2A" (collective-project compensation
+  ///     mechanism, 5 numbered sub-sections) followed by a page break and
+  ///     "A2" (parallel cash-based compensation) - unlike WCAG, where
+  ///     lignage only ever gets the simple cash annex.
+  ///   - communautaire: collective-project mechanism only (5 numbered
+  ///     sub-sections), no separate cash sub-annex.
+  static List<pw.Widget> _annexe2Simandou(ContractData d) {
+    final t = d.type;
+    final party = t.partyLabel;
+    final isCommunautaire = t == ContractType.communautaire;
+    final commune = d.sousPrefecture.isNotEmpty
+        ? d.sousPrefecture
+        : d.district;
+
+    List<pw.Widget> collectiveProjectSections(
+      String headerTitle,
+      String partyRepr,
+      String addresseeHtml,
+    ) {
+      return [
+        _sectionTitle(headerTitle),
+        _paragraph(
+          isCommunautaire
+              ? 'La $party, signataire de l\'Accord, accepte de quitter la ou les parcelles dont la liste figure '
+                    'en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il appartient '
+                    'donc à la $party de prendre toutes les dispositions utiles afin de retirer les éléments meubles et '
+                    'immeubles qui s\'y trouvent avant cette échéance.'
+              : 'Le $party, signataire de l\'Accord, accepte de quitter la ou les parcelles dont la liste figure '
+                    'en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il appartient '
+                    'donc au $party de prendre toutes les dispositions utiles afin de retirer les éléments meubles et '
+                    'immeubles qui s\'y trouvent avant cette échéance.',
+        ),
+        _paragraph(
+          'En contrepartie, BWCS SA s\'engage, conformément au PARC, à indemniser ${isCommunautaire ? 'la' : 'le'} '
+          '$party des conséquences du Projet sur ses conditions de vie, y compris tous les dommages et '
+          'pertes subis par lui du fait de ce Projet, de la manière et dans les conditions décrites ci-après :',
+        ),
+        _articleTitle('1. CONSTITUTION D\'UN BUDGET PROJET'),
+        _paragraph(
+          'Conformément aux modalités d\'indemnisation prévues dans le PARC, les biens détenus par ${isCommunautaire ? 'la' : 'le'} '
+          '$party seront compensés par le biais d\'un ou plusieurs projets d\'intérêt général'
+          '${!isCommunautaire ? ', ci-après désigné « Projets collectifs »,' : ''} réalisés au profit '
+          '${isCommunautaire ? 'de la' : 'du'} $party.',
+        ),
+        _paragraph(
+          'Le budget dévolu à ce ou ces projets est fonction de la superficie totale des parcelles impactées '
+          'par le projet et des biens qui s\'y trouvent, tel qu\'énumérés en Annexe 1.',
+        ),
+        _paragraph(
+          '${isCommunautaire ? 'La' : 'Le'} $party considère ce budget comme étant suffisant, '
+          'satisfaisant et de nature à compenser intégralement les pertes occasionnées par le Projet.',
+        ),
+        _paragraph(
+          'Sur cette base, le budget total disponible s\'élève ainsi à ${Formatters.gnf(d.summary.total)}.',
+        ),
+        _articleTitle('2. IDENTIFICATION DES PROJETS COLLECTIFS'),
+        _paragraph(
+          'Conformément aux dispositions du PARC, les projets ${isCommunautaire ? 'communautaires' : 'collectifs'} '
+          'seront identifiés conjointement par :',
+        ),
+        _paragraph(
+          '- $partyRepr ; et\n'
+          '- BWCS SA ou son représentant désigné,',
+        ),
+        _paragraph(
+          'L\'appui des Services Techniques Déconcentrés compétents en la matière sera également sollicité, et '
+          'une cohérence recherchée avec le Plan de Développement Local et le Plan Annuel d\'Investissement de '
+          '${commune.isNotEmpty ? 'la Commune de $commune' : 'la Commune concernée'}.',
+        ),
+        _paragraph(
+          'Les Parties s\'engagent à prendre toutes les mesures requises afin que le ou les projets soient '
+          'identifiés et démarrés dans un délai maximum de trois (3) mois à compter de la signature du présent '
+          'Accord.',
+        ),
+        _paragraph(
+          'Les projets seront sélectionnés parmi la liste de projets-types proposés ci-dessous :',
+        ),
+        _paragraph(
+          isCommunautaire
+              ? '- Aménagement agricole collectif ;\n'
+                    '- Puits (pastoral, maraîcher, ou domestique) ;\n'
+                    '- Marché (amélioration d\'une structure existante) ;\n'
+                    '- École, centre de santé (amélioration et équipement d\'une structure existante) ;\n'
+                    '- Voies d\'accès à partir de la voie nouvellement créée ou en direction des axes principaux '
+                    'existants (cette création ne pourra pas donner lieu à de nouvelle compensation et leur tracé '
+                    'doit donc faire l\'objet d\'un consentement mutuel avec les parties concernées) ;\n'
+                    '- Autre projet identifié par la communauté et dans les limites du budget disponible.'
+              : '- Aménagement agricole collectif ;\n'
+                    '- Puits (pastoral, maraîcher, ou domestique) ;\n'
+                    '- Autre projet identifié par le $party et dans les limites du budget disponible.',
+        ),
+        _paragraph(
+          'À l\'issue de ce processus de concertation, une fiche d\'identification sommaire sera corédigée par '
+          'BWCS SA et le comité établi par ${isCommunautaire ? 'la' : 'le'} $party en vue de leur mise '
+          'en œuvre. La fiche comprendra la sélection des projets à mettre en œuvre (plusieurs peuvent être '
+          'prévus), et une estimation budgétaire par composante ainsi que le montant total.',
+        ),
+        _paragraph(
+          'Seuls les projets pouvant être exécutés intégralement dans les limites du budget défini au point 1 '
+          'ci-dessus pourront être entrepris dans le cadre du présent Accord.',
+        ),
+        _articleTitle('3. MISE EN ŒUVRE DES PROJETS'),
+        if (isCommunautaire) ...[
+          _paragraph(
+            'Conformément aux dispositions du PARC, les projets seront mis en œuvre par des prestataires '
+            'sélectionnés par appel d\'offres ou directement par leur soin (cas des voies d\'accès '
+            'notamment), selon leurs capacités techniques, leurs expériences et les prix proposés. À '
+            'qualité et à prix comparables, la préférence sera accordée aux prestataires installés dans '
+            'la préfecture d\'implantation du projet.',
+          ),
+          _paragraph('À cet effet :'),
+          _paragraph(
+            '- Un dossier d\'appel d\'offres sera développé par le maître d\'œuvre, sur base de la fiche '
+            'd\'identification sommaire ;\n'
+            '- Les offres seront ouvertes à l\'occasion d\'une réunion convoquée par le maître d\'œuvre, en '
+            'présence du comité constitué par la Communauté Affectée.',
+          ),
+          _paragraph(
+            'Les marchés seront attribués par BWCS SA, qui reste seule responsable de la sélection '
+            'finale du ou des prestataires, sur base des critères énoncés dans le dossier d\'appel '
+            'd\'offres, puis de la réalisation des travaux.',
+          ),
+          _paragraph(
+            'Les travaux seront réalisés sous la supervision du maître d\'œuvre et du comité constitué '
+            'par la Communauté Affectée. La réception provisoire du projet sera accordée à l\'achèvement '
+            'des travaux, moyennant l\'accord du maître d\'œuvre et dudit comité.',
+          ),
+        ] else ...[
+          _paragraph(
+            'Conformément aux dispositions du PARC, les projets seront mis en œuvre par des '
+            'prestataires choisis par le $party et ayant les compétences techniques et les '
+            'expériences nécessaires requises pour la réalisation de ces projets.',
+          ),
+          _paragraph(
+            'Les travaux seront réalisés sous la supervision de BWCS SA et des membres du $party. La '
+            'réception provisoire du projet sera accordée à l\'achèvement des travaux, moyennant '
+            'l\'accord de BWCS SA et du Représentant du $party.',
+          ),
+        ],
+        _articleTitle('4. RÉTROCESSION DES PROJETS'),
+        _paragraph(
+          'À la suite de la réception provisoire des projets, il sera procédé à leur rétrocession formelle '
+          '${isCommunautaire ? 'à la' : 'au'} $party. À cet effet, un acte de rétrocession sera dressé '
+          'dans lequel ${isCommunautaire ? 'la' : 'le'} $party s\'engage à utiliser le projet selon sa '
+          'destination convenue jusqu\'à l\'achèvement de la période de garantie et le versement, par BWCS SA, '
+          'de la retenue de garantie.',
+        ),
+        _paragraph(
+          'La signature de l\'acte de rétrocession marque également la fin du processus de compensation.',
+        ),
+        _articleTitle('5. GESTION DES FONDS'),
+        _paragraph(
+          'Le budget défini au point 1 ci-dessus sera provisionné sur les livres de BWCS SA en vue de son '
+          'décaissement progressif, au bénéfice des prestataires désignés pour assurer l\'exécution des '
+          'projets.',
+        ),
+        _paragraph(
+          'Une situation financière détaillée sera dressée par BWCS SA à la fin de chaque trimestre et '
+          'transmise $addresseeHtml, afin qu\'à tout moment, ${isCommunautaire ? 'la' : 'le'} $party '
+          'dispose d\'une information complète quant à la gestion des fonds.',
+        ),
+        _paragraph(
+          'Conformément au PARC, les reliquats éventuels seront soit mis à la disposition ${isCommunautaire ? 'de la' : 'du'} '
+          '$party, soit engagés sur un nouveau projet au bénéfice ${isCommunautaire ? 'de la' : 'du'} '
+          '$party, selon leur montant. Dans tous les cas, ces reliquats éventuels restent acquis '
+          '${isCommunautaire ? 'à la' : 'au'} $party.',
+        ),
+      ];
+    }
+
+    List<pw.Widget> cashSection(
+      String headerTitle,
+      String payeeClause, {
+      String extraIdClause = '',
+    }) {
+      return [
+        _sectionTitle(headerTitle),
+        _paragraph(
+          'Le $party, signataire de l\'Accord, accepte de quitter définitivement et irrévocablement la ou '
+          'les parcelles dont la liste figure sur sa fiche d\'indemnisation, au plus tard sept (7) jours après '
+          'la mise en œuvre des dispositions décrites ci-dessous. Il appartient donc au $party de prendre '
+          'toutes les dispositions utiles afin de retirer les éléments meubles et immeubles qui s\'y trouvent '
+          'avant cette échéance.',
+        ),
+        _paragraph(
+          'En contrepartie, BWCS SA s\'engage, conformément au PARC, à indemniser le $party des consé'
+          'quences du Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par lui '
+          'du fait du Projet, de la manière et dans les conditions décrites ci-après :',
+        ),
+        _articleTitle('1. INDEMNISATION FINANCIÈRE'),
+        _paragraph(
+          'Conformément aux modalités d\'indemnisation prévues dans le PARC, les Parties conviennent que le '
+          'montant total des indemnisations financières devant être payées au $party $payeeClause, soit '
+          '${Formatters.gnf(d.summary.total)}. Le $party considère le montant total de l\'indemnisation comme étant '
+          'suffisant, satisfaisant et de nature à compenser intégralement ses pertes du fait du Projet.',
+        ),
+        _articleTitle('2. MODALITÉS DE PAIEMENT'),
+        if (extraIdClause.isEmpty) ...[
+          _paragraph(
+            'BWCS SA portera assistance au $party pour l\'ouverture d\'un compte bancaire afin de '
+            'recevoir les paiements dus par BWCS SA au titre de l\'indemnisation financière.',
+          ),
+          _paragraph(
+            'En cas de retard toutefois dans l\'ouverture de ce compte bancaire, le paiement de '
+            'l\'indemnisation financière pourra s\'effectuer selon les modalités suivantes :',
+          ),
+        ],
+        _paragraph(
+          extraIdClause.isEmpty
+              ? '- Tous les montants seront réglés par chèque, établi en francs guinéens à l\'ordre de la PAP.'
+              : '- Tous les montants seront réglés par chèque, établi en francs guinéens à l\'ordre Représentant '
+                    'mandaté du $party.',
+        ),
+        _paragraph(
+          'Dans tous les cas, les paiements seront effectués dans un délai maximal de vingt (20) jours après '
+          'la signature du présent Accord.',
+        ),
+        _paragraph(
+          'Le paiement, selon les modalités prévues ici, des sommes indiquées ci-dessus libère BWCS SA de '
+          'toute obligation au titre du paiement de l\'indemnisation.',
+        ),
+        if (extraIdClause.isEmpty)
+          _paragraph(
+            'Pour faire valoir ses droits et être payé, le $party devra obligatoirement se munir de '
+            'l\'Annexe 1 (montant et désignation du bénéficiaire) signée et validée par toutes les parties '
+            'et de la carte d\'identité nationale à son nom renseignée sur l\'accord de compensation.',
+          ),
+      ];
+    }
+
+    if (t == ContractType.proprietaire) {
+      return cashSection(
+        'ANNEXE 2 : MODALITÉS D\'INDEMNISATION EN NUMÉRAIRE',
+        'sera celui indiqué sur la fiche individuelle de compensation qui a été remise au Chef de Ménage',
+      );
+    }
+
+    if (t == ContractType.lignage) {
+      final story = collectiveProjectSections(
+        'ANNEXE 2 : MODALITÉS D\'INDEMNISATION EN NUMÉRAIRE\nANNEXE 2A – INDEMNISATION PAR LE BIAIS DE PROJET(S) COLLECTIF',
+        'Le Lignage affecté, représenté par le Chef du Lignage et la moitié au moins de ses membres ayant atteint l\'âge de la majorité civile',
+        'au Représentant du Lignage affecté, avec copie au Président du District et au Maire de la Commune Rurale',
+      );
+      story.add(pw.NewPage());
+      story.addAll(
+        cashSection(
+          'ANNEXE A2 – INDEMNISATION FINANCIÈRE',
+          's\'élève à ${Formatters.gnf(d.summary.total)}',
+          extraIdClause: 'lignage',
+        ),
+      );
+      return story;
+    }
+
+    // communautaire: collective-project mechanism only, no separate cash
+    // sub-annex.
+    return collectiveProjectSections(
+      'ANNEXE 2 : MODALITÉS D\'INDEMNISATION',
+      'La Communauté Affectée, représentée par un comité constitué à cet effet',
+      'au comité constitué par la Communauté Affectée, avec copie au Préfet',
+    );
+  }
+
+  /// SMB Annexe 2, mirroring contract_pdf.py's _annexe2_smb() exactly -
+  /// notably SIMPLER than SIMANDOU's:
+  ///   - proprietaire (Ménage) AND lignage: both use the SAME single
+  ///     cash-only section, unlike SIMANDOU where lignage got a dual 2A+A2
+  ///     structure. Only the party label changes between the two.
+  ///   - communautaire: collective-project mechanism only, matching WCAG's
+  ///     own communautaire structure closely (branded SMB, "Commune
+  ///     concernée" instead of the "Kérouané" copy-paste artifact).
+  static List<pw.Widget> _annexe2Smb(ContractData d) {
+    final t = d.type;
+    final party = t.partyLabel;
+
+    if (t == ContractType.communautaire) {
+      return [
+        _sectionTitle('ANNEXE 2 : MODALITÉS D\'INDEMNISATION'),
+        _paragraph(
+          'La Communauté Affectée, signataire de l\'Accord, accepte de quitter la ou les parcelles dont la '
+          'liste figure en Annexe 1 au plus tard quinze (15) jours après la signature du présent Accord. Il '
+          'appartient donc à la Communauté Affectée de prendre toutes les dispositions utiles afin de '
+          'retirer les éléments meubles et immeubles qui s\'y trouvent avant cette échéance.',
+        ),
+        _paragraph(
+          'En contrepartie, SMB s\'engage, conformément au PARC, à indemniser la Communauté Affectée des '
+          'conséquences du Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par '
+          'lui du fait de ce Projet, de la manière et dans les conditions décrites ci-après :',
+        ),
+        _articleTitle('1. CONSTITUTION D\'UN BUDGET PROJET'),
+        _paragraph(
+          'Conformément aux modalités d\'indemnisation prévues dans le PARC, les biens détenus par la '
+          'Communauté Affectée seront compensés par le biais d\'un ou plusieurs projets d\'intérêt général '
+          'réalisés au profit de la Communauté Affectée.',
+        ),
+        _paragraph(
+          'Le budget dévolu à ce ou ces projets est fonction de la superficie totale des parcelles impactées '
+          'par le projet et des biens qui s\'y trouvent, tel qu\'énumérés en Annexe 1.',
+        ),
+        _paragraph(
+          'La Communauté Affectée considère ce budget comme étant suffisant, satisfaisant et de nature à '
+          'compenser intégralement les pertes occasionnées par le Projet.',
+        ),
+        _paragraph(
+          'Sur cette base, le budget total disponible s\'élève ainsi à ${Formatters.gnf(d.summary.total)}.',
+        ),
+        _articleTitle('2. IDENTIFICATION DES PROJETS COLLECTIFS'),
+        _paragraph(
+          'Conformément aux dispositions du PARC, les projets communautaires seront identifiés conjointement '
+          'par :',
+        ),
+        _paragraph(
+          '- La Communauté Affectée, représentée par un comité constitué à cet effet ; et\n'
+          '- SMB ou son représentant désigné,',
+        ),
+        _paragraph(
+          'L\'appui des Services Techniques Déconcentrés compétents en la matière sera également sollicité, '
+          'et une cohérence recherchée avec le Plan de Développement Local et le Plan Annuel '
+          'd\'Investissement de la Commune concernée.',
+        ),
+        _paragraph(
+          'Les Parties s\'engagent à prendre toutes les mesures requises afin que le ou les projets soient '
+          'identifiés et démarrés dans un délai maximum de trois (3) mois à compter de la signature du '
+          'présent Accord.',
+        ),
+        _paragraph(
+          'Les projets seront sélectionnés parmi la liste de projets-types proposés ci-dessous :',
+        ),
+        _paragraph(
+          '- Aménagement agricole collectif ;\n'
+          '- Puits (pastoral, maraîcher, ou domestique) ;\n'
+          '- Marché (amélioration d\'une structure existante) ;\n'
+          '- École, centre de santé (amélioration et équipement d\'une structure existante) ;\n'
+          '- Voies d\'accès à partir de la voie nouvellement créée ou en direction des axes principaux '
+          'existants (cette création ne pourra pas donner lieu à de nouvelle compensation et leur tracé doit '
+          'donc faire l\'objet d\'un consentement mutuel avec les parties concernées) ;\n'
+          '- Autre projet identifié par la communauté et dans les limites du budget disponible.',
+        ),
+        _paragraph(
+          'À l\'issue de ce processus de concertation, une fiche d\'identification sommaire sera corédigée '
+          'par SMB et le comité établi par la Communauté Affectée en vue de leur mise en œuvre. La fiche '
+          'comprendra la sélection des projets à mettre en œuvre (plusieurs peuvent être prévus), et une '
+          'estimation budgétaire par composante ainsi que le montant total.',
+        ),
+        _paragraph(
+          'Seuls les projets pouvant être exécutés intégralement dans les limites du budget défini au point '
+          '1 ci-dessus pourront être entrepris dans le cadre du présent Accord.',
+        ),
+        _articleTitle('3. MISE EN ŒUVRE DES PROJETS'),
+        _paragraph(
+          'Conformément aux dispositions du PARC, les projets seront mis en œuvre par des prestataires '
+          'sélectionnés par appel d\'offres ou directement par leur soin (cas des voies d\'accès notamment), '
+          'selon leurs capacités techniques, leurs expériences et les prix proposés. À qualité et à prix '
+          'comparables, la préférence sera accordée aux prestataires installés dans la préfecture '
+          'd\'implantation du projet.',
+        ),
+        _paragraph('À cet effet :'),
+        _paragraph(
+          '- Un dossier d\'appel d\'offres sera développé par le maître d\'œuvre, sur base de la fiche '
+          'd\'identification sommaire ;\n'
+          '- Les offres seront ouvertes à l\'occasion d\'une réunion convoquée par le maître d\'œuvre, en '
+          'présence du comité constitué par la Communauté Affectée.',
+        ),
+        _paragraph(
+          'Les marchés seront attribués par SMB, qui reste seule responsable de la sélection finale du ou '
+          'des prestataires, sur base des critères énoncés dans le dossier d\'appel d\'offres, puis de la '
+          'réalisation des travaux.',
+        ),
+        _paragraph(
+          'Les travaux seront réalisés sous la supervision du maître d\'œuvre et du comité constitué par la '
+          'Communauté Affectée. La réception provisoire du projet sera accordée à l\'achèvement des travaux, '
+          'moyennant l\'accord du maître d\'œuvre et dudit comité.',
+        ),
+        _articleTitle('4. RÉTROCESSION DES PROJETS'),
+        _paragraph(
+          'À la suite de la réception provisoire des projets, il sera procédé à leur rétrocession formelle à '
+          'la Communauté Affectée. À cet effet, un acte de rétrocession sera dressé dans lequel la '
+          'Communauté Affectée s\'engage à utiliser le projet selon sa destination convenue jusqu\'à '
+          'l\'achèvement de la période de garantie et le versement, par SMB, de la retenue de garantie.',
+        ),
+        _paragraph(
+          'La signature de l\'acte de rétrocession marque également la fin du processus de compensation.',
+        ),
+        _articleTitle('5. GESTION DES FONDS'),
+        _paragraph(
+          'Le budget défini au point 1 ci-dessus sera provisionné sur les livres de SMB en vue de son '
+          'décaissement progressif, au bénéfice des prestataires désignés pour assurer l\'exécution des '
+          'projets.',
+        ),
+        _paragraph(
+          'Une situation financière détaillée sera dressée par SMB à la fin de chaque trimestre et transmise '
+          'au comité constitué par la Communauté Affectée, avec copie au Préfet, afin qu\'à tout moment, la '
+          'Communauté Affectée dispose d\'une information complète quant à la gestion des fonds.',
+        ),
+        _paragraph(
+          'Conformément au PARC, les reliquats éventuels seront soit mis à la disposition de la Communauté '
+          'Affectée, soit engagés sur un nouveau projet au bénéfice de la Communauté Affectée, selon leur '
+          'montant. Dans tous les cas, ces reliquats éventuels restent acquis à la Communauté Affectée.',
+        ),
+      ];
+    }
+
+    // proprietaire / lignage: identical simple cash-only section, only the
+    // party label changes.
+    return [
+      _sectionTitle('ANNEXE 2 : MODALITÉS D\'INDEMNISATION EN NUMÉRAIRE'),
+      _paragraph(
+        'Le $party, signataire de l\'Accord, accepte de quitter définitivement et irrévocablement la ou les '
+        'parcelles dont la liste figure sur sa fiche d\'indemnisation, au plus tard sept (7) jours après la '
+        'mise en œuvre des dispositions décrites ci-dessous. Il appartient donc au $party de prendre toutes '
+        'les dispositions utiles afin de retirer les éléments meubles et immeubles qui s\'y trouvent avant '
+        'cette échéance.',
+      ),
+      _paragraph(
+        'En contrepartie, SMB s\'engage, conformément au PARC, à indemniser le $party des conséquences du '
+        'Projet sur ses conditions de vie, y compris tous les dommages et pertes subis par lui du fait du '
+        'Projet, de la manière et dans les conditions décrites ci-après :',
+      ),
+      _articleTitle('1. INDEMNISATION FINANCIÈRE'),
+      _paragraph(
+        'Conformément aux modalités d\'indemnisation prévues dans le PARC, les Parties conviennent que le '
+        'montant total des indemnisations financières devant être payées au $party sera celui indiqué sur '
+        'la fiche individuelle de compensation qui a été remise au ${t.chefLabel}, soit '
+        '${Formatters.gnf(d.summary.total)}. Le $party considère le montant total de l\'indemnisation comme étant '
+        'suffisant, satisfaisant et de nature à compenser intégralement ses pertes du fait du Projet.',
+      ),
+      _articleTitle('2. MODALITÉS DE PAIEMENT'),
+      _paragraph(
+        'SMB portera assistance au $party pour l\'ouverture d\'un compte bancaire afin de recevoir les '
+        'paiements dus par SMB au titre de l\'indemnisation financière.',
+      ),
+      _paragraph(
+        'En cas de retard toutefois dans l\'ouverture de ce compte bancaire, le paiement de l\'indemnisation '
+        'financière pourra s\'effectuer selon les modalités suivantes :',
+      ),
+      _paragraph(
+        '- Tous les montants seront réglés par chèque, établi en francs guinéens à l\'ordre de la PAP.',
+      ),
+      _paragraph(
+        'Dans tous les cas, les paiements seront effectués dans un délai maximal de vingt (20) jours après la '
+        'signature du présent Accord.',
+      ),
+      _paragraph(
+        'Le paiement, selon les modalités prévues ici, des sommes indiquées ci-dessus libère SMB de toute '
+        'obligation au titre du paiement de l\'indemnisation.',
+      ),
+      _paragraph(
+        'Pour faire valoir ses droits et être payé, le $party devra obligatoirement se munir de l\'Annexe 1 '
+        '(montant et désignation du bénéficiaire) signée et validée par toutes les parties lors des '
+        'inventaires des biens et de la carte d\'identité nationale à son nom renseignée sur l\'accord de '
+        'compensation.',
       ),
     ];
   }
