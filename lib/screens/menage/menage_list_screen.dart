@@ -1,14 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/app_data_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/session_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/sync_status_banner.dart';
 import '../sync/sync_screen.dart';
 import 'menage_form_screen.dart';
 
-class MenageListScreen extends StatelessWidget {
+class MenageListScreen extends StatefulWidget {
   const MenageListScreen({super.key});
+
+  @override
+  State<MenageListScreen> createState() => _MenageListScreenState();
+}
+
+class _MenageListScreenState extends State<MenageListScreen> {
+  AppUser? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final user = await AuthService.instance.currentUser;
+    if (!mounted) return;
+    setState(() => _currentUser = user);
+  }
+
+  /// Delete is restricted to "Chef d'équipe" / "Administrateur principal",
+  /// and (for Chef d'équipe) only for records created on their OWN
+  /// tablette. Editing remains available to everyone regardless of statut.
+  bool _canDelete(String recordTablette) {
+    final user = _currentUser;
+    if (user == null) return false;
+    return SessionService.canDeleteRecord(
+      statut: user.statut,
+      userTablette: user.tablette,
+      recordTablette: recordTablette,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +80,7 @@ class MenageListScreen extends StatelessWidget {
                     itemCount: data.menages.length,
                     itemBuilder: (context, i) {
                       final m = data.menages[i];
+                      final canDelete = _canDelete(m.tablette);
                       return Card(
                         child: ListTile(
                           leading: const CircleAvatar(
@@ -78,40 +113,42 @@ class MenageListScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  color: OkapiColors.error,
-                                ),
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                      title: const Text('Supprimer ?'),
-                                      content: Text(
-                                        'Supprimer le ménage "${m.codeMenage}" et tous ses membres ?',
+                              if (canDelete)
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    color: OkapiColors.error,
+                                  ),
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text('Supprimer ?'),
+                                        content: Text(
+                                          'Supprimer le ménage "${m.codeMenage}" et tous ses membres ?\n\n'
+                                          'Cette suppression sera propagée à toutes les tablettes et au serveur lors de la prochaine synchronisation.',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(ctx).pop(false),
+                                            child: const Text('Annuler'),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () =>
+                                                Navigator.of(ctx).pop(true),
+                                            child: const Text('Supprimer'),
+                                          ),
+                                        ],
                                       ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(ctx).pop(false),
-                                          child: const Text('Annuler'),
-                                        ),
-                                        ElevatedButton(
-                                          onPressed: () =>
-                                              Navigator.of(ctx).pop(true),
-                                          child: const Text('Supprimer'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                  if (confirm == true && context.mounted) {
-                                    await context
-                                        .read<AppDataProvider>()
-                                        .deleteMenage(m.id);
-                                  }
-                                },
-                              ),
+                                    );
+                                    if (confirm == true && context.mounted) {
+                                      await context
+                                          .read<AppDataProvider>()
+                                          .deleteMenage(m.id);
+                                    }
+                                  },
+                                ),
                             ],
                           ),
                         ),

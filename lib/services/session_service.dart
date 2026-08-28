@@ -126,6 +126,41 @@ class SessionService {
     await prefs.remove(_prefKeyModule);
   }
 
+  /// Statuts allowed to delete a Ménage/Enquête Champs/Enquête Structures
+  /// record (mobile app "Ménage"/"Champs"/"Structures" list screens). Every
+  /// other statut may still EDIT any record, but must not see/use the
+  /// delete action.
+  static const Set<String> kDeleteAllowedStatuts = {
+    kChefDEquipe,
+    kAdministrateurPrincipal,
+  };
+
+  static bool canDeleteRecords(String statut) =>
+      kDeleteAllowedStatuts.contains(statut);
+
+  /// Whether a user with the given [statut]/[userTablette] may delete a
+  /// specific record whose own `tablette` field is [recordTablette].
+  ///
+  /// - Only "Chef d'équipe" and "Administrateur principal" may delete at
+  ///   all (see [canDeleteRecords]).
+  /// - "Administrateur principal" may delete ANY record, on any tablette
+  ///   (they are not tied to a single physical tablet).
+  /// - "Chef d'équipe" may only delete records CREATED ON THEIR OWN
+  ///   tablette ("qui ne sont créées que sur leur tablette"). If their
+  ///   account has no tablette assigned (legacy accounts created before
+  ///   this field existed), the restriction is not applied (backward
+  ///   compatibility), matching the same fallback used for sync push.
+  static bool canDeleteRecord({
+    required String statut,
+    required String userTablette,
+    required String recordTablette,
+  }) {
+    if (!canDeleteRecords(statut)) return false;
+    if (statut == kAdministrateurPrincipal) return true;
+    if (userTablette.isEmpty) return true;
+    return recordTablette == userTablette;
+  }
+
   static String labelForProject(String? code) {
     return projects.firstWhere(
       (p) => p.code == code,

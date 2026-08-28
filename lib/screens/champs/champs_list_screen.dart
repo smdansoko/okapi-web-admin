@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../services/app_data_provider.dart';
+import '../../services/auth_service.dart';
+import '../../services/session_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import 'champ_form_screen.dart';
 
-class ChampsListScreen extends StatelessWidget {
+class ChampsListScreen extends StatefulWidget {
   final String projectCode;
   const ChampsListScreen({super.key, this.projectCode = 'wcag'});
+
+  @override
+  State<ChampsListScreen> createState() => _ChampsListScreenState();
+}
+
+class _ChampsListScreenState extends State<ChampsListScreen> {
+  AppUser? _currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCurrentUser();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    final user = await AuthService.instance.currentUser;
+    if (!mounted) return;
+    setState(() => _currentUser = user);
+  }
+
+  bool _canDelete(String recordTablette) {
+    final user = _currentUser;
+    if (user == null) return false;
+    return SessionService.canDeleteRecord(
+      statut: user.statut,
+      userTablette: user.tablette,
+      recordTablette: recordTablette,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +59,7 @@ class ChampsListScreen extends StatelessWidget {
           }
           Navigator.of(context).push(
             MaterialPageRoute(
-              builder: (_) => ChampFormScreen(projectCode: projectCode),
+              builder: (_) => ChampFormScreen(projectCode: widget.projectCode),
             ),
           );
         },
@@ -42,6 +73,7 @@ class ChampsListScreen extends StatelessWidget {
               itemCount: data.champs.length,
               itemBuilder: (context, i) {
                 final c = data.champs[i];
+                final canDelete = _canDelete(c.tablette);
                 return Card(
                   child: ListTile(
                     leading: const CircleAvatar(
@@ -66,45 +98,47 @@ class ChampsListScreen extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (_) => ChampFormScreen(
                                 existing: c,
-                                projectCode: projectCode,
+                                projectCode: widget.projectCode,
                               ),
                             ),
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(
-                            Icons.delete_outline,
-                            color: OkapiColors.error,
-                          ),
-                          onPressed: () async {
-                            final confirm = await showDialog<bool>(
-                              context: context,
-                              builder: (ctx) => AlertDialog(
-                                title: const Text('Supprimer ?'),
-                                content: const Text(
-                                  'Supprimer cette enquête champs ?',
+                        if (canDelete)
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_outline,
+                              color: OkapiColors.error,
+                            ),
+                            onPressed: () async {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Supprimer ?'),
+                                  content: const Text(
+                                    'Supprimer cette enquête champs ?\n\n'
+                                    'Cette suppression sera propagée à toutes les tablettes et au serveur lors de la prochaine synchronisation.',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(ctx).pop(false),
+                                      child: const Text('Annuler'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () =>
+                                          Navigator.of(ctx).pop(true),
+                                      child: const Text('Supprimer'),
+                                    ),
+                                  ],
                                 ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(ctx).pop(false),
-                                    child: const Text('Annuler'),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () =>
-                                        Navigator.of(ctx).pop(true),
-                                    child: const Text('Supprimer'),
-                                  ),
-                                ],
-                              ),
-                            );
-                            if (confirm == true && context.mounted) {
-                              await context.read<AppDataProvider>().deleteChamp(
-                                c.id,
                               );
-                            }
-                          },
-                        ),
+                              if (confirm == true && context.mounted) {
+                                await context.read<AppDataProvider>().deleteChamp(
+                                  c.id,
+                                );
+                              }
+                            },
+                          ),
                       ],
                     ),
                   ),
