@@ -58,11 +58,29 @@ class ContractsScreen extends StatelessWidget {
     final menagesWithProprietaireChamp = proprietaireOwners.values
         .map((o) => o.codeMenage)
         .toSet();
-    // Fallback: households without any "Propriétaire" Champs survey yet
-    // fall back to the chef de ménage, so a contract can still be produced
-    // before the Champs survey has been completed for that household.
+    // A household must NEVER get a contract solely because it exists in
+    // the "Ménage" tab: it is only eligible once it is registered in at
+    // least one "Enquête Champs" OR "Enquête Structures" record (synced
+    // from ANY tablette - data.champs/data.structures already reflect the
+    // merged multi-tablette dataset). This mirrors the web admin's
+    // contract_rows.py, which never produces a ménage-only fallback row.
+    final codesWithAnyChamp = data.champs.map((c) => c.codeMenage).toSet();
+    final codesWithAnyStructure = data.structures
+        .map((s) => s.codeMenage)
+        .toSet();
+    // Fallback: households without a "Propriétaire" Champs survey yet, but
+    // already registered in at least one Champs (any type) or Structures
+    // record, fall back to the chef de ménage so a contract can still be
+    // produced before the dedicated Propriétaire Champs survey is done.
+    // Households with NO Champs and NO Structures record at all are
+    // excluded entirely - they must not show any contract option.
     final fallbackMenages = data.menages
-        .where((m) => !menagesWithProprietaireChamp.contains(m.codeMenage))
+        .where(
+          (m) =>
+              !menagesWithProprietaireChamp.contains(m.codeMenage) &&
+              (codesWithAnyChamp.contains(m.codeMenage) ||
+                  codesWithAnyStructure.contains(m.codeMenage)),
+        )
         .toList();
 
     return DefaultTabController(
