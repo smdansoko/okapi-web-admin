@@ -72,6 +72,21 @@ extension ContractTypeX on ContractType {
     }
   }
 
+  /// SIMANDOU's 3 reference PDFs use a distinct wording for this section
+  /// title (lowercase "représentant", and "du Ménage/Lignage affecté"
+  /// suffix instead of the bare lowercase "ménage"/"lignage" used by
+  /// WCAG/SMB) - mirrors contract_pdf.py's IDENT_SECTION_TITLE_SIMANDOU.
+  String get identificationSectionTitleSimandou {
+    switch (this) {
+      case ContractType.proprietaire:
+        return '1. Identification du représentant du Ménage affecté';
+      case ContractType.lignage:
+        return '1. Identification du représentant du Lignage affecté';
+      case ContractType.communautaire:
+        return '1. Identification du représentant';
+    }
+  }
+
   String get temoinsGroupLabel {
     switch (this) {
       case ContractType.proprietaire:
@@ -83,6 +98,23 @@ extension ContractTypeX on ContractType {
     }
   }
 }
+
+/// Per-project branding (operating company short name + oral language used
+/// during the census/consent process), mirroring contract_pdf.py's BRAND
+/// dict. WCAG behaviour is kept unchanged; SIMANDOU/SMB add new branches.
+class _Brand {
+  final String short;
+  final String oralLang;
+  const _Brand(this.short, this.oralLang);
+}
+
+const Map<String, _Brand> _brands = {
+  'wcag': _Brand('WCAG', 'soussou'),
+  'simandou': _Brand('BWCS SA', 'malinké'),
+  'smb': _Brand('SMB', 'soussou'),
+};
+
+_Brand _brandFor(String project) => _brands[project] ?? _brands['wcag']!;
 
 /// All data needed to render one contract PDF. Assembled by the caller
 /// (ContractsScreen) from Menage / Individu / EnqueteChamp / EnqueteStructure.
@@ -251,7 +283,14 @@ class ContractData {
   }
 
   /// Contract reference code shown in the header/footer of every page.
-  String get referenceCode => codeMenage.isEmpty ? codeIndividu : codeMenage;
+  /// Prefers "Code de l'individu" (codeIndividu) over "Code du ménage"
+  /// (codeMenage) - confirmed via the SIMANDOU reference PDFs, whose footer
+  /// shows the INDIVIDU-suffixed code (e.g. "CU2-220524-3-1") rather than
+  /// the bare ménage code ("CU2-220524-3"). For WCAG/SMB samples the two
+  /// values happen to coincide, so this is safe there too. Mirrors
+  /// contract_pdf.py's `ref = d.get("codeIndividu") or d.get("codeMenage")`.
+  String get referenceCode =>
+      codeIndividu.isNotEmpty ? codeIndividu : codeMenage;
 }
 
 /// Generates the full "Accord de compensation" PDF, matching page-by-page
@@ -456,6 +495,33 @@ class ContractPdfGenerator {
     );
   }
 
+  /// Left-side footer text, per project - mirrors contract_pdf.py's
+  /// `_header_footer()` footer branch (simandou / smb / wcag).
+  static String _footerLeftText(ContractData d) {
+    switch (d.project) {
+      case 'simandou':
+        final label = switch (d.type) {
+          ContractType.proprietaire => 'du Ménage',
+          ContractType.lignage => 'du Lignage',
+          ContractType.communautaire => 'de la Communauté',
+        };
+        return 'Projet BWCS SA « Simandou » Accord de compensation $label';
+      case 'smb':
+        final label = switch (d.type) {
+          ContractType.proprietaire => 'Ménage',
+          ContractType.lignage => 'Lignage',
+          ContractType.communautaire => 'collectif',
+        };
+        return 'Société Minière de Boké (SMB) Accord $label';
+      default:
+        return 'Winning Consortium Alumina Guinea (WCAG) ${d.type.footerLabel}';
+    }
+  }
+
+  /// Page-count separator word: "sur" for SIMANDOU, "de" for WCAG/SMB -
+  /// mirrors contract_pdf.py's `_make_numbered_canvas()` `sep` variable.
+  static String _pageSep(String project) => project == 'simandou' ? 'sur' : 'de';
+
   static pw.Widget _pageFooter(ContractData d, int pageNumber, int pagesCount) {
     return pw.Container(
       margin: const pw.EdgeInsets.only(top: 8),
@@ -467,7 +533,7 @@ class ContractPdfGenerator {
         mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
         children: [
           pw.Text(
-            'Winning Consortium Alumina Guinea (WCAG) ${d.type.footerLabel}',
+            _footerLeftText(d),
             style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey700),
           ),
           pw.Text(
@@ -475,7 +541,7 @@ class ContractPdfGenerator {
             style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey700),
           ),
           pw.Text(
-            'Page $pageNumber de $pagesCount',
+            'Page $pageNumber ${_pageSep(d.project)} $pagesCount',
             style: const pw.TextStyle(fontSize: 7, color: PdfColors.grey700),
           ),
         ],
@@ -653,9 +719,67 @@ class ContractPdfGenerator {
     final rectoImage = _decodePhoto(d.photoCniRectoBase64);
     final versoImage = _decodePhoto(d.photoCniVersoBase64);
 
+    final company = _brandFor(d.project).short;
+    // SIMANDOU's lignage/communautaire reference PDFs prepend "LA SOCIÉTÉ"
+    // before the company name (WCAG/SMB references never do this, for any
+    // of the 3 contract types) - mirrors contract_pdf.py's `_page1()`.
+    final titleCompany =
+        (d.project == 'simandou' &&
+            d.type != ContractType.proprietaire)
+        ? 'LA SOCIÉTÉ $company'
+        : company;
+
+    // SIMANDOU's reference PDFs use a SHORT field set: batch number +
+    // village instead of région/préfecture/sous-préfecture/district, and
+    // no "Code PAP" line. WCAG/SMB use the full field set including
+    // "District" and "Code du ménage" - mirrors contract_pdf.py's `_page1()`
+    // `fields` branching.
+    final List<pw.Widget> fieldRows;
+    if (d.project == 'simandou') {
+      fieldRows = [
+        _fieldRow('Numéro de batch', d.numeroLot),
+        _fieldRow('Village', d.village),
+        _fieldRow('Code du ménage', d.codeMenage),
+        _fieldRow('Code de l\'individu', d.codeIndividu),
+        _fieldRow('Prénom et Nom', d.nomPrenom),
+        _fieldRow('Sexe', d.sexe),
+        _fieldRow('Date de naissance', d.dateNaissance),
+        _fieldRow('Type de pièce d\'identité', d.typeDePiece),
+        _fieldRow('Numéro de la pièce d\'identité', d.numeroPiece),
+        _fieldRow('Date d\'établissement PI', d.dateEtablissementPiece),
+        _fieldRow('Numéro de téléphone', d.telephone),
+      ];
+    } else {
+      fieldRows = [
+        _fieldRow('Numéro de lot', d.numeroLot),
+        _fieldRow('Région', d.region),
+        _fieldRow('Préfecture', d.prefecture),
+        _fieldRow('Sous préfecture', d.sousPrefecture),
+        _fieldRow('District', d.district),
+        _fieldRow('Localité', d.village),
+        _fieldRow('Code du ménage', d.codeMenage),
+        _fieldRow('Code de l\'individu', d.codeIndividu),
+        _fieldRow('Code PAP', d.codePap),
+        _fieldRow('Prénom et NOM', d.nomPrenom),
+        _fieldRow('Sexe', d.sexe),
+        _fieldRow('Date de naissance', d.dateNaissance),
+        _fieldRow('Type de pièce d\'identité', d.typeDePiece),
+        _fieldRow('Numéro de la pièce d\'identité', d.numeroPiece),
+        _fieldRow(
+          'Date d\'établissement de la PI',
+          d.dateEtablissementPiece,
+        ),
+        _fieldRow('Numéro de téléphone', d.telephone),
+      ];
+    }
+
+    final identTitle = d.project == 'simandou'
+        ? d.type.identificationSectionTitleSimandou
+        : d.type.identificationSectionTitle;
+
     final widgets = <pw.Widget>[
       _title(
-        'ACCORD DE COMPENSATION CONCLU ENTRE WCAG ET ${d.type.titleSuffix}',
+        'ACCORD DE COMPENSATION CONCLU ENTRE $titleCompany ET ${d.type.titleSuffix}',
       ),
       pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -664,26 +788,7 @@ class ContractPdfGenerator {
             flex: 3,
             child: pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                _sectionTitle(d.type.identificationSectionTitle),
-                _fieldRow('Numéro de lot', d.numeroLot),
-                _fieldRow('Région', d.region),
-                _fieldRow('Préfecture', d.prefecture),
-                _fieldRow('Sous préfecture', d.sousPrefecture),
-                _fieldRow('Localité', d.village),
-                _fieldRow('Code de l\'individu', d.codeIndividu),
-                _fieldRow('Code PAP', d.codePap),
-                _fieldRow('Prénom et NOM', d.nomPrenom),
-                _fieldRow('Sexe', d.sexe),
-                _fieldRow('Date de naissance', d.dateNaissance),
-                _fieldRow('Type de pièce d\'identité', d.typeDePiece),
-                _fieldRow('Numéro de la pièce d\'identité', d.numeroPiece),
-                _fieldRow(
-                  'Date d\'établissement de la PI',
-                  d.dateEtablissementPiece,
-                ),
-                _fieldRow('Numéro de téléphone', d.telephone),
-              ],
+              children: [_sectionTitle(identTitle), ...fieldRows],
             ),
           ),
           pw.SizedBox(width: 10),
@@ -755,16 +860,45 @@ class ContractPdfGenerator {
           'physiques composant ledit ${partyWord[1]} affecté, lesquelles lui ont reconnu et conféré l\'ensemble des '
           'pouvoirs nécessaires, en ce compris le pouvoir de représentation, pour conclure le présent accord.';
     }
-    return pw.Column(
-      crossAxisAlignment: pw.CrossAxisAlignment.start,
-      children: [
-        _paragraph(
+    // Company legal-identity paragraph + "Ci-après dénommée" alias, per
+    // project - mirrors contract_pdf.py's `_page1()` company-identity
+    // branch (simandou / smb / wcag).
+    final pw.Widget identityParagraph;
+    final pw.Widget aliasParagraph;
+    switch (d.project) {
+      case 'simandou':
+        identityParagraph = _paragraph(
+          'La société Baowu Winning Consortium Simandou SA (BWCS SA), au capital de 2 031 046 700 000 GNF, '
+          'immatriculée au Registre du Commerce et du Crédit Mobilier sous le numéro RCCM/GN-TCC.2019.B.05570, '
+          'dont le siège social est situé à Camayenne Corniche Nord, BP 4357, Commune de Dixinn, Conakry '
+          '(République de Guinée), représentée par Monsieur Wang Lingsong, en sa qualité de Directeur Général, '
+          'dûment habilité aux fins des présentes,',
+        );
+        aliasParagraph = _paragraph('Ci-après dénommée «BWCS SA».');
+        break;
+      case 'smb':
+        identityParagraph = _paragraph(
+          'LA SOCIÉTÉ MINIÈRE DE BOKÉ (SMB), société de droit guinéen enregistrée au Registre de commerce sous '
+          'le numéro RCCM/GC-KAL/055.689A/2014 dont le siège social se situe à l\'Immeuble Wazni à Tombo I, '
+          'Kaloum, République de Guinée, représentée par son Directeur Général Mr WU Qiong, dûment habilité aux '
+          'fins des présentes,',
+        );
+        aliasParagraph = _paragraph('Ci-après dénommée «SMB».');
+        break;
+      default:
+        identityParagraph = _paragraph(
           'LA SOCIÉTÉ Winning Consortium Alumina Guinea (WCAG), société de droit guinéen enregistrée au Registre de '
           'commerce sous le numéro RCCM/GN-KAL/2018.B.086411/2018 dont le siège social se situe à Camayenne, Corniche '
           'Nord, BP : 435, C/Dixinnn, Conakry, République de Guinée, représentée par son Directeur Général M. WU '
           'QIONG, dûment habilité aux fins des présentes,',
-        ),
-        _paragraph('Ci-après dénommée «WCAG».'),
+        );
+        aliasParagraph = _paragraph('Ci-après dénommée «WCAG».');
+    }
+    return pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        identityParagraph,
+        aliasParagraph,
         _paragraph('Et'),
         _paragraph(repIntro),
       ],
@@ -795,39 +929,92 @@ class ContractPdfGenerator {
         break;
     }
     final art = isCommunautaire ? 'la' : 'le';
+    final company = _brandFor(d.project).short;
+    final isSmb = d.project == 'smb';
+    final isSimandou = d.project == 'simandou';
+
+    // Preamble bullet(s) recalling the census/consent process, per project -
+    // mirrors contract_pdf.py's `_page2()` `preamble_bullets` branching
+    // (SIMANDOU: mining-concession decree + geographic description; SMB:
+    // narrower "travaux de layonnage" wording; WCAG: refinery-construction
+    // wording, unchanged).
+    final List<pw.Widget> preambleBullets;
+    if (isSimandou) {
+      preambleBullets = [
+        _paragraph(
+          '- Aux termes du Décret No D/2020/143/PRG/SGG du 3 juillet 2020, une concession minière a été '
+          'accordée à BWCS SA afin de procéder aux travaux d\'exploration et d\'exploitation d\'un gisement de '
+          'fer dans la Préfecture de Kérouané. Le Projet d\'exploitation est dénommé « Simandou ». Cette '
+          'concession est régie par la Convention de Base dûment révisée et ratifiée par l\'Assemblée '
+          'Nationale en date du 26 juin 2020 ;',
+        ),
+        _paragraph(
+          '- Le projet d\'exploitation du minerai de fer dans les Blocs 1 et 2 de Simandou se situe à l\'est de '
+          'la ville de Kérouané sur la chaîne montagneuse de Simandou, ce qui forme une crête pratiquement '
+          'orientée nord-sud qui s\'élève brusquement de 300 à 900 m au-dessus de la plaine. Ils sont à cheval '
+          'sur les Communes rurales de Konsankoro, Damaro, Linko et Kérouané ;',
+        ),
+        _paragraph(
+          '- En vue de la construction et de l\'exploitation de la mine de Simandou par $company, un '
+          'recensement des ayants droit et un inventaire de l\'ensemble de leurs biens affectés ont été '
+          'entrepris du 12/05/2022 au 27/06/2022, dans l\'emprise concernée du Projet ;',
+        ),
+      ];
+    } else if (isSmb) {
+      preambleBullets = [
+        _paragraph(
+          '- En vue de la réalisation des travaux de layonnage par la $company, un recensement des ayants '
+          'droit et un inventaire de l\'ensemble de leurs biens affectés (hors foncier) ont été entrepris '
+          'depuis le 12/02/2026, dans l\'emprise concernée du Projet ;',
+        ),
+      ];
+    } else {
+      preambleBullets = [
+        _paragraph(
+          '- En vue de la construction et de l\'exploitation de la raffinerie d\'alumine par $company, un '
+          'recensement des ayants droit et un inventaire de l\'ensemble de leurs biens affectés ont été '
+          'entrepris depuis le 21/11/2025, dans l\'emprise concernée du Projet ;',
+        ),
+      ];
+    }
+
+    // SMB's ménage contract Article 1 has a NARROWER scope ("biens (hors
+    // foncier)", excluding "terres") than lignage/communautaire and all
+    // WCAG/SIMANDOU types - mirrors contract_pdf.py's `_page2()` Article 1.
+    final article1Text = (isSmb && d.type == ContractType.proprietaire)
+        ? 'Les Parties conviennent des termes et conditions de l\'indemnisation, pour la perte des biens '
+              '(hors foncier) $partyLower figurant en Annexe 1. '
+        : 'Les Parties conviennent des termes et conditions de l\'indemnisation, pour la perte des terres et des '
+              'biens ${isCommunautaire ? 'de la' : 'du'} $partyLower figurant en Annexe 1. ';
 
     return [
       _paragraph('Ci-après dénommé${isCommunautaire ? 'e' : ''} « $party ».'),
       _paragraph(
-        'WCAG et ${isCommunautaire ? 'la' : 'le'} $partyLower étant également désignés ci-après collectivement '
+        '$company et ${isCommunautaire ? 'la' : 'le'} $partyLower étant également désignés ci-après collectivement '
         '« les Parties » et individuellement « la Partie ».',
       ),
       pw.SizedBox(height: 6),
       _paragraph('APRÈS AVOIR PRÉALABLEMENT RAPPELÉ QUE :', fontSize: 10.5),
-      _paragraph(
-        '- En vue de la construction et de l\'exploitation de la raffinerie d\'alumine par WCAG, un recensement des '
-        'ayants droit et un inventaire de l\'ensemble de leurs biens affectés ont été entrepris depuis le '
-        '21/11/2025, dans l\'emprise concernée du Projet ;',
-      ),
+      ...preambleBullets,
       _paragraph(
         '- De ces études, il ressort que $art $partyLower détient des droits dans la zone visée par le Projet. Ces '
         'droits, dûment énumérés dans une fiche récapitulative signée par le $chefDesigne, sont détaillés en '
         'Annexe 1 ;',
       ),
       _paragraph(
-        '- Conformément à ses principes et à ses engagements vis-à-vis de l\'État guinéen, WCAG a élaboré un Plan '
+        '- Conformément à ses principes et à ses engagements vis-à-vis de l\'État guinéen, $company a élaboré un Plan '
         'd\'action de Réinstallation et de Compensation (PARC) afin d\'assurer la compensation de tous les ayants '
         'droits affectés par le Projet. Le PARC prévoit la compensation pour une occupation permanente.',
       ),
       _paragraph(
-        '- En application du PARC, une proposition de compensation personnalisée a été développée par WCAG, et '
+        '- En application du PARC, une proposition de compensation personnalisée a été développée par $company, et '
         'communiquée, présentée et expliquée ${isCommunautaire ? 'à la' : 'au'} $partyLower et aux personnes le '
         'composant ;',
       ),
       _paragraph(
         '- Après avoir pris le temps nécessaire à la réflexion et à la consultation de l\'ensemble des personnes le '
         'constituant, le $chefOf consent librement et en toute connaissance de cause à l\'offre de compensation '
-        'proposée par WCAG telle que décrite en Annexe 2 ;',
+        'proposée par $company telle que décrite en Annexe 2 ;',
       ),
       _paragraph(
         'Dans ce contexte, les Parties ont conclu le présent accord de compensation (ci-après dénommé l\'« '
@@ -837,9 +1024,7 @@ class ContractPdfGenerator {
       _paragraph('IL A ÉTÉ CONVENU ET ARRÊTÉ CE QUI SUIT :', fontSize: 10.5),
       _articleTitle('Article 1 – Principe d\'indemnisation'),
       _paragraph(
-        'Les Parties conviennent des termes et conditions de l\'indemnisation, pour la perte des terres et des '
-        'biens ${isCommunautaire ? 'de la' : 'du'} $partyLower figurant en Annexe 1. '
-        '${isCommunautaire ? 'La' : 'Le'} $partyLower considère ces termes et conditions comme étant pleinement '
+        '$article1Text${isCommunautaire ? 'La' : 'Le'} $partyLower considère ces termes et conditions comme étant pleinement '
         'suffisants, satisfaisants et de nature à compenser intégralement tout préjudice causé par son '
         'déplacement physique et/ou économique ainsi que les éventuelles conséquences sur ses conditions de vie, '
         'y compris tous les dommages et pertes subis par ${isCommunautaire ? 'elle' : 'lui'} du fait de ce '
@@ -859,11 +1044,19 @@ class ContractPdfGenerator {
     final membresDe = isCommunautaire
         ? 'de la Communauté affectée'
         : 'du $partyLower';
+    final brand = _brandFor(d.project);
+    final company = brand.short;
+    final oralLang = brand.oralLang;
+    // SMB's ménage contract has only ONE renunciation bullet (actifs only -
+    // no parcelles/land renunciation, consistent with its narrower "hors
+    // foncier" Article 1 scope). Mirrors contract_pdf.py's `_page3()`.
+    final skipParcellesBullet =
+        d.project == 'smb' && d.type == ContractType.proprietaire;
 
     return [
       _articleTitle('Article 2 – Principe de non-contestation'),
       _paragraph(
-        '${isCommunautaire ? 'La' : 'Le'} $partyLower déclare expressément renoncer à réclamer à WCAG, ainsi qu\'à '
+        '${isCommunautaire ? 'La' : 'Le'} $partyLower déclare expressément renoncer à réclamer à $company, ainsi qu\'à '
         'ses sous-traitants intervenant dans le cadre de la mise en œuvre du Projet, une quelconque indemnisation '
         'supplémentaire, de quelque nature que ce soit, à raison des faits cités en préambule et autres que les '
         'indemnisations prévues dans le cadre du présent Accord.',
@@ -872,10 +1065,11 @@ class ContractPdfGenerator {
         '${isCommunautaire ? 'La' : 'Le'} $partyLower s\'engage ainsi dans les conditions prévues dans l\'Annexe 2 '
         'à renoncer :',
       ),
-      _paragraph(
-        '- À tous droits de quelque nature que ce soit, formels, informels ou coutumiers, sur les parcelles listées '
-        'en Annexe 1 pour la durée prévue à cet accord ;',
-      ),
+      if (!skipParcellesBullet)
+        _paragraph(
+          '- À tous droits de quelque nature que ce soit, formels, informels ou coutumiers, sur les parcelles listées '
+          'en Annexe 1 pour la durée prévue à cet accord ;',
+        ),
       _paragraph(
         '- À tous droits sur les actifs de quelque nature que ce soit qui y sont implantés ou édifiés, (ci-après '
         'les « Actifs ») pour la durée prévue à cet accord.',
@@ -904,7 +1098,7 @@ class ContractPdfGenerator {
         'présent Accord. En apposant sa signature au bas du présent Accord, ledit représentant confirme :',
       ),
       _paragraph(
-        '- Que l\'Accord a fait l\'objet d\'une traduction orale en soussou, langue parlée par la Communauté '
+        '- Que l\'Accord a fait l\'objet d\'une traduction orale en $oralLang, langue parlée par la Communauté '
         'affectée ;',
       ),
       _paragraph(
