@@ -189,12 +189,26 @@ class _SyncScreenState extends State<SyncScreen> {
       _lastResult = null;
     });
 
+    final pendingDeletions = data.pendingDeletions;
+
     final result = await SyncService.instance.syncAll(
       menages: toSync.menages,
       champs: toSync.champs,
       structures: toSync.structures,
       surveyRecords: surveyRecordsToSync,
+      deletions: pendingDeletions,
     );
+
+    if (result.success && pendingDeletions.isNotEmpty) {
+      await data.clearPendingDeletions(
+        pendingDeletions.map(
+          (d) => (
+            recordType: d['recordType'] as String,
+            recordId: d['recordId'] as String,
+          ),
+        ),
+      );
+    }
 
     if (!mounted) return;
     setState(() {
@@ -244,6 +258,7 @@ class _SyncScreenState extends State<SyncScreen> {
         menages: result.menages,
         champs: result.champs,
         structures: result.structures,
+        deletions: result.deletions,
       );
       await surveyData.mergeFromServer(result.surveyRecords);
     }

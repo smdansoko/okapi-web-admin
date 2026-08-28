@@ -37,6 +37,9 @@ class PullResult {
   // BIODIVERSITE/SOCIAL survey records, keyed by formKey (e.g.
   // 'pose_cameras', 'socioeconomique').
   final Map<String, List<SurveyRecord>> surveyRecords;
+  // Deletion tombstones fetched from the server (records deleted on
+  // another tablet, or by this tablet earlier), to be applied locally.
+  final List<({String recordType, String recordId})> deletions;
   final Map<String, dynamic>? serverTotals;
   final DateTime timestamp;
 
@@ -47,6 +50,7 @@ class PullResult {
     this.champs = const [],
     this.structures = const [],
     this.surveyRecords = const {},
+    this.deletions = const [],
     this.serverTotals,
     DateTime? timestamp,
   }) : timestamp = timestamp ?? DateTime.now();
@@ -156,6 +160,11 @@ class SyncService {
     required List<EnqueteStructure> structures,
     Map<String, List<SurveyRecord>> surveyRecords = const {},
     String? project,
+    // Deletions made locally that still need to be pushed to the server
+    // (Req #3: propagate a deletion made on one tablet to every other
+    // tablet + the web server). Each entry: {recordType, recordId,
+    // tablette, deletedAt}.
+    List<Map<String, dynamic>> deletions = const [],
   }) async {
     final url = await serverUrl;
     if (url.isEmpty) {
@@ -180,6 +189,7 @@ class SyncService {
         (formKey, records) =>
             MapEntry(formKey, records.map((r) => r.toMap()).toList()),
       ),
+      'deletions': deletions,
     };
 
     try {
@@ -286,6 +296,18 @@ class SyncService {
           surveyRecords[formKey] = records;
         });
 
+        final deletionsJson = (body['deletions'] as List? ?? []);
+        final deletions = <({String recordType, String recordId})>[];
+        for (final d in deletionsJson) {
+          if (d is Map) {
+            final recordType = (d['recordType'] ?? '').toString();
+            final recordId = (d['recordId'] ?? '').toString();
+            if (recordType.isNotEmpty && recordId.isNotEmpty) {
+              deletions.add((recordType: recordType, recordId: recordId));
+            }
+          }
+        }
+
         await _setLastSyncAt(DateTime.now());
         return PullResult(
           success: true,
@@ -294,6 +316,7 @@ class SyncService {
           champs: champs,
           structures: structures,
           surveyRecords: surveyRecords,
+          deletions: deletions,
           serverTotals: body['totals'] as Map<String, dynamic>?,
         );
       } else {
