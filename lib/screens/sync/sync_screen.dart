@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/menage.dart';
@@ -6,6 +7,7 @@ import '../../models/structure.dart';
 import '../../main.dart' show kAllSurveyFormKeys;
 import '../../services/app_data_provider.dart';
 import '../../services/auth_service.dart';
+import '../../services/photo_cache_service.dart';
 import '../../services/session_service.dart';
 import '../../services/survey_data_provider.dart';
 import '../../services/sync_service.dart';
@@ -49,6 +51,13 @@ class _SyncScreenState extends State<SyncScreen> {
   DateTime? _lastSyncAt;
   SyncResult? _lastResult;
   PullResult? _lastPullResult;
+
+  // ---- Legacy photo download (offline cache) state ----
+  bool _downloadingPhotos = false;
+  int _photosDone = 0;
+  int _photosTotal = 0;
+  String? _photosResultMessage;
+  bool? _photosResultOk;
 
   AppUser? _currentUser;
   bool get _canSynchronize =>
@@ -288,6 +297,63 @@ class _SyncScreenState extends State<SyncScreen> {
           backgroundColor: Colors.red.shade700,
         ),
       );
+    }
+  }
+
+  /// Downloads every legacy member photo (uploaded by the admin on the
+  /// web) for the CURRENT project onto this device's local storage, so
+  /// they remain available for display in generated contracts even
+  /// without internet afterwards. Only downloads photos not already
+  /// cached (incremental), so pressing this again after the first full
+  /// download is fast.
+  Future<void> _downloadPhotos() async {
+    if (kIsWeb) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Le stockage local des photos hors-ligne n\'est disponible '
+            'que sur l\'application Android, pas dans l\'aperçu Web.',
+          ),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+    await _saveServerSettings();
+    if (!mounted) return;
+    setState(() {
+      _downloadingPhotos = true;
+      _photosDone = 0;
+      _photosTotal = 0;
+      _photosResultMessage = null;
+      _photosResultOk = null;
+    });
+    try {
+      final count = await PhotoCacheService.instance
+          .downloadCurrentProjectPhotos(
+            onProgress: (done, total) {
+              if (!mounted) return;
+              setState(() {
+                _photosDone = done;
+                _photosTotal = total;
+              });
+            },
+          );
+      if (!mounted) return;
+      setState(() {
+        _downloadingPhotos = false;
+        _photosResultOk = true;
+        _photosResultMessage = count > 0
+            ? '$count nouvelle(s) photo(s) téléchargée(s) et disponible(s) hors-ligne.'
+            : 'Toutes les photos disponibles sont déjà téléchargées sur cet appareil.';
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _downloadingPhotos = false;
+        _photosResultOk = false;
+        _photosResultMessage = 'Échec du téléchargement des photos : $e';
+      });
     }
   }
 
@@ -825,6 +891,101 @@ class _SyncScreenState extends State<SyncScreen> {
                     ),
                   ),
                 ],
+                const SizedBox(height: 24),
+
+                // ---- Photos hors-ligne (téléchargement des photos web) ----
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Photos des membres (hors-ligne)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Télécharge sur cet appareil les photos des membres '
+                          'téléversées par l\'administrateur sur le site web '
+                          '(répertoire photos), afin qu\'elles restent '
+                          'disponibles dans les contrats même SANS connexion '
+                          'internet par la suite.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey.shade700,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: _downloadingPhotos
+                                ? null
+                                : _downloadPhotos,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: OkapiColors.primary,
+                              side: const BorderSide(
+                                color: OkapiColors.primary,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 16,
+                              ),
+                            ),
+                            icon: _downloadingPhotos
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : const Icon(Icons.photo_library_rounded),
+                            label: Text(
+                              _downloadingPhotos
+                                  ? (_photosTotal > 0
+                                        ? 'Téléchargement… $_photosDone/$_photosTotal'
+                                        : 'Préparation…')
+                                  : 'Télécharger les photos pour utilisation hors-ligne',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        if (_photosResultMessage != null) ...[
+                          const SizedBox(height: 10),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: _photosResultOk == true
+                                  ? OkapiColors.secondary.withValues(
+                                      alpha: 0.08,
+                                    )
+                                  : Colors.red.withValues(alpha: 0.08),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: _photosResultOk == true
+                                    ? OkapiColors.secondary.withValues(
+                                        alpha: 0.3,
+                                      )
+                                    : Colors.red.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Text(
+                              _photosResultMessage!,
+                              style: const TextStyle(fontSize: 12.5),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 24),
               ],
             ),
