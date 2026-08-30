@@ -6,6 +6,7 @@ import '../../services/survey_data_provider.dart';
 import '../../theme/app_theme.dart';
 import 'patrimoine_culturel_report_screen.dart';
 import 'survey_list_screen.dart';
+import 'survey_photo_gallery_screen.dart';
 
 /// Module landing screen listing the forms belonging to one module
 /// ('BIODIVERSITE' -> 8 forms, 'SOCIAL' -> 3 forms). Tapping a form opens
@@ -31,6 +32,20 @@ class SurveyModuleScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(moduleTitle),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.photo_library_rounded),
+            tooltip: 'Photos',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => SurveyPhotoGalleryScreen(
+                    module: module,
+                    moduleTitle: moduleTitle,
+                  ),
+                ),
+              );
+            },
+          ),
           if (module == 'SOCIAL')
             IconButton(
               icon: const Icon(Icons.temple_buddhist),

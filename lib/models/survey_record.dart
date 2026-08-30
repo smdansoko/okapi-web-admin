@@ -22,6 +22,13 @@ class SurveyRecord {
   Map<String, List<Map<String, dynamic>>> repeats;
   DateTime createdAt;
   DateTime updatedAt;
+  // Which project (simandou/wcag/smb) this record belongs to. Empty for
+  // records created before this field existed (legacy local cache) — these
+  // are treated as belonging to no project (excluded from every project's
+  // filtered view) until re-synced from the server. See
+  // SurveyDataProvider.setProject()/AppDataProvider's equivalent pattern
+  // for Ménages/Champs/Structures.
+  String project;
 
   SurveyRecord({
     String? id,
@@ -30,11 +37,13 @@ class SurveyRecord {
     Map<String, List<Map<String, dynamic>>>? repeats,
     DateTime? createdAt,
     DateTime? updatedAt,
+    String? project,
   }) : id = id ?? const Uuid().v4(),
        values = values ?? {},
        repeats = repeats ?? {},
        createdAt = createdAt ?? DateTime.now(),
-       updatedAt = updatedAt ?? DateTime.now();
+       updatedAt = updatedAt ?? DateTime.now(),
+       project = project ?? '';
 
   /// Convenience accessors mirroring the existing app's
   /// region/prefecture/sousPrefecture convention (used by LocationPickerField
@@ -54,6 +63,7 @@ class SurveyRecord {
       ),
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
+      'project': project,
     };
   }
 
@@ -77,6 +87,7 @@ class SurveyRecord {
       updatedAt: map['updatedAt'] != null
           ? DateTime.tryParse(map['updatedAt'].toString()) ?? DateTime.now()
           : DateTime.now(),
+      project: map['project']?.toString() ?? '',
     );
   }
 }

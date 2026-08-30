@@ -4,6 +4,8 @@ import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
 import '../services/session_service.dart';
 import '../services/app_data_provider.dart';
+import '../services/survey_data_provider.dart';
+import '../services/sync_service.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'dashboard/module_dashboard_screen.dart';
 import 'menage/menage_list_screen.dart';
@@ -65,7 +67,39 @@ class _RootShellState extends State<RootShell> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<AppDataProvider>().setProject(widget.projectCode);
+      context.read<SurveyDataProvider>().setProject(widget.projectCode);
+      _autoPullOnEntry();
     });
+  }
+
+  /// Silently pulls the latest Ménages/Champs/Structures/fiches
+  /// BIODIVERSITÉ/SOCIAL for [projectCode] from the server as soon as the
+  /// user enters the app (right after login/project selection), so newly
+  /// imported/synced data (e.g. ménages imported by the admin directly on
+  /// the server) becomes visible WITHOUT requiring the user to remember to
+  /// press "Actualiser" manually first. Runs in the background: failures
+  /// (offline, unreachable server) are silently ignored — the app still
+  /// works fully offline with whatever data is already cached locally, and
+  /// the user can always retry manually via "Actualiser" in Synchroniser.
+  Future<void> _autoPullOnEntry() async {
+    try {
+      final result = await SyncService.instance.pullFromServer(
+        project: widget.projectCode,
+      );
+      if (!mounted || !result.success) return;
+      await context.read<AppDataProvider>().mergeFromServer(
+        menages: result.menages,
+        champs: result.champs,
+        structures: result.structures,
+        deletions: result.deletions,
+      );
+      if (!mounted) return;
+      await context.read<SurveyDataProvider>().mergeFromServer(
+        result.surveyRecords,
+      );
+    } catch (_) {
+      // Offline or server unreachable: ignore, local data remains usable.
+    }
   }
 
   List<Widget> get _screens {

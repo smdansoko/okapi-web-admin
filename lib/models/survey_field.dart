@@ -123,4 +123,54 @@ class SurveySchema {
           .toList(),
     );
   }
+
+  /// Recursively walks [fields] and returns every `image`-type field found,
+  /// whether it sits at the top level or nested inside a repeat section.
+  /// Used to build the "Photos" gallery (aggregating every photo captured
+  /// across all records of a form) without hardcoding field names per form
+  /// — stays automatically in sync with lib/data/survey_schema.json.
+  List<SurveyImageFieldRef> get imageFields {
+    final out = <SurveyImageFieldRef>[];
+    void walk(List<SurveyNode> nodes, String? repeatName, String? repeatLabel) {
+      for (final n in nodes) {
+        if (n.isField && n.type == 'image') {
+          out.add(
+            SurveyImageFieldRef(
+              fieldName: n.name,
+              fieldLabel: n.label ?? n.name,
+              repeatName: repeatName,
+              repeatLabel: repeatLabel,
+            ),
+          );
+        } else if (n.isRepeat) {
+          walk(n.children, n.name, n.label ?? n.name);
+        } else if (n.children.isNotEmpty) {
+          walk(n.children, repeatName, repeatLabel);
+        }
+      }
+    }
+
+    walk(fields, null, null);
+    return out;
+  }
+}
+
+/// Reference to one `image`-type field within a [SurveySchema], noting
+/// whether it lives at the top level (values map) or inside a repeat
+/// section's instances (repeats map), so photo-aggregation code knows where
+/// to look up the base64 data on a [SurveyRecord].
+class SurveyImageFieldRef {
+  final String fieldName;
+  final String fieldLabel;
+  final String? repeatName; // null if top-level (not inside a repeat)
+  final String? repeatLabel;
+
+  const SurveyImageFieldRef({
+    required this.fieldName,
+    required this.fieldLabel,
+    this.repeatName,
+    this.repeatLabel,
+  });
+
+  bool get isInRepeat => repeatName != null;
 }

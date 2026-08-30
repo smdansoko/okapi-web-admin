@@ -9,10 +9,22 @@ import '../../services/app_data_provider.dart';
 import '../../services/auth_service.dart';
 import '../../services/photo_cache_service.dart';
 import '../../services/session_service.dart';
+import '../../services/storage_service.dart';
 import '../../services/survey_data_provider.dart';
 import '../../services/sync_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+
+/// Statuts allowed to reset ALL locally saved data on THIS device
+/// (superficie parcelles, champs, ménages, fiches BIODIVERSITÉ/SOCIAL,
+/// etc.) without touching the survey forms/schemas themselves (the forms
+/// are bundled app assets, not stored in Hive, so they are never affected
+/// by this action regardless). Restricted to avoid an Enquêteur
+/// accidentally wiping a whole team's unsynced field work.
+const Set<String> _kResetAllowedStatuts = {
+  "Chef d'équipe",
+  SessionService.kAdministrateurPrincipal,
+};
 
 /// Every "statut" is allowed to push data to the server via
 /// "Synchroniser" (PUSH) AND pull via "Actualiser", EXCEPT "Enquêteur"
@@ -54,6 +66,9 @@ class _SyncScreenState extends State<SyncScreen> {
   int _photosTotal = 0;
   String? _photosResultMessage;
   bool? _photosResultOk;
+
+  // ---- Reset local data state ----
+  bool _resettingData = false;
 
   AppUser? _currentUser;
   bool get _canSynchronize =>
@@ -294,6 +309,93 @@ class _SyncScreenState extends State<SyncScreen> {
         ),
       );
     }
+  }
+
+  bool get _canResetData =>
+      _currentUser != null && _kResetAllowedStatuts.contains(_currentUser!.statut);
+
+  /// Wipes ALL data currently saved locally on THIS device (Ménages,
+  /// Enquêtes Champs/Structures — superficie parcelles, etc. — and every
+  /// BIODIVERSITÉ/SOCIAL fiche), WITHOUT touching the survey forms
+  /// themselves (the form definitions are a bundled app asset, never
+  /// stored in Hive, so they are never affected). Requires typing
+  /// "REINITIALISER" to confirm, since this is destructive and cannot be
+  /// undone for any data not already synchronized to the server.
+  Future<void> _confirmResetData() async {
+    final confirmController = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Réinitialiser les données locales ?'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Cette action supprime DÉFINITIVEMENT de cet appareil : les '
+              'ménages, les enquêtes champs (superficie des parcelles, '
+              'cultures, etc.), les enquêtes structures, ainsi que toutes '
+              'les fiches BIODIVERSITÉ/SOCIAL enregistrées localement.\n\n'
+              'Les FORMULAIRES eux-mêmes (questions/schémas) ne sont PAS '
+              'touchés. Toute donnée non encore synchronisée sera perdue.',
+            ),
+            const SizedBox(height: 12),
+            const Text(
+              'Tapez REINITIALISER pour confirmer :',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: confirmController,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'REINITIALISER',
+              ),
+              textCapitalization: TextCapitalization.characters,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Annuler'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
+            onPressed: () => Navigator.of(ctx).pop(
+              confirmController.text.trim().toUpperCase() == 'REINITIALISER',
+            ),
+            child: const Text(
+              'Réinitialiser',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+
+    setState(() => _resettingData = true);
+    await StorageService.instance.clearAll();
+    if (!mounted) return;
+    final data = context.read<AppDataProvider>();
+    final surveyData = context.read<SurveyDataProvider>();
+    await data.loadAll();
+    if (!mounted) return;
+    await surveyData.loadAll(kAllSurveyFormKeys);
+    if (!mounted) return;
+    setState(() => _resettingData = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Données locales réinitialisées. Les formulaires restent '
+          'inchangés. Utilisez "Actualiser" pour récupérer les données '
+          'depuis le serveur.',
+        ),
+        backgroundColor: OkapiColors.secondary,
+      ),
+    );
   }
 
   /// Downloads every legacy member photo (uploaded by the admin on the
@@ -982,6 +1084,82 @@ class _SyncScreenState extends State<SyncScreen> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 24),
+
+                // ---- Réinitialiser les données locales ----
+                if (_canResetData)
+                  Card(
+                    color: Colors.red.shade50,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.delete_forever_rounded,
+                                color: Colors.red.shade700,
+                              ),
+                              const SizedBox(width: 8),
+                              const Expanded(
+                                child: Text(
+                                  'Réinitialiser les données locales',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Supprime de CET appareil uniquement les ménages, '
+                            'champs (superficie des parcelles, etc.), '
+                            'structures et fiches BIODIVERSITÉ/SOCIAL '
+                            'enregistrés localement, SANS toucher aux '
+                            'formulaires. Pensez à synchroniser avant, sinon '
+                            'les données non envoyées seront perdues.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _resettingData ? null : _confirmResetData,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red.shade700,
+                                side: BorderSide(color: Colors.red.shade700),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
+                              ),
+                              icon: _resettingData
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.delete_forever_rounded),
+                              label: Text(
+                                _resettingData
+                                    ? 'Réinitialisation…'
+                                    : 'Réinitialiser les données locales',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 24),
               ],
             ),

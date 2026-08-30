@@ -14,10 +14,30 @@ class SurveyDataProvider extends ChangeNotifier {
 
   final Map<String, List<SurveyRecord>> _records = {};
 
-  List<SurveyRecord> recordsFor(String formKey) =>
-      List.unmodifiable(_records[formKey] ?? const []);
+  // The currently active project (simandou/wcag/smb), set via [setProject]
+  // once the user has chosen a project (see RootShell.initState, mirroring
+  // AppDataProvider's own pattern). All public getters below are FILTERED
+  // by this value so a BIODIVERSITÉ/SOCIAL record belonging to one project
+  // never leaks into another project's dashboard/list — this is the fix
+  // for "les mêmes chiffres dans les tableaux de bord de tous les projets"
+  // reported for the BIODIVERSITÉ/SOCIAL module dashboards.
+  String? _activeProject;
 
-  int countFor(String formKey) => _records[formKey]?.length ?? 0;
+  void setProject(String? project) {
+    if (_activeProject == project) return;
+    _activeProject = project;
+    notifyListeners();
+  }
+
+  List<SurveyRecord> recordsFor(String formKey) {
+    final list = _records[formKey] ?? const [];
+    if (_activeProject == null) return List.unmodifiable(list);
+    return List.unmodifiable(
+      list.where((r) => r.project == _activeProject).toList(),
+    );
+  }
+
+  int countFor(String formKey) => recordsFor(formKey).length;
 
   Future<void> loadAll(List<String> formKeys) async {
     for (final key in formKeys) {
@@ -42,6 +62,9 @@ class SurveyDataProvider extends ChangeNotifier {
   }
 
   Future<void> saveRecord(SurveyRecord record) async {
+    if (record.project.isEmpty && _activeProject != null) {
+      record.project = _activeProject!;
+    }
     await _storage.saveSurveyRecord(record);
     final list = _records.putIfAbsent(record.formKey, () => []);
     final idx = list.indexWhere((r) => r.id == record.id);
@@ -60,6 +83,12 @@ class SurveyDataProvider extends ChangeNotifier {
   }
 
   /// Bulk-upsert records pulled from the OKAPI Web Admin server (sync).
+  ///
+  /// Server responses may not carry a `project` field (server DB is
+  /// already project-scoped per project database, see okapi_web_admin/
+  /// db.py); stamp it here from the active project so the pulled record
+  /// is correctly filterable locally too (mirrors AppDataProvider's
+  /// mergeFromServer behaviour for Ménages/Champs/Structures).
   Future<void> mergeFromServer(
     Map<String, List<SurveyRecord>> byFormKey,
   ) async {
@@ -67,8 +96,16 @@ class SurveyDataProvider extends ChangeNotifier {
       final formKey = entry.key;
       final list = _records.putIfAbsent(formKey, () => []);
       for (final record in entry.value) {
-        await _storage.saveSurveyRecord(record);
+        if (record.project.isEmpty && _activeProject != null) {
+          record.project = _activeProject!;
+        }
         final idx = list.indexWhere((r) => r.id == record.id);
+        // Last-write-wins: only overwrite the local copy if the server's
+        // version is not older than what we already have locally.
+        if (idx >= 0 && record.updatedAt.isBefore(list[idx].updatedAt)) {
+          continue;
+        }
+        await _storage.saveSurveyRecord(record);
         if (idx >= 0) {
           list[idx] = record;
         } else {
