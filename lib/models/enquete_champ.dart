@@ -3,6 +3,9 @@ import 'champ_agricole.dart';
 /// Enquête champs (Formulaire 2: WCAG_Enquête_Champs_V1)
 class EnqueteChamp {
   String id; // codeEnquete
+  // Which OKAPI project (simandou/wcag/smb) this survey belongs to — see
+  // Menage.project for the rationale (per-project data isolation).
+  String project;
   DateTime dateEnquete;
   String numBatch;
   String enqueteurs;
@@ -43,6 +46,7 @@ class EnqueteChamp {
 
   EnqueteChamp({
     required this.id,
+    this.project = '',
     required this.dateEnquete,
     this.numBatch = '',
     this.enqueteurs = '',
@@ -76,6 +80,7 @@ class EnqueteChamp {
 
   Map<String, dynamic> toMap() => {
     'id': id,
+    'project': project,
     'dateEnquete': dateEnquete.toIso8601String(),
     'numBatch': numBatch,
     'enqueteurs': enqueteurs,
@@ -106,6 +111,7 @@ class EnqueteChamp {
 
   factory EnqueteChamp.fromMap(Map map) => EnqueteChamp(
     id: map['id'] as String,
+    project: map['project'] as String? ?? '',
     dateEnquete: DateTime.parse(map['dateEnquete'] as String),
     numBatch: map['numBatch'] as String? ?? '',
     enqueteurs: map['enqueteurs'] as String? ?? '',

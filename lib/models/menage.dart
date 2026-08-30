@@ -3,6 +3,16 @@ import 'individu.dart';
 /// Enquête ménage (Formulaire 1: WCAG_Enquête des ménages)
 class Menage {
   String id; // codeMenage - unique key
+  // Which OKAPI project (simandou/wcag/smb) this household belongs to.
+  // Stamped automatically by AppDataProvider.saveMenage()/mergeFromServer()
+  // so the mobile app can strictly isolate each project's household list
+  // (a household created/pulled under SIMANDOU must never appear while the
+  // WCAG project is active, and vice-versa). Empty for records created
+  // before this field existed (legacy local cache) — these are filtered
+  // out of every project's list until refreshed via "Actualiser" (pull),
+  // since the server-side databases are already correctly split by
+  // project (see okapi_web_admin/db.py).
+  String project;
   DateTime dateEnquete;
   String enqueteurs;
   String tablette;
@@ -37,6 +47,7 @@ class Menage {
 
   Menage({
     required this.id,
+    this.project = '',
     required this.dateEnquete,
     this.enqueteurs = '',
     this.tablette = '',
@@ -77,6 +88,7 @@ class Menage {
 
   Map<String, dynamic> toMap() => {
     'id': id,
+    'project': project,
     'dateEnquete': dateEnquete.toIso8601String(),
     'enqueteurs': enqueteurs,
     'tablette': tablette,
@@ -105,6 +117,7 @@ class Menage {
 
   factory Menage.fromMap(Map map) => Menage(
     id: map['id'] as String,
+    project: map['project'] as String? ?? '',
     dateEnquete: DateTime.parse(map['dateEnquete'] as String),
     enqueteurs: map['enqueteurs'] as String? ?? '',
     tablette: map['tablette'] as String? ?? '',

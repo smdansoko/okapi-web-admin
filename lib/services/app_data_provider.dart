@@ -15,9 +15,37 @@ class AppDataProvider extends ChangeNotifier {
   List<EnqueteChamp> _champs = [];
   List<EnqueteStructure> _structures = [];
 
-  List<Menage> get menages => List.unmodifiable(_menages);
-  List<EnqueteChamp> get champs => List.unmodifiable(_champs);
-  List<EnqueteStructure> get structures => List.unmodifiable(_structures);
+  // The currently active project (simandou/wcag/smb), set via [setProject]
+  // once the user has chosen a project (see AuthGate/RootShell). All public
+  // getters below are FILTERED by this value so a household/survey
+  // belonging to one project never leaks into another project's lists —
+  // this is the fix for "WCAG households appearing in SIMANDOU".
+  // Records with an empty `project` (legacy local cache created before the
+  // `project` field existed) are excluded from every project's view until
+  // re-synced from the server (which is already correctly project-scoped).
+  String? _activeProject;
+
+  void setProject(String? project) {
+    if (_activeProject == project) return;
+    _activeProject = project;
+    notifyListeners();
+  }
+
+  List<Menage> get menages => List.unmodifiable(
+    _activeProject == null
+        ? _menages
+        : _menages.where((m) => m.project == _activeProject).toList(),
+  );
+  List<EnqueteChamp> get champs => List.unmodifiable(
+    _activeProject == null
+        ? _champs
+        : _champs.where((c) => c.project == _activeProject).toList(),
+  );
+  List<EnqueteStructure> get structures => List.unmodifiable(
+    _activeProject == null
+        ? _structures
+        : _structures.where((s) => s.project == _activeProject).toList(),
+  );
 
   Future<void> loadAll() async {
     _menages = _storage.getAllMenages();
@@ -28,6 +56,9 @@ class AppDataProvider extends ChangeNotifier {
 
   // -------- Ménages --------
   Future<void> saveMenage(Menage menage) async {
+    if (menage.project.isEmpty && _activeProject != null) {
+      menage.project = _activeProject!;
+    }
     await _storage.saveMenage(menage);
     final idx = _menages.indexWhere((m) => m.id == menage.id);
     if (idx >= 0) {
@@ -62,6 +93,9 @@ class AppDataProvider extends ChangeNotifier {
 
   // -------- Enquêtes Champs --------
   Future<void> saveChamp(EnqueteChamp enquete) async {
+    if (enquete.project.isEmpty && _activeProject != null) {
+      enquete.project = _activeProject!;
+    }
     await _storage.saveChamp(enquete);
     final idx = _champs.indexWhere((c) => c.id == enquete.id);
     if (idx >= 0) {
@@ -82,6 +116,9 @@ class AppDataProvider extends ChangeNotifier {
 
   // -------- Enquêtes Structures --------
   Future<void> saveStructureEnquete(EnqueteStructure enquete) async {
+    if (enquete.project.isEmpty && _activeProject != null) {
+      enquete.project = _activeProject!;
+    }
     await _storage.saveStructureEnquete(enquete);
     final idx = _structures.indexWhere((s) => s.id == enquete.id);
     if (idx >= 0) {
@@ -154,6 +191,13 @@ class AppDataProvider extends ChangeNotifier {
 
     for (final menage in menages) {
       if (deletedMenageIds.contains(menage.id)) continue;
+      // Server responses may not carry a `project` field (server DB is
+      // already project-scoped, see okapi_web_admin/db.py); stamp it here
+      // from the active project so the pulled record is correctly
+      // filterable locally too.
+      if (menage.project.isEmpty && _activeProject != null) {
+        menage.project = _activeProject!;
+      }
       final idx = _menages.indexWhere((m) => m.id == menage.id);
       // Last-write-wins: only overwrite the local copy if the server's
       // version is not older than what we already have locally (protects
@@ -171,6 +215,9 @@ class AppDataProvider extends ChangeNotifier {
     }
     for (final champ in champs) {
       if (deletedChampIds.contains(champ.id)) continue;
+      if (champ.project.isEmpty && _activeProject != null) {
+        champ.project = _activeProject!;
+      }
       final idx = _champs.indexWhere((c) => c.id == champ.id);
       if (idx >= 0 && champ.updatedAt.isBefore(_champs[idx].updatedAt)) {
         continue;
@@ -184,6 +231,9 @@ class AppDataProvider extends ChangeNotifier {
     }
     for (final structure in structures) {
       if (deletedStructureIds.contains(structure.id)) continue;
+      if (structure.project.isEmpty && _activeProject != null) {
+        structure.project = _activeProject!;
+      }
       final idx = _structures.indexWhere((s) => s.id == structure.id);
       if (idx >= 0 && structure.updatedAt.isBefore(_structures[idx].updatedAt)) {
         continue;

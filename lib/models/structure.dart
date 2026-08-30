@@ -124,6 +124,9 @@ class StructureItem {
 /// Enquête structures (Formulaire 3: WCAG_Enquête_Structures_V1)
 class EnqueteStructure {
   String id; // codeEnquete
+  // Which OKAPI project (simandou/wcag/smb) this survey belongs to — see
+  // Menage.project for the rationale (per-project data isolation).
+  String project;
   DateTime dateEnquete;
   String numBatch;
   String enqueteurs;
@@ -156,6 +159,7 @@ class EnqueteStructure {
 
   EnqueteStructure({
     required this.id,
+    this.project = '',
     required this.dateEnquete,
     this.numBatch = '',
     this.enqueteurs = '',
@@ -186,6 +190,7 @@ class EnqueteStructure {
 
   Map<String, dynamic> toMap() => {
     'id': id,
+    'project': project,
     'dateEnquete': dateEnquete.toIso8601String(),
     'numBatch': numBatch,
     'enqueteurs': enqueteurs,
@@ -214,6 +219,7 @@ class EnqueteStructure {
 
   factory EnqueteStructure.fromMap(Map map) => EnqueteStructure(
     id: map['id'] as String,
+    project: map['project'] as String? ?? '',
     dateEnquete: DateTime.parse(map['dateEnquete'] as String),
     numBatch: map['numBatch'] as String? ?? '',
     enqueteurs: map['enqueteurs'] as String? ?? '',

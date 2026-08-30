@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
 import '../services/session_service.dart';
+import '../services/app_data_provider.dart';
 import 'dashboard/dashboard_screen.dart';
 import 'dashboard/module_dashboard_screen.dart';
 import 'menage/menage_list_screen.dart';
@@ -51,6 +53,20 @@ class RootShell extends StatefulWidget {
 
 class _RootShellState extends State<RootShell> {
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Wire the active project into AppDataProvider so its menages/champs/
+    // structures getters are filtered to ONLY this project's records (see
+    // AppDataProvider.setProject) — this is what actually enforces the
+    // per-project household/champ/structure isolation once a project has
+    // been selected.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<AppDataProvider>().setProject(widget.projectCode);
+    });
+  }
 
   List<Widget> get _screens {
     switch (widget.moduleCode) {

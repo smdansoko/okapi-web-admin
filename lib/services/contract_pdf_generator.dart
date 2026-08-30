@@ -1580,6 +1580,47 @@ class ContractPdfGenerator {
       );
     }
 
+    // -------- Cultures annuelles (champs) --------
+    if (s.cultureAnnuelleDetails.isNotEmpty) {
+      widgets.add(pw.SizedBox(height: 10));
+      widgets.add(_annexSubtitle('CULTURES ANNUELLES (CHAMPS)'));
+      double totalSup = 0, totalMontant = 0;
+      final rows = <pw.TableRow>[
+        _annexHeaderRow([
+          'Culture',
+          'Superficie (ha)',
+          'Revenu/ha (GNF)',
+          'Montant (GNF)',
+        ]),
+      ];
+      for (final c in s.cultureAnnuelleDetails) {
+        totalSup += c.superficieHa;
+        totalMontant += c.montant;
+        rows.add(
+          _annexDataRow([
+            c.culture,
+            c.superficieHa.toStringAsFixed(2),
+            Formatters.number(c.revenuHa),
+            Formatters.number(c.montant),
+          ]),
+        );
+      }
+      rows.add(
+        _annexTotalRow([
+          'TOTAL',
+          totalSup.toStringAsFixed(2),
+          '',
+          Formatters.number(totalMontant),
+        ]),
+      );
+      widgets.add(
+        pw.Table(
+          border: pw.TableBorder.all(color: greyBorder, width: 0.5),
+          children: rows,
+        ),
+      );
+    }
+
     // -------- Bois d'œuvre — column order matches the reference contracts:
     // Espèce, Circonférence, Hauteur, Volume unitaire, Nombre de pieds,
     // Coût/m³, Volume total, Montant (GNF). --------
