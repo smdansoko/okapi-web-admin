@@ -26,7 +26,7 @@ class ModuleOption {
 /// PARC. BIODIVERSITÉ forms are reachable only when BIODIVERSITÉ is the
 /// active module, and likewise for SOCIAL. Which modules are even
 /// SELECTABLE is further restricted by the account's "statut":
-///   - "Chef d'équipe" / "Enquêteur"      -> PARC only
+///   - "Chef d'équipe" / "Enquêteur"      -> PARC + SOCIAL
 ///   - "Expert Biodiversité"              -> BIODIVERSITÉ only
 ///   - "Expert Social"                    -> SOCIAL only
 ///   - "Administrateur principal"         -> all 3 (the web admin's main
@@ -70,7 +70,7 @@ class SessionService {
     switch (statut) {
       case kChefDEquipe:
       case kEnqueteur:
-        return {'parc'};
+        return {'parc', 'social'};
       case kExpertBiodiversite:
         return {'biodiversite'};
       case kExpertSocial:

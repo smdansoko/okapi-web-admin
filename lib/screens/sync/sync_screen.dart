@@ -14,18 +14,14 @@ import '../../services/sync_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 
-/// Only users with one of these exact "statut" values are allowed to push
-/// data to the server via "Synchroniser" (PUSH). All users (regardless of
-/// statut) may still pull via "Actualiser". "Chef d'équipe" pushes the
-/// PARC team's ménages/champs/structures; "Expert Biodiversité"/"Expert
-/// Social" push their own module's survey records (there is no separate
-/// "chef" role for those modules).
+/// Every "statut" is allowed to push data to the server via
+/// "Synchroniser" (PUSH) AND pull via "Actualiser", EXCEPT "Enquêteur"
+/// which may only pull ("Actualiser"). This lets "Chef d'équipe",
+/// "Expert Biodiversité", "Expert Social" and "Administrateur principal"
+/// (including admin accounts logging in from the mobile app) trigger
+/// synchronization.
 const String _kChefDEquipeStatut = "Chef d'équipe";
-const Set<String> _kAllowedPushStatuts = {
-  _kChefDEquipeStatut,
-  SessionService.kExpertBiodiversite,
-  SessionService.kExpertSocial,
-};
+const Set<String> _kPushDeniedStatuts = {SessionService.kEnqueteur};
 
 /// "Synchroniser" tab: lets the field team push all locally collected data
 /// (Ménages, Enquêtes Champs, Enquêtes Structures — including the recent
@@ -61,7 +57,7 @@ class _SyncScreenState extends State<SyncScreen> {
 
   AppUser? _currentUser;
   bool get _canSynchronize =>
-      _currentUser != null && _kAllowedPushStatuts.contains(_currentUser!.statut);
+      _currentUser != null && !_kPushDeniedStatuts.contains(_currentUser!.statut);
 
   @override
   void initState() {
@@ -158,10 +154,10 @@ class _SyncScreenState extends State<SyncScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Seuls les utilisateurs avec le statut "$_kChefDEquipeStatut", '
-            '"${SessionService.kExpertBiodiversite}" ou '
-            '"${SessionService.kExpertSocial}" peuvent effectuer la '
-            'synchronisation (envoi vers le serveur).',
+            'Le statut "${SessionService.kEnqueteur}" ne peut pas '
+            'effectuer la synchronisation (envoi vers le serveur). '
+            'Utilisez "Actualiser" pour récupérer les données, ou '
+            'contactez votre "$_kChefDEquipeStatut" pour l\'envoi.',
           ),
           backgroundColor: Colors.red.shade700,
         ),
@@ -756,8 +752,8 @@ class _SyncScreenState extends State<SyncScreen> {
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
-                          'Réservé aux utilisateurs avec le statut '
-                          '"$_kChefDEquipeStatut". Votre statut actuel : '
+                          'Le statut "${SessionService.kEnqueteur}" ne peut '
+                          'pas synchroniser (envoi). Votre statut actuel : '
                           '${_currentUser?.statut.isNotEmpty == true ? _currentUser!.statut : "inconnu"}.',
                           style: TextStyle(
                             fontSize: 12,
