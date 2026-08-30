@@ -13,6 +13,17 @@ void main() {
         final summary = CompensationSummary();
         summary.parcelles = 1000000;
         summary.champsCulturesAnnuelles = 500000;
+        // Populate cultureAnnuelleDetails so the Annexe 1 "Cultures
+        // annuelles (champs)" table has data to render (regression test for
+        // the table that was previously dropped from Annexe 1).
+        summary.cultureAnnuelleDetails.add(
+          CultureAnnuelleDetail(
+            culture: 'Riz',
+            superficieHa: 2.0,
+            revenuHa: 12830000,
+            montant: 25660000,
+          ),
+        );
         final data = ContractData(
           type: type,
           project: project,
