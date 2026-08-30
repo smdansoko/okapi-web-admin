@@ -79,7 +79,7 @@ class SyncService {
   /// Default OKAPI Web Admin server address (sandbox preview deployment).
   /// Update this value once the server is deployed to a permanent address.
   static const String defaultServerUrl =
-      'https://5070-i1bw6quvtj3j3sq04mntj-dfc00ec5.sandbox.novita.ai';
+      'https://okapi-web-admin.onrender.com';
 
   Future<String> get serverUrl async {
     if (_cachedServerUrl != null) return _cachedServerUrl!;

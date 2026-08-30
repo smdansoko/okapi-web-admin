@@ -190,6 +190,13 @@ class ContractData {
     required Menage menage,
     required CompensationSummary summary,
     String project = 'wcag',
+    // Fallback profile photo (base64) resolved from the local legacy
+    // photo cache (see PhotoCacheService), passed in ONLY when the chef
+    // de ménage is eligible (registered in Enquête Champs or Enquête
+    // Structures) — mirrors okapi_web_admin/contract_pdf.py's
+    // `_fallback_photo_b64()`. Ignored when the chef already has a live
+    // photoProfilBase64 of their own.
+    String? fallbackPhotoBase64,
   }) {
     final chef = menage.chefDeMenage;
     return ContractData(
@@ -221,7 +228,10 @@ class ContractData {
       telephone: chef?.telephone ?? '',
       dateEnquete: menage.dateEnquete,
       summary: summary,
-      photoProfilBase64: chef?.photoProfilBase64,
+      photoProfilBase64:
+          (chef?.photoProfilBase64 != null && chef!.photoProfilBase64!.isNotEmpty)
+          ? chef.photoProfilBase64
+          : fallbackPhotoBase64,
       photoCniRectoBase64: chef?.photoCniRectoBase64,
       photoCniVersoBase64: chef?.photoCniVersoBase64,
     );
@@ -243,6 +253,11 @@ class ContractData {
     required CompensationSummary summary,
     String codeEnquete = '',
     String project = 'wcag',
+    // See ContractData.fromMenage's fallbackPhotoBase64 doc — same
+    // eligibility-gated legacy-photo-cache fallback, applied here to the
+    // Champs/Structures-selected "propriétaire" individu instead of the
+    // chef de ménage.
+    String? fallbackPhotoBase64,
   }) {
     return ContractData(
       type: type,
@@ -276,7 +291,11 @@ class ContractData {
       telephone: proprietaire.telephone,
       dateEnquete: dateEnquete,
       summary: summary,
-      photoProfilBase64: proprietaire.photoProfilBase64,
+      photoProfilBase64:
+          (proprietaire.photoProfilBase64 != null &&
+              proprietaire.photoProfilBase64!.isNotEmpty)
+          ? proprietaire.photoProfilBase64
+          : fallbackPhotoBase64,
       photoCniRectoBase64: proprietaire.photoCniRectoBase64,
       photoCniVersoBase64: proprietaire.photoCniVersoBase64,
     );

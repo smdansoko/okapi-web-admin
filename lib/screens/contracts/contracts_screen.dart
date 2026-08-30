@@ -6,6 +6,7 @@ import '../../models/menage.dart';
 import '../../services/app_data_provider.dart';
 import '../../services/compensation_calculator.dart';
 import '../../services/contract_pdf_generator.dart';
+import '../../services/photo_cache_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/sync_status_banner.dart';
 import '../sync/sync_screen.dart';
@@ -212,10 +213,32 @@ class ContractsScreen extends StatelessWidget {
       codeProprietaire: chef.id,
       project: projectCode,
     );
+    // Eligibility gate (user requirement: legacy photo shown in contracts
+    // "si l'individu correspondant est registré dans enquête champs ou
+    // structures") — mirrors okapi_web_admin/app.py's
+    // individu_photos_manage() in_champs/in_structures check. Only
+    // resolved from the local offline photo cache when the chef has no
+    // live photoProfilBase64 of their own AND is eligible.
+    String? fallbackPhoto;
+    if ((chef.photoProfilBase64 == null || chef.photoProfilBase64!.isEmpty) &&
+        chef.photoMembreFilenameLegacy != null &&
+        chef.photoMembreFilenameLegacy!.isNotEmpty) {
+      final inChamps = data.champs.any((c) => c.codeProprietaire == chef.id);
+      final inStructures = data.structures.any(
+        (s) => s.proprietaireStructure == chef.id,
+      );
+      if (inChamps || inStructures) {
+        fallbackPhoto = await PhotoCacheService.instance.localPhotoBase64(
+          projectCode,
+          chef.photoMembreFilenameLegacy,
+        );
+      }
+    }
     final contractData = ContractData.fromMenage(
       menage: menage,
       summary: summary,
       project: projectCode,
+      fallbackPhotoBase64: fallbackPhoto,
     );
     await _previewContract(context, contractData);
   }
@@ -249,6 +272,21 @@ class ContractsScreen extends StatelessWidget {
       codeProprietaire: ref.codeProprietaire,
       project: projectCode,
     );
+    // This individu is by construction already eligible here (owners in
+    // proprietaireOwners/lignageOwners/communautaireOwners only exist
+    // because they appear as codeProprietaire in data.champs — the same
+    // "registered in Enquête Champs" gate applies). Still resolve the
+    // legacy photo cache only as a fallback when no live photo exists.
+    String? fallbackPhoto;
+    if ((proprietaire.photoProfilBase64 == null ||
+            proprietaire.photoProfilBase64!.isEmpty) &&
+        proprietaire.photoMembreFilenameLegacy != null &&
+        proprietaire.photoMembreFilenameLegacy!.isNotEmpty) {
+      fallbackPhoto = await PhotoCacheService.instance.localPhotoBase64(
+        projectCode,
+        proprietaire.photoMembreFilenameLegacy,
+      );
+    }
     final contractData = ContractData.fromChampOwner(
       type: type,
       numeroLot: ref.numBatch.isEmpty ? ref.codeMenage : ref.numBatch,
@@ -263,6 +301,7 @@ class ContractsScreen extends StatelessWidget {
       summary: summary,
       codeEnquete: ref.codeEnquete,
       project: projectCode,
+      fallbackPhotoBase64: fallbackPhoto,
     );
     await _previewContract(context, contractData);
   }

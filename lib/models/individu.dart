@@ -35,6 +35,17 @@ class Individu {
   /// dérivé temporaire "{codeIndividu}-1" en attendant l'attribution.
   String? codePap;
 
+  /// Original KoboToolbox/ODK photo attachment filename, preserved from
+  /// the legacy Excel import (see okapi_web_admin/import_legacy_excel.py).
+  /// When [photoProfilBase64] is empty (always the case for legacy
+  /// households not yet re-photographed on mobile), the app resolves this
+  /// filename against its local photo cache (see PhotoCacheService) —
+  /// mirroring the web admin's own `_fallback_photo_b64()` logic in
+  /// contract_pdf.py — to still show a profile photo in contracts,
+  /// PROVIDED this individu is registered in an Enquête Champs or
+  /// Enquête Structures record (eligibility gate, see contracts_screen).
+  String? photoMembreFilenameLegacy;
+
   Individu({
     required this.id,
     required this.numOrdreIndividu,
@@ -58,6 +69,7 @@ class Individu {
     this.photoCniRectoBase64,
     this.photoCniVersoBase64,
     this.codePap,
+    this.photoMembreFilenameLegacy,
   });
 
   /// True when [typeDePiece] denotes an actual identity document (i.e. not
@@ -89,6 +101,7 @@ class Individu {
     'photoCniRectoBase64': photoCniRectoBase64,
     'photoCniVersoBase64': photoCniVersoBase64,
     'codePap': codePap,
+    'photoMembreFilenameLegacy': photoMembreFilenameLegacy,
   };
 
   factory Individu.fromMap(Map map) => Individu(
@@ -114,6 +127,7 @@ class Individu {
     photoCniRectoBase64: map['photoCniRectoBase64'] as String?,
     photoCniVersoBase64: map['photoCniVersoBase64'] as String?,
     codePap: map['codePap'] as String?,
+    photoMembreFilenameLegacy: map['photoMembreFilenameLegacy'] as String?,
   );
 
   /// Label used in dropdown pickers: "Prénom NOM (numéro pièce) - relation"
