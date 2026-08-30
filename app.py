@@ -1517,6 +1517,64 @@ def api_pull():
     })
 
 
+@app.route("/api/photos/manifest", methods=["GET", "OPTIONS"])
+def api_photos_manifest():
+    """Lets the mobile app know which legacy member photos are currently
+    available on the server for the active project (bound via
+    mobile_request_project(), same as /api/sync + /api/pull), so it can
+    diff against what it already has cached locally and only download the
+    ones it's missing (Req: web-uploaded photos auto-synced to mobile for
+    offline use in contracts)."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+    project = db.get_current_project()
+    return jsonify({
+        "status": "ok",
+        "project": project,
+        "photos": photos.manifest_for_project(project),
+    })
+
+
+@app.route("/api/photos/file/<path:filename>", methods=["GET", "OPTIONS"])
+def api_photos_file(filename):
+    """Streams a single legacy photo file for the active project (simpler
+    alternative to the ZIP endpoint below - avoids requiring a ZIP/archive
+    library on the mobile client)."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+    project = db.get_current_project()
+    raw = photos.get_photo_bytes(project, filename)
+    if not raw:
+        abort(404)
+    return send_file(io.BytesIO(raw), mimetype="image/jpeg")
+
+
+@app.route("/api/photos/download", methods=["GET", "OPTIONS"])
+def api_photos_download():
+    """Streams a ZIP archive of legacy member photos for the active
+    project, so the mobile app can download them in bulk and cache them
+    on-device (Hive/filesystem) for fully offline use afterwards. Pass
+    `?filenames=a.jpg,b.jpg` to fetch only specific files (incremental
+    sync); omit it to fetch every photo currently uploaded for the
+    project (initial/full sync)."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+    project = db.get_current_project()
+    filenames_param = request.args.get("filenames", "")
+    filenames = [f.strip() for f in filenames_param.split(",") if f.strip()] or None
+    buf, included = photos.build_zip_bytes(project, filenames)
+    if included == 0:
+        return jsonify({"status": "empty", "message": "Aucune photo disponible."}), 404
+    resp = send_file(
+        buf,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name=f"okapi_photos_{project}.zip",
+    )
+    resp.headers["X-Photo-Count"] = str(included)
+    return resp
+
+
 @app.route("/api/status")
 def api_status():
     return jsonify({

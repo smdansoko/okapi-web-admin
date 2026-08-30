@@ -138,6 +138,47 @@ def save_zip_archive(project: str, file_storage) -> dict:
     return {"saved": saved, "skipped": skipped, "error": None}
 
 
+def manifest_for_project(project: str) -> list:
+    """Returns [{"filename", "size", "mtime"}, ...] for every photo
+    currently uploaded for this project. Used by the mobile app (Req:
+    "photos téléversées dans le web synchronisées automatiquement dans
+    l'application mobile") to compute which files it is still missing
+    locally, without having to download anything it already cached."""
+    d = photos_dir_for(project)
+    out = []
+    for fn in sorted(os.listdir(d)):
+        if fn.startswith("."):
+            continue
+        full = os.path.join(d, fn)
+        if os.path.isfile(full):
+            try:
+                st = os.stat(full)
+            except OSError:
+                continue
+            out.append({"filename": fn, "size": st.st_size, "mtime": int(st.st_mtime)})
+    return out
+
+
+def build_zip_bytes(project: str, filenames=None):
+    """Builds an in-memory ZIP archive containing the requested photo
+    filenames for a project (or ALL uploaded photos when `filenames` is
+    falsy). Unknown/missing filenames are silently skipped. Returns
+    (bytes_io, included_count)."""
+    import io as _io
+    index = _index_existing(project)
+    if filenames:
+        wanted = [index[_norm_key(fn)] for fn in filenames if _norm_key(fn) in index]
+    else:
+        wanted = list(index.values())
+    buf = _io.BytesIO()
+    d = photos_dir_for(project)
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_STORED) as zf:
+        for fn in wanted:
+            zf.write(os.path.join(d, fn), arcname=fn)
+    buf.seek(0)
+    return buf, len(wanted)
+
+
 def stats_for_project(project: str, menages: list) -> dict:
     """Computes photo coverage stats for every individu across all
     ménages of a project: how many carry a photo_membre legacy reference

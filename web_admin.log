@@ -45,3 +45,4 @@
 10.64.44.144 - - [30/Aug/2026 16:41:32] "GET /photos-directory HTTP/1.1" 200 -
 10.64.44.144 - - [30/Aug/2026 16:41:32] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
 10.64.44.144 - - [30/Aug/2026 16:41:32] "[36mGET /static/img/okapi_icon_circular.png HTTP/1.1[0m" 304 -
+10.64.65.60 - - [30/Aug/2026 17:06:00] "[31m[1mPOST /photos-directory/upload HTTP/1.1[0m" 400 -
