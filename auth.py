@@ -53,12 +53,20 @@ _PARC_ENDPOINTS = {
     "dashboard", "dashboard_stats", "menages_list", "menage_detail",
     "contracts_list", "export_contract", "preview_contract",
     "photos_directory", "photos_directory_upload", "individu_photo",
+    "individu_photo_field", "individu_photos_manage", "individu_photo_crop",
     "compensation_page", "compensation_export",
     "facturation_page", "facturation_export_superficie", "facturation_export",
     "rapport_page", "rapport_export_pdf", "rapport_export_docx",
 }
-_BIODIVERSITE_ENDPOINTS = {"biodiversite_dashboard", "biodiversite_form_records"}
-_SOCIAL_ENDPOINTS = {"social_dashboard", "social_form_records"}
+_BIODIVERSITE_ENDPOINTS = {
+    "biodiversite_dashboard", "biodiversite_form_records",
+    "biodiversite_export", "biodiversite_form_export",
+}
+_SOCIAL_ENDPOINTS = {
+    "social_dashboard", "social_form_records",
+    "social_export", "social_form_export",
+    "rapport_patrimoine_page", "rapport_patrimoine_export_docx",
+}
 # Endpoints reachable regardless of the selected module (admin user mgmt).
 _SHARED_ENDPOINTS = {"users_list", "user_approve", "user_reject", "user_delete"}
 

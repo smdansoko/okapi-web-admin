@@ -151,6 +151,15 @@ def _create_tables():
             synced_at TEXT DEFAULT (datetime('now'))
         );
 
+        CREATE TABLE IF NOT EXISTS deleted_records (
+            record_type TEXT NOT NULL,
+            record_id TEXT NOT NULL,
+            tablette TEXT,
+            device_id TEXT,
+            deleted_at TEXT DEFAULT (datetime('now')),
+            PRIMARY KEY (record_type, record_id)
+        );
+
         CREATE TABLE IF NOT EXISTS users (
             id TEXT PRIMARY KEY,
             nom_prenom TEXT NOT NULL,
@@ -264,7 +273,79 @@ def users_counts():
     return out
 
 
+TOMBSTONE_TABLES = {
+    "menage": "menages",
+    "champ": "champs",
+    "structure": "structures",
+}
+
+
+def is_deleted(record_type: str, record_id: str) -> bool:
+    conn = get_conn()
+    row = conn.execute(
+        "SELECT 1 FROM deleted_records WHERE record_type=? AND record_id=?",
+        (record_type, record_id),
+    ).fetchone()
+    conn.close()
+    return row is not None
+
+
+def record_deletion(record_type: str, record_id: str, tablette: str = "",
+                     device_id: str = ""):
+    """Deletes the record from its data table (if present) and records a
+    tombstone so the deletion is propagated to every other tablet on their
+    next 'Actualiser' (pull), and so the record is never re-created by a
+    later, out-of-order upsert of stale data for the same id."""
+    table = TOMBSTONE_TABLES.get(record_type)
+    with _lock:
+        conn = get_conn()
+        if table:
+            conn.execute(f"DELETE FROM {table} WHERE id=?", (record_id,))
+        conn.execute(
+            """INSERT INTO deleted_records (record_type, record_id, tablette, device_id, deleted_at)
+               VALUES (?,?,?,?,datetime('now'))
+               ON CONFLICT(record_type, record_id) DO UPDATE SET
+                 tablette=excluded.tablette,
+                 device_id=excluded.device_id,
+                 deleted_at=excluded.deleted_at
+            """,
+            (record_type, record_id, tablette, device_id),
+        )
+        conn.commit()
+        conn.close()
+
+
+def all_deletions(since: str = None):
+    """Returns all deletion tombstones (optionally only those recorded
+    after [since], an ISO datetime string) as a list of
+    {recordType, recordId, deletedAt} dicts, for the mobile /api/pull
+    response so every tablet can purge its own local copy of records
+    deleted elsewhere."""
+    conn = get_conn()
+    if since:
+        rows = conn.execute(
+            "SELECT * FROM deleted_records WHERE deleted_at > ? ORDER BY deleted_at",
+            (since,),
+        ).fetchall()
+    else:
+        rows = conn.execute(
+            "SELECT * FROM deleted_records ORDER BY deleted_at"
+        ).fetchall()
+    conn.close()
+    return [
+        {
+            "recordType": r["record_type"],
+            "recordId": r["record_id"],
+            "tablette": r["tablette"] or "",
+            "deletedAt": r["deleted_at"],
+        }
+        for r in rows
+    ]
+
+
 def upsert_menage(m: dict, device_id: str = ""):
+    if is_deleted("menage", m.get("id", "")):
+        return
     with _lock:
         conn = get_conn()
         chef = None
@@ -291,6 +372,10 @@ def upsert_menage(m: dict, device_id: str = ""):
                  updated_at=excluded.updated_at,
                  synced_at=datetime('now'),
                  device_id=excluded.device_id
+               WHERE excluded.updated_at IS NULL
+                  OR menages.updated_at IS NULL
+                  OR menages.updated_at = ''
+                  OR excluded.updated_at >= menages.updated_at
             """,
             (
                 m.get("id"),
@@ -311,6 +396,8 @@ def upsert_menage(m: dict, device_id: str = ""):
 
 
 def upsert_champ(c: dict, device_id: str = ""):
+    if is_deleted("champ", c.get("id", "")):
+        return
     with _lock:
         conn = get_conn()
         conn.execute(
@@ -329,6 +416,10 @@ def upsert_champ(c: dict, device_id: str = ""):
                  updated_at=excluded.updated_at,
                  synced_at=datetime('now'),
                  device_id=excluded.device_id
+               WHERE excluded.updated_at IS NULL
+                  OR champs.updated_at IS NULL
+                  OR champs.updated_at = ''
+                  OR excluded.updated_at >= champs.updated_at
             """,
             (
                 c.get("id"),
@@ -348,6 +439,8 @@ def upsert_champ(c: dict, device_id: str = ""):
 
 
 def upsert_structure(s: dict, device_id: str = ""):
+    if is_deleted("structure", s.get("id", "")):
+        return
     with _lock:
         conn = get_conn()
         conn.execute(
@@ -365,6 +458,10 @@ def upsert_structure(s: dict, device_id: str = ""):
                  updated_at=excluded.updated_at,
                  synced_at=datetime('now'),
                  device_id=excluded.device_id
+               WHERE excluded.updated_at IS NULL
+                  OR structures.updated_at IS NULL
+                  OR structures.updated_at = ''
+                  OR excluded.updated_at >= structures.updated_at
             """,
             (
                 s.get("id"),
@@ -488,6 +585,52 @@ def menage_by_id(mid: str):
     row = conn.execute("SELECT * FROM menages WHERE id=?", (mid,)).fetchone()
     conn.close()
     return json.loads(row["data_json"]) if row else None
+
+
+def find_individu(individu_id: str):
+    """Searches every ménage for an individu with this id. Returns
+    (menage_dict, individu_dict) or (None, None) if not found. Used by the
+    web admin's photo view/crop endpoints (Req #4: photos "directement
+    liées aux individus correspondants dans le ménage")."""
+    conn = get_conn()
+    rows = conn.execute("SELECT * FROM menages").fetchall()
+    conn.close()
+    for row in rows:
+        m = json.loads(row["data_json"])
+        for ind in m.get("individus", []):
+            if ind.get("id") == individu_id:
+                return m, ind
+    return None, None
+
+
+def update_individu_photo(menage_id: str, individu_id: str, field: str, base64_data: str):
+    """Updates one of an individu's 3 photo fields (photoProfilBase64 /
+    photoCniRectoBase64 / photoCniVersoBase64) directly on the ménage's
+    stored JSON, e.g. after cropping in the web admin UI. Bumps the
+    ménage's updatedAt so the change propagates to every mobile tablet on
+    their next 'Actualiser' (Req #3's last-write-wins pull-merge), and is
+    immediately reflected wherever this individu's photo is displayed
+    (ménage detail page, generated contract PDFs).
+
+    Returns True if the individu was found and updated, False otherwise.
+    """
+    if field not in ("photoProfilBase64", "photoCniRectoBase64", "photoCniVersoBase64"):
+        raise ValueError(f"Unknown photo field: {field}")
+    m = menage_by_id(menage_id)
+    if not m:
+        return False
+    found = False
+    for ind in m.get("individus", []):
+        if ind.get("id") == individu_id:
+            ind[field] = base64_data
+            found = True
+            break
+    if not found:
+        return False
+    from datetime import datetime as _dt
+    m["updatedAt"] = _dt.now().isoformat()
+    upsert_menage(m, device_id="webadmin")
+    return True
 
 
 def champs_by_owner(code_proprietaire: str):

@@ -8,6 +8,14 @@
     Statistiques des fiches d'enquête {{ module_title|lower }} synchronisées depuis l'application mobile.
     Ce module est totalement indépendant du module PARC (aucun contrat ni indemnisation n'est calculé ici).
   </p>
+  <div style="margin: 10px 0 4px;">
+    {% if export_module_endpoint %}
+    <a class="btn small maroon" href="{{ url_for(export_module_endpoint) }}">📊 Exporter toutes les fiches {{ module_title|lower }} (Excel)</a>
+    {% endif %}
+    {% if patrimoine_rapport_endpoint %}
+    <a class="btn small maroon" href="{{ url_for(patrimoine_rapport_endpoint) }}" style="margin-left:8px;">🛕 Annuaire Patrimoine culturel</a>
+    {% endif %}
+  </div>
 </div>
 
 <div class="cards-row">
@@ -20,6 +28,11 @@
     <div class="icon">📋</div>
     <div class="label">Formulaires disponibles</div>
     <div class="value">{{ form_rows|length }}</div>
+  </div>
+  <div class="stat-card">
+    <div class="icon">✅</div>
+    <div class="label">Formulaires avec des données</div>
+    <div class="value">{{ forms_with_data }}</div>
   </div>
   <div class="stat-card">
     <div class="icon">🗺️</div>
@@ -48,6 +61,9 @@
         <td><strong>{{ f.count }}</strong></td>
         <td>
           <a class="btn small" href="{{ url_for(records_endpoint, form_key=f.key) }}">Voir les fiches</a>
+          {% if export_form_endpoint %}
+          <a class="btn small" href="{{ url_for(export_form_endpoint, form_key=f.key) }}">Excel</a>
+          {% endif %}
         </td>
       </tr>
       {% endfor %}
@@ -59,27 +75,79 @@
 </div>
 
 <div class="panel">
-  <h2>Répartition par région</h2>
-  {% if region_rows %}
-  <table class="data-table">
-    <thead>
-      <tr>
-        <th>Région</th>
-        <th>Nombre de fiches</th>
-      </tr>
-    </thead>
+  <h2>Répartition géographique</h2>
+  <div style="display:flex; gap:24px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:260px;">
+      <h3 style="font-size:14px; margin:0 0 8px;">Par région</h3>
+      {% if region_rows %}
+      <table class="data-table compact-table">
+        <thead><tr><th>Région</th><th>Fiches</th></tr></thead>
+        <tbody>
+          {% for r in region_rows %}
+          <tr><td>{{ r.region }}</td><td><strong>{{ r.count }}</strong></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">Aucune donnée de région disponible.</div>
+      {% endif %}
+    </div>
+    <div style="flex:1; min-width:260px;">
+      <h3 style="font-size:14px; margin:0 0 8px;">Par préfecture (top 15)</h3>
+      {% if prefecture_rows %}
+      <table class="data-table compact-table">
+        <thead><tr><th>Préfecture</th><th>Fiches</th></tr></thead>
+        <tbody>
+          {% for r in prefecture_rows %}
+          <tr><td>{{ r.prefecture }}</td><td><strong>{{ r.count }}</strong></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">Aucune donnée de préfecture disponible.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if form_stats %}
+<div class="panel">
+  <h2>Statistiques par formulaire</h2>
+  <p style="font-size:13px; color:#666; margin-top:-6px;">Répartition des principaux champs de chaque formulaire (top valeurs par fréquence).</p>
+  <div style="display:flex; gap:20px; flex-wrap:wrap;">
+    {% for fs in form_stats %}
+    <div class="stats-panel-block" style="flex:1 1 300px; min-width:280px; border:1px solid #e6dfd6; border-radius:8px; padding:12px 14px; background:#fbfaf8;">
+      <h3 style="font-size:14px; margin:0 0 6px;">{{ fs.emoji }} {{ fs.title }} <span style="color:#999; font-weight:400;">({{ fs.count }})</span></h3>
+      {% for b in fs.breakdowns %}
+      <div style="margin-bottom:10px;">
+        <div style="font-size:12px; font-weight:600; color:#666; margin-bottom:4px;">{{ b.label }}</div>
+        <table class="data-table compact-table" style="margin:0;">
+          <tbody>
+            {% for value, count in b.top %}
+            <tr><td>{{ value }}</td><td style="width:50px; text-align:right;"><strong>{{ count }}</strong></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+{% if sync_timeline %}
+<div class="panel">
+  <h2>Activité de synchronisation (14 derniers jours actifs)</h2>
+  <table class="data-table compact-table">
+    <thead><tr><th>Date</th><th>Fiches synchronisées</th></tr></thead>
     <tbody>
-      {% for r in region_rows %}
-      <tr>
-        <td>{{ r.region }}</td>
-        <td><strong>{{ r.count }}</strong></td>
-      </tr>
+      {% for day, count in sync_timeline %}
+      <tr><td>{{ day }}</td><td><strong>{{ count }}</strong></td></tr>
       {% endfor %}
     </tbody>
   </table>
-  {% else %}
-  <div class="empty-state">Aucune donnée de région disponible pour le moment.</div>
-  {% endif %}
 </div>
+{% endif %}
 
 {% endblock %}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Photos — {{ individu.nomPrenom }} - OKAPI Survey Admin{% endblock %}
+{% block content %}
+
+<p><a href="{{ url_for('menage_detail', menage_id=menage.id) }}">&larr; Retour au ménage {{ menage.codeMenage }}</a></p>
+
+<div class="panel">
+  <h2>Photos de {{ individu.nomPrenom }}</h2>
+  <table class="data-table">
+    <tbody>
+      <tr><th style="width:220px;">Ménage</th><td><code class="mono">{{ menage.codeMenage }}</code></td></tr>
+      <tr><th>Relation au CDM</th><td>{{ individu.relationCdm }}</td></tr>
+      <tr>
+        <th>Éligible aux contrats</th>
+        <td>
+          {% if eligible_for_contract %}
+            <span class="badge status-approved">Oui — enregistré dans
+              {% if in_champs %}Champs{% endif %}{% if in_champs and in_structures %} et {% endif %}{% if in_structures %}Structures{% endif %}
+            </span>
+          {% else %}
+            <span class="badge status-pending">Non — pas encore enregistré dans une enquête Champs ou Structures</span>
+          {% endif %}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="muted" style="margin-top:8px;">
+    Si cet individu est éligible aux contrats, ces photos (profil et CNI) sont automatiquement
+    intégrées dans le contrat PDF généré pour lui (page 1 — identification).
+  </p>
+</div>
+
+<div class="panel-grid">
+  {% for field_key, field_label, base64_val in [
+      ('profil', 'Photo de profil', individu.photoProfilBase64),
+      ('cni-recto', 'CNI — Recto', individu.photoCniRectoBase64),
+      ('cni-verso', 'CNI — Verso', individu.photoCniVersoBase64),
+  ] %}
+  <div class="panel photo-card" data-field="{{ field_key }}">
+    <h3>{{ field_label }}</h3>
+    {% if base64_val %}
+      <div class="photo-preview-wrap">
+        <img class="photo-preview" src="{{ url_for('individu_photo_field', menage_id=menage.id, individu_id=individu.id, field=field_key) }}?t={{ range(1,999999) | random }}" alt="{{ field_label }}">
+      </div>
+      <button type="button" class="btn small crop-btn" data-field="{{ field_key }}" data-label="{{ field_label }}">Rogner</button>
+    {% else %}
+      <div class="empty-state">Aucune photo synchronisée pour ce champ.</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<!-- Crop modal -->
+<div id="crop-modal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <h3 id="crop-modal-title">Rogner la photo</h3>
+    <div class="crop-container">
+      <img id="crop-image" src="" alt="À rogner">
+    </div>
+    <div class="modal-actions">
+      <button type="button" class="btn-outline" id="crop-cancel">Annuler</button>
+      <button type="button" class="btn" id="crop-save">Enregistrer</button>
+    </div>
+    <p id="crop-status" class="muted"></p>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<style>
+  .panel-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .photo-card { text-align: center; }
+  .photo-preview-wrap { margin: 10px 0; }
+  .photo-preview { max-width: 100%; max-height: 260px; border-radius: 6px; border: 1px solid var(--grey-border); object-fit: contain; }
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
+  }
+  .modal-box {
+    background: #fff; border-radius: 8px; padding: 20px; width: 90%; max-width: 640px;
+    max-height: 90vh; overflow: auto;
+  }
+  .crop-container { max-height: 60vh; margin: 12px 0; }
+  #crop-image { max-width: 100%; display: block; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+</style>
+<script>
+(function () {
+  const menageId = {{ menage.id | tojson }};
+  const individuId = {{ individu.id | tojson }};
+  const modal = document.getElementById('crop-modal');
+  const cropImage = document.getElementById('crop-image');
+  const cropTitle = document.getElementById('crop-modal-title');
+  const cropStatus = document.getElementById('crop-status');
+  const btnCancel = document.getElementById('crop-cancel');
+  const btnSave = document.getElementById('crop-save');
+  let cropper = null;
+  let currentField = null;
+
+  function openCropModal(field, label, imgSrc) {
+    currentField = field;
+    cropTitle.textContent = 'Rogner — ' + label;
+    cropStatus.textContent = '';
+    cropImage.src = imgSrc;
+    modal.style.display = 'flex';
+    cropImage.onload = function () {
+      if (cropper) cropper.destroy();
+      cropper = new Cropper(cropImage, {
+        viewMode: 1,
+        autoCropArea: 1,
+        background: false,
+      });
+    };
+  }
+
+  function closeCropModal() {
+    modal.style.display = 'none';
+    if (cropper) { cropper.destroy(); cropper = null; }
+    currentField = null;
+  }
+
+  document.querySelectorAll('.crop-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      const field = btn.getAttribute('data-field');
+      const label = btn.getAttribute('data-label');
+      const card = btn.closest('.photo-card');
+      const img = card.querySelector('.photo-preview');
+      openCropModal(field, label, img.src);
+    });
+  });
+
+  btnCancel.addEventListener('click', closeCropModal);
+
+  btnSave.addEventListener('click', function () {
+    if (!cropper || !currentField) return;
+    cropStatus.textContent = 'Enregistrement…';
+    const canvas = cropper.getCroppedCanvas({ imageSmoothingQuality: 'high' });
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+    fetch(`/menages/${menageId}/individus/${individuId}/photo/${currentField}/crop`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageDataUrl: dataUrl }),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.status === 'ok') {
+          cropStatus.textContent = 'Photo mise à jour ✔';
+          setTimeout(function () { window.location.reload(); }, 500);
+        } else {
+          cropStatus.textContent = 'Erreur : ' + (data.message || 'inconnue');
+        }
+      })
+      .catch(function (e) {
+        cropStatus.textContent = 'Erreur réseau : ' + e;
+      });
+  });
+})();
+</script>
+{% endblock %}

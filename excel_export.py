@@ -22,6 +22,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
+import db
 from compensation import compute_for_owner, compute_for_champ_record
 from contract_rows import contract_rows_for_batch, individu_lookup
 
@@ -74,6 +75,7 @@ def build_compensation_table(
     structures: list,
     num_batch: str = "",
     villages_label: str = "",
+    project=None,
 ):
     """Builds the compensation/indemnification workbook for all PAPs
     belonging to [num_batch] (or all if num_batch is empty), aggregating
@@ -131,17 +133,20 @@ def build_compensation_table(
             "statut_contrat": _statut_contrat_label(row["type_contrat"]),
         }
 
+    proj = project if project is not None else db.get_current_project()
+
     def _summary_for_row(row):
         if row.get("champ_id"):
             champ = next((c for c in champs if c.get("id") == row["champ_id"]), None)
             if champ is None:
-                return compute_for_owner([], [], row["code"])
+                return compute_for_owner([], [], row["code"], project=proj)
             return compute_for_champ_record(
                 champ, structures, row["code"],
                 include_structures=row.get("include_structures", False),
+                project=proj,
             )
         structs = structures if row.get("include_structures", True) else []
-        return compute_for_owner([], structs, row["code"])
+        return compute_for_owner([], structs, row["code"], project=proj)
 
     # ---- Compute compensation + superficie totals per row ----
     row_idx = header_row_idx + 1

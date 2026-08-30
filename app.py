@@ -41,8 +41,11 @@ from contract_rows import (
 from rapport_data import build_full_report_data, build_indemnisation_rows
 from rapport_pdf import generate_rapport_pdf
 from rapport_docx import generate_rapport_docx
+from rapport_patrimoine_data import build_patrimoine_report_data
+from rapport_patrimoine_docx import generate_rapport_patrimoine_docx
 from facturation_data import build_lot_superficie_rows, build_invoice_workbook
-from survey_forms import FORM_DEFS, FORMS_BY_MODULE, FORM_TITLES, forms_for_module
+from survey_forms import FORM_DEFS, FORMS_BY_MODULE, FORM_TITLES, forms_for_module, STAT_FIELDS_BY_FORM
+from survey_excel_export import build_survey_form_workbook, build_survey_module_workbook
 
 app = Flask(__name__)
 app.config["JSON_AS_ASCII"] = False
@@ -112,12 +115,14 @@ def _compute_age(date_naissance_iso):
 # above.
 
 
-def _summary_for_row(champs, structures, row):
+def _summary_for_row(champs, structures, row, project=None):
     """Computes the compensation summary for a single contract row,
     respecting the non-merge rule: a champs-based row only accounts for
     ITS OWN champs record (never other records belonging to the same
     owner), and structures are only added on the row flagged
     include_structures=True."""
+    if project is None:
+        project = db.get_current_project()
     if row.get("champ_id"):
         champ = next((c for c in champs if c.get("id") == row["champ_id"]), None)
         if champ is None:
@@ -125,24 +130,26 @@ def _summary_for_row(champs, structures, row):
         return compute_for_champ_record(
             champ, structures, row["code"],
             include_structures=row.get("include_structures", False),
+            project=project,
         )
     structs = structures if row.get("include_structures", True) else []
-    return compute_for_owner([], structs, row["code"])
+    return compute_for_owner([], structs, row["code"], project=project)
 
 
 # ---------------------------------------------------------------------------
 # Dashboard
 # ---------------------------------------------------------------------------
 
-def _total_montant_for_rows(champs, structures, rows):
+def _total_montant_for_rows(champs, structures, rows, project=None):
     total = 0.0
     for r in rows:
-        total += _summary_for_row(champs, structures, r).total
+        total += _summary_for_row(champs, structures, r, project=project).total
     return round(total)
 
 
 @app.route("/")
 def dashboard():
+    project = db.get_current_project()
     menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
@@ -154,7 +161,7 @@ def dashboard():
         for p in ch.get("parcelles", []):
             total_superficie += p.get("superficieParcelle", 0) or 0
 
-    global_summary = compute_global(champs, structures)
+    global_summary = compute_global(champs, structures, project=project)
     batches = _distinct_batches(champs, structures)
 
     recent_syncs = db.recent_syncs(10)
@@ -163,7 +170,7 @@ def dashboard():
     batch_rows = []
     for b in batches:
         rows = _contract_rows_for_batch(menages, champs, structures, b)
-        total_montant = _total_montant_for_rows(champs, structures, rows)
+        total_montant = _total_montant_for_rows(champs, structures, rows, project=project)
         batch_rows.append({
             "num_batch": b,
             "owners_count": _distinct_owner_count(rows),
@@ -189,6 +196,7 @@ def dashboard_stats():
     """Second dashboard screen: as many additional statistics as possible
     (breakdowns by contract type, région/préfecture/village, structure
     types, culture/espèce totals, sync activity over time, etc.)."""
+    project = db.get_current_project()
     menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
@@ -284,7 +292,7 @@ def dashboard_stats():
 
     # --- Montant total détaillé par catégorie (across all PAP, no merging
     #     needed here since this is a GLOBAL sum, not per-contract) ---
-    global_summary = compute_global(champs, structures)
+    global_summary = compute_global(champs, structures, project=project)
     montant_par_categorie = [
         ("Parcelles (terrain)", round(global_summary.parcelles)),
         ("Cultures annuelles", round(global_summary.champs_cultures_annuelles)),
@@ -414,29 +422,76 @@ def dashboard_stats():
 # breakdown, no ménages/contrats/compensation involved whatsoever.
 # ---------------------------------------------------------------------------
 
+def _top_counts(counter_dict, n=10):
+    return sorted(counter_dict.items(), key=lambda kv: -kv[1])[:n]
+
+
 def _module_dashboard_context(module: str):
     forms = forms_for_module(module)
     by_form = db.all_survey_records()  # {formKey: [record,...]}
     form_rows = []
     total = 0
     region_counts = {}
+    prefecture_counts = {}
+    form_stats = []  # per-form top-N breakdowns of its key categorical fields
+    sync_by_day = {}
+
     for f in forms:
         records = by_form.get(f["key"], [])
         n = len(records)
         total += n
         form_rows.append({**f, "count": n})
+
+        field_defs = STAT_FIELDS_BY_FORM.get(f["key"], [])
+        field_counters = {name: {} for name, _label in field_defs}
+
         for r in records:
-            region = ((r.get("values") or {}).get("region") or "").strip()
+            v = r.get("values") or {}
+            region = (v.get("region") or "").strip()
             if region:
                 region_counts[region] = region_counts.get(region, 0) + 1
+            prefecture = (v.get("prefecture") or "").strip()
+            if prefecture:
+                prefecture_counts[prefecture] = prefecture_counts.get(prefecture, 0) + 1
+            for name, _label in field_defs:
+                val = (v.get(name) or "").strip() if isinstance(v.get(name), str) else v.get(name)
+                if val:
+                    field_counters[name][val] = field_counters[name].get(val, 0) + 1
+
+            ts = r.get("updatedAt") or r.get("createdAt")
+            if ts:
+                day = str(ts)[:10]
+                if day:
+                    sync_by_day[day] = sync_by_day.get(day, 0) + 1
+
+        if n and field_defs:
+            breakdowns = []
+            for name, label in field_defs:
+                top = _top_counts(field_counters.get(name, {}), 8)
+                if top:
+                    breakdowns.append({"field": name, "label": label, "top": top})
+            if breakdowns:
+                form_stats.append({**f, "count": n, "breakdowns": breakdowns})
+
     region_rows = sorted(
         [{"region": k, "count": v} for k, v in region_counts.items()],
         key=lambda x: -x["count"],
     )
+    prefecture_rows = sorted(
+        [{"prefecture": k, "count": v} for k, v in prefecture_counts.items()],
+        key=lambda x: -x["count"],
+    )[:15]
+    sync_timeline = sorted(sync_by_day.items(), key=lambda kv: kv[0], reverse=True)[:14]
+    forms_with_data = sum(1 for f in form_rows if f["count"] > 0)
+
     return {
         "form_rows": form_rows,
         "total_records": total,
         "region_rows": region_rows,
+        "prefecture_rows": prefecture_rows,
+        "form_stats": form_stats,
+        "sync_timeline": sync_timeline,
+        "forms_with_data": forms_with_data,
         "now": datetime.now(),
     }
 
@@ -449,6 +504,8 @@ def biodiversite_dashboard():
         module_code="biodiversite",
         module_title="BIODIVERSITÉ",
         records_endpoint="biodiversite_form_records",
+        export_form_endpoint="biodiversite_form_export",
+        export_module_endpoint="biodiversite_export",
         **ctx,
     )
 
@@ -464,6 +521,7 @@ def biodiversite_form_records(form_key):
         module_code="biodiversite",
         module_title="BIODIVERSITÉ",
         dashboard_endpoint="biodiversite_dashboard",
+        export_endpoint="biodiversite_form_export",
         form_key=form_key,
         form_title=FORM_TITLES.get(form_key, form_key),
         records=records,
@@ -479,6 +537,9 @@ def social_dashboard():
         module_code="social",
         module_title="SOCIAL",
         records_endpoint="social_form_records",
+        export_form_endpoint="social_form_export",
+        export_module_endpoint="social_export",
+        patrimoine_rapport_endpoint="rapport_patrimoine_page",
         **ctx,
     )
 
@@ -494,10 +555,93 @@ def social_form_records(form_key):
         module_code="social",
         module_title="SOCIAL",
         dashboard_endpoint="social_dashboard",
+        export_endpoint="social_form_export",
+        patrimoine_rapport_endpoint=("rapport_patrimoine_page" if form_key == "patrimoine_culturel" else None),
         form_key=form_key,
         form_title=FORM_TITLES.get(form_key, form_key),
         records=records,
         now=datetime.now(),
+    )
+
+
+@app.route("/biodiversite/export")
+def biodiversite_export():
+    """Exports ALL BIODIVERSITÉ forms (one sheet per form) to a single
+    .xlsx workbook."""
+    xlsx_bytes, _count = build_survey_module_workbook("biodiversite")
+    filename = f"OKAPI_Biodiversite_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    return send_file(
+        io.BytesIO(xlsx_bytes),
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+@app.route("/biodiversite/formulaire/<form_key>/export")
+def biodiversite_form_export(form_key):
+    if form_key not in {f["key"] for f in FORMS_BY_MODULE["biodiversite"]}:
+        abort(404)
+    xlsx_bytes, _count = build_survey_form_workbook(form_key)
+    filename = f"OKAPI_{form_key}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    return send_file(
+        io.BytesIO(xlsx_bytes),
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+@app.route("/social/export")
+def social_export():
+    """Exports ALL SOCIAL forms (one sheet per form) to a single .xlsx
+    workbook."""
+    xlsx_bytes, _count = build_survey_module_workbook("social")
+    filename = f"OKAPI_Social_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    return send_file(
+        io.BytesIO(xlsx_bytes),
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+@app.route("/social/formulaire/<form_key>/export")
+def social_form_export(form_key):
+    if form_key not in {f["key"] for f in FORMS_BY_MODULE["social"]}:
+        abort(404)
+    xlsx_bytes, _count = build_survey_form_workbook(form_key)
+    filename = f"OKAPI_{form_key}_{datetime.now().strftime('%Y%m%d_%H%M')}.xlsx"
+    return send_file(
+        io.BytesIO(xlsx_bytes),
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        as_attachment=True,
+        download_name=filename,
+    )
+
+
+@app.route("/social/patrimoine-culturel/rapport")
+def rapport_patrimoine_page():
+    """Preview page for the "Annuaire des sites de patrimoine culturel"
+    report, built live from the patrimoine_culturel survey records."""
+    report = build_patrimoine_report_data()
+    return render_template(
+        "rapport_patrimoine.html",
+        report=report,
+        now=datetime.now(),
+    )
+
+
+@app.route("/social/patrimoine-culturel/rapport/export/docx")
+def rapport_patrimoine_export_docx():
+    report = build_patrimoine_report_data()
+    docx_bytes = generate_rapport_patrimoine_docx(report_data=report)
+    filename = f"Annuaire_Patrimoine_Culturel_{datetime.now().strftime('%Y%m%d')}.docx"
+    return send_file(
+        io.BytesIO(docx_bytes),
+        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        as_attachment=True,
+        download_name=filename,
     )
 
 
@@ -597,9 +741,11 @@ def _resolve_contract_data(code_individu, champ_id="", contract_type=""):
     if menage_match is None and champ_match is None:
         return None
 
+    project = db.get_current_project()
+
     if menage_match is not None:
-        d = build_contract_data(menage=menage_match, project=db.get_current_project())
-        summary = compute_for_owner(champs, structures, code_individu)
+        d = build_contract_data(menage=menage_match, project=project)
+        summary = compute_for_owner(champs, structures, code_individu, project=project)
         out_suffix = code_individu
     else:
         individu = _individu_lookup(menages, champ_match.get("codeMenage", ""), code_individu) or {
@@ -614,7 +760,7 @@ def _resolve_contract_data(code_individu, champ_id="", contract_type=""):
                 contract_type = "communautaire"
             else:
                 contract_type = "proprietaire"
-        d = build_contract_data(champ=champ_match, individu=individu, contract_type=contract_type, project=db.get_current_project())
+        d = build_contract_data(champ=champ_match, individu=individu, contract_type=contract_type, project=project)
 
         # Non-merge rule: this contract accounts ONLY for champ_match's own
         # champs record. Structures are only included if this is the
@@ -635,13 +781,14 @@ def _resolve_contract_data(code_individu, champ_id="", contract_type=""):
             summary = compute_for_champ_record(
                 champ_match, structures, code_individu,
                 include_structures=is_first_record,
+                project=project,
             )
             out_suffix = f"{code_individu}_{champ_match.get('numEnqueteChamp', 1)}"
         else:
             # Structure-only or ménage-fallback owner (no actual champs
             # record) - keep the previous merged/global behaviour since
             # there is only ever one contract for this PAP in that case.
-            summary = compute_for_owner(champs, structures, code_individu)
+            summary = compute_for_owner(champs, structures, code_individu, project=project)
             out_suffix = code_individu
 
     return d, summary, out_suffix
@@ -840,6 +987,110 @@ def menage_detail(menage_id):
     )
 
 
+@app.route("/menages/<menage_id>/individus/<individu_id>/photo/<field>")
+def individu_photo_field(menage_id, individu_id, field):
+    """Serves a specific photo field (profil / cni-recto / cni-verso) for
+    a given individu, straight from its base64 data, for display and
+    cropping in the web admin UI (Req #4)."""
+    field_map = {
+        "profil": "photoProfilBase64",
+        "cni-recto": "photoCniRectoBase64",
+        "cni-verso": "photoCniVersoBase64",
+    }
+    key = field_map.get(field)
+    if not key:
+        abort(404)
+    menage, individu = db.find_individu(individu_id)
+    if not individu:
+        abort(404)
+    b64 = individu.get(key)
+    if not b64:
+        abort(404)
+    try:
+        raw = base64.b64decode(b64)
+    except Exception:
+        abort(404)
+    return send_file(io.BytesIO(raw), mimetype="image/jpeg")
+
+
+@app.route("/menages/<menage_id>/individus/<individu_id>/photos")
+def individu_photos_manage(menage_id, individu_id):
+    """Photo view/crop page for one individu: shows the 3 possible photos
+    (profil, CNI recto, CNI verso) synced from the mobile app, each with a
+    'Rogner' (crop) action. Also shows whether this individu is registered
+    in champs/structures (i.e. whether their photo will actually appear in
+    a generated contract), per Req #4's requirement that photos be "shown
+    in contracts if the individual is registered in the champs/structures
+    survey"."""
+    menage = db.menage_by_id(menage_id)
+    if not menage:
+        abort(404)
+    individu = None
+    for ind in menage.get("individus", []):
+        if ind.get("id") == individu_id:
+            individu = ind
+            break
+    if not individu:
+        abort(404)
+
+    champs = db.all_champs()
+    structures = db.all_structures()
+    in_champs = any(c.get("codeProprietaire") == individu_id for c in champs)
+    in_structures = any(s.get("proprietaireStructure") == individu_id for s in structures)
+
+    return render_template(
+        "individu_photos.html",
+        menage=menage,
+        individu=individu,
+        in_champs=in_champs,
+        in_structures=in_structures,
+        eligible_for_contract=(in_champs or in_structures),
+    )
+
+
+@app.route("/menages/<menage_id>/individus/<individu_id>/photo/<field>/crop", methods=["POST"])
+def individu_photo_crop(menage_id, individu_id, field):
+    """Receives a cropped image (as a data URL / base64 JPEG produced by
+    the client-side cropper) and saves it back onto the individu's
+    corresponding photo field, replacing the original. The change is
+    immediately reflected on the ménage detail page and in any
+    subsequently generated contract PDF, and propagates to every mobile
+    tablet on their next 'Actualiser' pull (Req #3's tombstone/last-write-
+    wins merge already covers ménage record updates generically)."""
+    field_map = {
+        "profil": "photoProfilBase64",
+        "cni-recto": "photoCniRectoBase64",
+        "cni-verso": "photoCniVersoBase64",
+    }
+    key = field_map.get(field)
+    if not key:
+        return jsonify({"status": "error", "message": "Champ photo inconnu."}), 400
+
+    payload = request.get_json(force=True, silent=True) or {}
+    data_url = payload.get("imageDataUrl", "")
+    if not data_url or "," not in data_url:
+        return jsonify({"status": "error", "message": "Image manquante."}), 400
+
+    try:
+        header, b64data = data_url.split(",", 1)
+        raw = base64.b64decode(b64data)
+        from PIL import Image
+        img = Image.open(io.BytesIO(raw))
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=90)
+        cropped_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Image invalide : {e}"}), 400
+
+    ok = db.update_individu_photo(menage_id, individu_id, key, cropped_b64)
+    if not ok:
+        return jsonify({"status": "error", "message": "Individu introuvable."}), 404
+
+    return jsonify({"status": "ok", "message": "Photo mise à jour."})
+
+
 @app.route("/photos/<code_individu>.jpg")
 def individu_photo(code_individu):
     """Serves a member's profile photo for display in the web admin:
@@ -922,6 +1173,7 @@ def photos_directory_upload():
 
 @app.route("/rapport")
 def rapport_page():
+    project = db.get_current_project()
     menages = db.all_menages()
     champs = db.all_champs()
     structures = db.all_structures()
@@ -948,12 +1200,12 @@ def rapport_page():
         for p in ch.get("parcelles", []):
             total_superficie += p.get("superficieParcelle", 0) or 0
 
-    global_summary = compute_global(filtered_champs, filtered_structures)
+    global_summary = compute_global(filtered_champs, filtered_structures, project=project)
 
     batch_report_rows = []
     for b in ([selected_batch] if selected_batch else batches):
         rows = _contract_rows_for_batch(menages, champs, structures, b)
-        total_montant = _total_montant_for_rows(champs, structures, rows)
+        total_montant = _total_montant_for_rows(champs, structures, rows, project=project)
         villages = sorted({r["village"] for r in rows if r.get("village")})
         batch_report_rows.append({
             "num_batch": b,
@@ -1199,6 +1451,17 @@ def api_sync():
     champs = payload.get("champs", [])
     structures = payload.get("structures", [])
     survey_records = payload.get("survey_records", {}) or {}
+    deletions = payload.get("deletions", []) or []
+
+    # Apply deletions BEFORE upserts so a deletion made on this tablet
+    # always wins over any stale local copy still queued for push in the
+    # SAME request (defensive; the client already removes deleted records
+    # from the menages/champs/structures lists it sends).
+    for d in deletions:
+        record_type = (d.get("recordType") or "").strip()
+        record_id = d.get("recordId") or ""
+        if record_type and record_id:
+            db.record_deletion(record_type, record_id, d.get("tablette", ""), device_id)
 
     for m in menages:
         db.upsert_menage(m, device_id)
@@ -1245,6 +1508,10 @@ def api_pull():
         "champs": db.all_champs(),
         "structures": db.all_structures(),
         "survey_records": db.all_survey_records(),
+        # Deletion tombstones: lets every tablet purge, on its own local
+        # storage, any Ménage/Champ/Structure deleted on ANOTHER tablet (or
+        # pushed as a deletion earlier by this same tablet). See Req #3.
+        "deletions": db.all_deletions(),
         "totals": db.counts(),
         "pulled_at": datetime.now().isoformat(),
     })

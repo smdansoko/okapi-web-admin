@@ -8,6 +8,14 @@
   <p style="font-size:13px; color:#666; margin-top:-6px;">
     <strong>{{ records|length }}</strong> fiche(s) synchronisée(s) pour ce formulaire.
   </p>
+  <div style="margin: 10px 0 4px;">
+    {% if export_endpoint %}
+    <a class="btn small maroon" href="{{ url_for(export_endpoint, form_key=form_key) }}">📊 Exporter en Excel</a>
+    {% endif %}
+    {% if patrimoine_rapport_endpoint %}
+    <a class="btn small maroon" href="{{ url_for(patrimoine_rapport_endpoint) }}" style="margin-left:8px;">🛕 Voir l'annuaire (rapport formaté)</a>
+    {% endif %}
+  </div>
 </div>
 
 <div class="panel">

@@ -1,9 +1,15 @@
 """Python port of lib/services/compensation_calculator.dart.
 
 Computes the same compensation breakdown (per PAP / owner) as the Flutter
-mobile app, using the same price_matrix.json reference data, so that the
-web admin's compensation table export exactly matches the mobile app's
-contract PDF figures.
+mobile app, using the same price_matrix.json / price_matrix_simandou.json
+reference data (with the same per-project routing as the Dart
+``ReferenceDataService``), so that the web admin's compensation table
+export exactly matches the mobile app's contract PDF figures.
+
+Project-specific price matrix routing (mirrors
+``ReferenceDataService._matrixFor`` in the Flutter app):
+  - project == 'simandou' -> price_matrix_simandou.json (PARC/SIMANDOU matrix)
+  - anything else (wcag, smb, None)  -> price_matrix.json (default/WCAG matrix)
 """
 import json
 import math
@@ -14,6 +20,28 @@ _DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
 with open(os.path.join(_DATA_DIR, "price_matrix.json"), encoding="utf-8") as f:
     PRICE_MATRIX = json.load(f)
 
+_price_matrix_simandou_path = os.path.join(_DATA_DIR, "price_matrix_simandou.json")
+if os.path.exists(_price_matrix_simandou_path):
+    with open(_price_matrix_simandou_path, encoding="utf-8") as f:
+        PRICE_MATRIX_SIMANDOU = json.load(f)
+else:
+    # Fallback: if the SIMANDOU-specific matrix isn't present for some reason,
+    # degrade gracefully to the default matrix rather than crashing.
+    PRICE_MATRIX_SIMANDOU = PRICE_MATRIX
+
+
+def _matrix_for(project):
+    """Returns the price-matrix dict to use for the given project code.
+
+    Mirrors ``ReferenceDataService._matrixFor`` in the Flutter app: only
+    'simandou' gets its own matrix; wcag/smb/None share the default matrix.
+    """
+    return PRICE_MATRIX_SIMANDOU if project == "simandou" else PRICE_MATRIX
+
+
+# Backward-compatible module-level default-matrix views (used when no
+# `project` argument is given, or by any other module that may still import
+# these directly).
 _TERRAINS = PRICE_MATRIX.get("terrains", [])
 _CULTURES_ANNUELLES = PRICE_MATRIX.get("cultures_annuelles", [])
 _CULTURES_PERENNES = PRICE_MATRIX.get("cultures_perennes", [])
@@ -60,11 +88,13 @@ def _find(lst, key, value):
     return None
 
 
-def terrain_price(type_de_terrain):
+def terrain_price(type_de_terrain, project=None):
     """Public helper: returns the compensation price per m² (GNF) for a
-    given `typeDeTerrain` label, using the same price_matrix.json reference
-    data as the rest of the compensation logic. Returns 0 if not found."""
-    t = _find(_TERRAINS, "type", type_de_terrain)
+    given `typeDeTerrain` label, using the price matrix appropriate for
+    `project` ('simandou' -> price_matrix_simandou.json, else default).
+    Returns 0 if not found."""
+    terrains = _matrix_for(project).get("terrains", [])
+    t = _find(terrains, "type", type_de_terrain)
     return (t or {}).get("prix_compensation", 0) or 0
 
 
@@ -97,9 +127,12 @@ class CompensationSummary:
         )
 
 
-def _accumulate_champs_enquete(summary: CompensationSummary, enquete: dict):
+def _accumulate_champs_enquete(summary: CompensationSummary, enquete: dict, project=None):
+    matrix = _matrix_for(project)
+    terrains = matrix.get("terrains", [])
+    cultures_annuelles = matrix.get("cultures_annuelles", [])
     for parcelle in enquete.get("parcelles", []):
-        terrain = _find(_TERRAINS, "type", parcelle.get("typeDeTerrain"))
+        terrain = _find(terrains, "type", parcelle.get("typeDeTerrain"))
         cout_m2 = (terrain or {}).get("prix_compensation", 0) or 0
         superficie = parcelle.get("superficieParcelle", 0) or 0
         montant_parcelle = cout_m2 * superficie
@@ -115,7 +148,7 @@ def _accumulate_champs_enquete(summary: CompensationSummary, enquete: dict):
             )
 
         for champ in parcelle.get("champs", []):
-            culture = _find(_CULTURES_ANNUELLES, "culture", champ.get("culture"))
+            culture = _find(cultures_annuelles, "culture", champ.get("culture"))
             if culture:
                 revenu_ha = culture.get("revenu_annuel_ha", 0) or 0
                 superficie_champ = champ.get("superficieChamps", 0) or 0
@@ -134,15 +167,16 @@ def _accumulate_champs_enquete(summary: CompensationSummary, enquete: dict):
         for arbre in parcelle.get("arbres", []):
             t = arbre.get("typeArbre")
             if t == "cultures_perennes":
-                _accumulate_culture_perenne(summary, arbre.get("especeArbre"), arbre)
+                _accumulate_culture_perenne(summary, arbre.get("especeArbre"), arbre, project)
             elif t == "especes_sauvages":
-                _accumulate_espece_sauvage(summary, arbre.get("especeArbre"), arbre)
+                _accumulate_espece_sauvage(summary, arbre.get("especeArbre"), arbre, project)
             elif t == "bois_doeuvre":
-                _accumulate_bois_doeuvre(summary, arbre.get("especeArbre"), arbre)
+                _accumulate_bois_doeuvre(summary, arbre.get("especeArbre"), arbre, project)
 
 
-def _accumulate_culture_perenne(summary, espece, arbre):
-    data = _find(_CULTURES_PERENNES, "nom_usuel", espece)
+def _accumulate_culture_perenne(summary, espece, arbre, project=None):
+    cultures_perennes = _matrix_for(project).get("cultures_perennes", [])
+    data = _find(cultures_perennes, "nom_usuel", espece)
     if not data:
         return
     prix_plante = data.get("prix_plante", 0) or 0
@@ -184,8 +218,9 @@ def _accumulate_culture_perenne(summary, espece, arbre):
         )
 
 
-def _accumulate_espece_sauvage(summary, espece, arbre):
-    data = _find(_ESPECES_SAUVAGES, "nom_usuel", espece)
+def _accumulate_espece_sauvage(summary, espece, arbre, project=None):
+    especes_sauvages = _matrix_for(project).get("especes_sauvages", [])
+    data = _find(especes_sauvages, "nom_usuel", espece)
     if not data:
         return
     prix_np = data.get("indemnisation_plant_non_productif", 0) or 0
@@ -207,8 +242,9 @@ def _accumulate_espece_sauvage(summary, espece, arbre):
         )
 
 
-def _accumulate_bois_doeuvre(summary, espece, arbre):
-    data = _find(_BOIS_DOEUVRE, "nom_usuel", espece)
+def _accumulate_bois_doeuvre(summary, espece, arbre, project=None):
+    bois_doeuvre = _matrix_for(project).get("bois_doeuvre", [])
+    data = _find(bois_doeuvre, "nom_usuel", espece)
     if not data:
         return
     valeur_m3 = data.get("valeur_bois_m3", 0) or 0
@@ -236,7 +272,8 @@ def _accumulate_bois_doeuvre(summary, espece, arbre):
     )
 
 
-def _accumulate_structure_enquete(summary, enquete):
+def _accumulate_structure_enquete(summary, enquete, project=None):
+    structures = _matrix_for(project).get("structures", [])
     for s in enquete.get("structures", []):
         type_structure = s.get("typeDeStructure", "")
         uses_materiaux = type_structure in (
@@ -245,13 +282,13 @@ def _accumulate_structure_enquete(summary, enquete):
             "Batiment rectangulaire",
         )
         if uses_materiaux:
-            _accumulate_habitation(summary, s)
+            _accumulate_habitation(summary, s, project)
         else:
             mapping = _AUTRES_STRUCTURES_MAP.get(type_structure)
             if not mapping:
                 continue
             designation, qty_kind = mapping
-            price_row = _find(_STRUCTURES, "designation", designation)
+            price_row = _find(structures, "designation", designation)
             if not price_row:
                 continue
             prix_unitaire = price_row.get("prix_unitaire", 0) or 0
@@ -275,11 +312,13 @@ def _accumulate_structure_enquete(summary, enquete):
                 )
 
 
-def _accumulate_habitation(summary, s):
+def _accumulate_habitation(summary, s, project=None):
+    structures = _matrix_for(project).get("structures", [])
+
     def add_line(materiau_label, superficie):
         if not materiau_label or materiau_label == "Aucun":
             return
-        price_row = _find(_STRUCTURES, "designation", materiau_label)
+        price_row = _find(structures, "designation", materiau_label)
         if not price_row:
             return
         prix_unitaire = price_row.get("prix_unitaire", 0) or 0
@@ -306,19 +345,19 @@ def _accumulate_habitation(summary, s):
     summary.structures += summary.structures_temp_total
 
 
-def compute_for_owner(champs_enquetes, structure_enquetes, code_proprietaire):
+def compute_for_owner(champs_enquetes, structure_enquetes, code_proprietaire, project=None):
     summary = CompensationSummary()
     for enquete in champs_enquetes:
         if enquete.get("codeProprietaire") == code_proprietaire:
-            _accumulate_champs_enquete(summary, enquete)
+            _accumulate_champs_enquete(summary, enquete, project)
     for enquete in structure_enquetes:
         if enquete.get("proprietaireStructure") == code_proprietaire:
-            _accumulate_structure_enquete(summary, enquete)
+            _accumulate_structure_enquete(summary, enquete, project)
     return summary
 
 
 def compute_for_champ_record(champ_enquete, structure_enquetes, code_proprietaire,
-                              include_structures=False):
+                              include_structures=False, project=None):
     """Computes a compensation summary for a SINGLE champs-survey record.
 
     Unlike ``compute_for_owner`` (which merges *every* champs record
@@ -335,18 +374,18 @@ def compute_for_champ_record(champ_enquete, structure_enquetes, code_proprietair
     that owner's contracts, never duplicated nor omitted).
     """
     summary = CompensationSummary()
-    _accumulate_champs_enquete(summary, champ_enquete)
+    _accumulate_champs_enquete(summary, champ_enquete, project)
     if include_structures:
         for enquete in structure_enquetes:
             if enquete.get("proprietaireStructure") == code_proprietaire:
-                _accumulate_structure_enquete(summary, enquete)
+                _accumulate_structure_enquete(summary, enquete, project)
     return summary
 
 
-def compute_global(champs_enquetes, structure_enquetes):
+def compute_global(champs_enquetes, structure_enquetes, project=None):
     summary = CompensationSummary()
     for enquete in champs_enquetes:
-        _accumulate_champs_enquete(summary, enquete)
+        _accumulate_champs_enquete(summary, enquete, project)
     for enquete in structure_enquetes:
-        _accumulate_structure_enquete(summary, enquete)
+        _accumulate_structure_enquete(summary, enquete, project)
     return summary

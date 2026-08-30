@@ -33,6 +33,7 @@
         <th>Relation au CDM</th>
         <th>Enquêtes champs</th>
         <th>Enquêtes structures</th>
+        <th>Photos</th>
       </tr>
     </thead>
     <tbody>
@@ -58,6 +59,9 @@
           {% if i.nb_enquetes_structure %}
             <span class="badge proprietaire">{{ i.nb_enquetes_structure }}</span>
           {% else %}0{% endif %}
+        </td>
+        <td>
+          <a href="{{ url_for('individu_photos_manage', menage_id=menage.id, individu_id=i.id) }}" class="btn small">Voir / Rogner</a>
         </td>
       </tr>
       {% endfor %}

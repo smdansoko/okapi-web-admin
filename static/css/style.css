@@ -26,10 +26,12 @@ body {
 
 .topbar img.logo {
   height: 44px;
+  width: 44px;
   margin-right: 16px;
   background: #fff;
-  border-radius: 6px;
+  border-radius: 50%;
   padding: 3px;
+  object-fit: cover;
 }
 
 .topbar .title-block h1 {
@@ -407,8 +409,11 @@ code.mono {
 .select-card { max-width: 480px; }
 
 .auth-logo {
-  height: 56px;
+  height: 72px;
+  width: 72px;
   margin-bottom: 14px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .auth-card h1 {

@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: okapi-web-admin
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    envVars:
+      - key: OKAPI_SECRET_KEY
+        generateValue: true
+      - key: PORT
+        value: "5070"
+    disk:
+      name: okapi-data
+      mountPath: /app/data
+      sizeGB: 1

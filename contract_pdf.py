@@ -30,6 +30,7 @@ from reportlab.platypus import (
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen.canvas import Canvas
 
 from compensation import compute_for_owner, CompensationSummary
 from contract_rows import code_enquete_for_champ
@@ -142,6 +143,15 @@ IDENT_SECTION_TITLE = {
     "proprietaire": "1. Identification du Représentant du ménage",
     "lignage": "1. Identification du Représentant du lignage",
     "communautaire": "1. Identification du Représentant",
+}
+# SIMANDOU's 3 reference PDFs use a distinct wording for this section title
+# (lowercase "représentant", and "du Ménage/Lignage affecté" suffix instead
+# of the bare lowercase "ménage"/"lignage" used by WCAG/SMB) - confirmed via
+# direct text extraction of all 3 SIMANDOU reference contracts.
+IDENT_SECTION_TITLE_SIMANDOU = {
+    "proprietaire": "1. Identification du représentant du Ménage affecté",
+    "lignage": "1. Identification du représentant du Lignage affecté",
+    "communautaire": "1. Identification du représentant",
 }
 TEMOINS_LABEL = {
     "proprietaire": "Témoins (Autres membres adultes du Ménage affecté présents, ou personnes de confiance choisies par le Ménage affecté)",
@@ -482,30 +492,63 @@ def _page1(d, styles):
     project = d.get("project", "wcag")
     company = BRAND.get(project, BRAND["wcag"])["short"]
     story = []
+    # SIMANDOU's lignage/communautaire reference PDFs prepend "LA SOCIÉTÉ"
+    # before the company name (WCAG/SMB references never do this, for any
+    # of the 3 contract types - confirmed via direct text extraction of all
+    # 6 reference PDFs).
+    title_company = (
+        f"LA SOCIÉTÉ {company}"
+        if project == "simandou" and d["type"] in ("lignage", "communautaire")
+        else company
+    )
     story.append(Paragraph(
-        f"ACCORD DE COMPENSATION CONCLU ENTRE {company} ET {TITLE_SUFFIX[d['type']]}",
+        f"ACCORD DE COMPENSATION CONCLU ENTRE {title_company} ET {TITLE_SUFFIX[d['type']]}",
         styles["title"],
     ))
     story.append(Spacer(1, 4))
 
-    # Field order matches the official reference contracts exactly (no
-    # "District", no "Code du ménage" — replaced by "Code de l'individu"
-    # followed by the new "Code PAP" identifier).
-    fields = [
-        ("Numéro de lot", d["numeroLot"]),
-        ("Région", d["region"]),
-        ("Préfecture", d["prefecture"]),
-        ("Sous préfecture", d["sousPrefecture"]),
-        ("Localité", d["village"]),
-        ("Code de l'individu", d["codeIndividu"]),
-        ("Code PAP", d.get("codePap", "")),
-        ("Prénom et NOM", d["nomPrenom"]),
-        ("Sexe", d["sexe"]),
-        ("Date de naissance", d["dateNaissance"]),
-        ("Type de pièce d'identité", d["typeDePiece"]),
-        ("Numéro de la pièce d'identité", d["numeroPiece"]),
-        ("Date d'établissement de la PI", d["dateEtablissementPiece"]),
-        ("Numéro de téléphone", d["telephone"]),
+    if project == "simandou":
+        # SIMANDOU's reference PDFs use a SHORT field set: batch number +
+        # village instead of région/préfecture/sous-préfecture/district, and
+        # no "Code PAP" line - confirmed via direct text extraction of all
+        # 3 SIMANDOU reference contracts (ménage/lignage/communautaire).
+        fields = [
+            ("Numéro de batch", d["numeroLot"]),
+            ("Village", d["village"]),
+            ("Code du ménage", d["codeMenage"]),
+            ("Code de l'individu", d["codeIndividu"]),
+            ("Prénom et Nom", d["nomPrenom"]),
+            ("Sexe", d["sexe"]),
+            ("Date de naissance", d["dateNaissance"]),
+            ("Type de pièce d'identité", d["typeDePiece"]),
+            ("Numéro de la pièce d'identité", d["numeroPiece"]),
+            ("Date d'établissement PI", d["dateEtablissementPiece"]),
+            ("Numéro de téléphone", d["telephone"]),
+        ]
+    else:
+        # WCAG / SMB reference PDFs use the full field set, including
+        # "District" and "Code du ménage" (both confirmed present in all 4
+        # WCAG/SMB reference contracts inspected via direct text
+        # extraction) - "Code PAP" is kept as an additional line beyond the
+        # original template (client-requested addition, see git history),
+        # not part of the literal reference text.
+        fields = [
+            ("Numéro de lot", d["numeroLot"]),
+            ("Région", d["region"]),
+            ("Préfecture", d["prefecture"]),
+            ("Sous préfecture", d["sousPrefecture"]),
+            ("District", d["district"]),
+            ("Localité", d["village"]),
+            ("Code du ménage", d["codeMenage"]),
+            ("Code de l'individu", d["codeIndividu"]),
+            ("Code PAP", d.get("codePap", "")),
+            ("Prénom et NOM", d["nomPrenom"]),
+            ("Sexe", d["sexe"]),
+            ("Date de naissance", d["dateNaissance"]),
+            ("Type de pièce d'identité", d["typeDePiece"]),
+            ("Numéro de la pièce d'identité", d["numeroPiece"]),
+            ("Date d'établissement de la PI", d["dateEtablissementPiece"]),
+            ("Numéro de téléphone", d["telephone"]),
     ]
     ident_table = _field_row_table(fields, styles)
 
@@ -526,7 +569,12 @@ def _page1(d, styles):
         ("LEFTPADDING", (0, 0), (-1, -1), 0),
     ]))
 
-    story.append(Paragraph(f"<b>{IDENT_SECTION_TITLE[d['type']]}</b>", styles["small_bold"]))
+    ident_title = (
+        IDENT_SECTION_TITLE_SIMANDOU[d["type"]]
+        if project == "simandou"
+        else IDENT_SECTION_TITLE[d["type"]]
+    )
+    story.append(Paragraph(f"<b>{ident_title}</b>", styles["small_bold"]))
     story.append(Spacer(1, 4))
     story.append(top)
     story.append(Spacer(1, 10))
@@ -1091,6 +1139,22 @@ def _annexe1(d, summary: CompensationSummary, styles):
             rows, total_row, [60 * mm, 33 * mm, 33 * mm, 34 * mm],
         ))
     story.append(Spacer(1, 10))
+
+    # Cultures annuelles (champs)
+    if summary.culture_annuelle_details:
+        story.append(Paragraph("CULTURES ANNUELLES (CHAMPS)", styles["annex_sub"]))
+        rows = []
+        tot_sup = tot_m = 0
+        for c in summary.culture_annuelle_details:
+            tot_sup += c["superficieHa"]
+            tot_m += c["montant"]
+            rows.append([c["culture"], f"{c['superficieHa']:.2f}", fmt_number(c["revenuHa"]), fmt_number(c["montant"])])
+        total_row = ["TOTAL", f"{tot_sup:.2f}", "", fmt_number(tot_m)]
+        story.append(_annex_table(
+            ["Culture", "Superficie (ha)", "Revenu/ha (GNF)", "Montant (GNF)"],
+            rows, total_row, [60 * mm, 33 * mm, 33 * mm, 34 * mm],
+        ))
+        story.append(Spacer(1, 10))
 
     # Bois d'oeuvre — column order matches the reference contracts: Espèce,
     # Circonférence, Hauteur, Volume unitaire, Nombre de pieds, Coût/m³,
@@ -2061,10 +2125,63 @@ def _header_footer(canvas, doc, d):
         canvas.drawString(32, 30, f"Société Minière de Boké (SMB) Accord {smb_footer_label}")
     else:
         canvas.drawString(32, 30, f"Winning Consortium Alumina Guinea (WCAG) {FOOTER_LABEL[d['type']]}")
-    ref = d["codeMenage"] or d["codeIndividu"]
+    # Footer reference code: prefer "Code de l'individu" (codeIndividu) over
+    # "Code du ménage" (codeMenage) - confirmed via the SIMANDOU reference
+    # PDFs, whose footer shows the INDIVIDU-suffixed code (e.g.
+    # "CU2-220524-3-1") rather than the bare ménage code ("CU2-220524-3").
+    # For WCAG/SMB samples the two values happen to coincide, so this
+    # change is safe there too.
+    ref = d.get("codeIndividu") or d.get("codeMenage") or ""
     canvas.drawCentredString(w / 2, 30, ref)
-    canvas.drawRightString(w - 32, 30, f"Page {doc.page}")
+    # NOTE: the "Page X [sur|de] Y" total-page-count text is drawn
+    # separately, AFTER all pages have been laid out, by the
+    # NumberedCanvas.save() override below (ReportLab's SimpleDocTemplate
+    # only knows the CURRENT page number during this per-page callback, not
+    # the eventual total).
     canvas.restoreState()
+
+
+def _make_numbered_canvas(d):
+    """Returns a reportlab Canvas subclass that draws "Page X sur Y"
+    (SIMANDOU) or "Page X de Y" (WCAG/SMB) in the bottom-right footer
+    position, matching all 6 reference contracts exactly. This requires a
+    two-pass technique: SimpleDocTemplate/Canvas only expose the CURRENT
+    page number while building (via `doc.page` in the per-page
+    onFirstPage/onLaterPages callback), never the eventual total page
+    count - so the actual page-number text is deferred and drawn here, in
+    `save()`, once every page has been rendered and the total is known.
+    """
+    project = d.get("project", "wcag")
+    sep = "sur" if project == "simandou" else "de"
+
+    class NumberedCanvas(Canvas):
+        def __init__(self, *args, **kwargs):
+            Canvas.__init__(self, *args, **kwargs)
+            self._saved_page_states = []
+
+        def showPage(self):
+            self._saved_page_states.append(dict(self.__dict__))
+            self._startPage()
+
+        def save(self):
+            total_pages = len(self._saved_page_states)
+            for state in self._saved_page_states:
+                self.__dict__.update(state)
+                self._draw_page_number(total_pages)
+                Canvas.showPage(self)
+            Canvas.save(self)
+
+        def _draw_page_number(self, total_pages):
+            w, _h = A4
+            self.saveState()
+            self.setFont("DejaVu", 7)
+            self.setFillColor(colors.HexColor("#555555"))
+            self.drawRightString(
+                w - 32, 30, f"Page {self._pageNumber} {sep} {total_pages}"
+            )
+            self.restoreState()
+
+    return NumberedCanvas
 
 
 def generate_contract_pdf(d, summary: CompensationSummary):
@@ -2099,6 +2216,7 @@ def generate_contract_pdf(d, summary: CompensationSummary):
         story,
         onFirstPage=lambda c, dd: _header_footer(c, dd, d),
         onLaterPages=lambda c, dd: _header_footer(c, dd, d),
+        canvasmaker=_make_numbered_canvas(d),
     )
     return buf.getvalue()
 
