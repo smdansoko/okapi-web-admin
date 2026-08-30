@@ -92,3 +92,65 @@ STAT_FIELDS_BY_FORM = {
         ("sexe_chef_menage", "Sexe du chef de ménage"),
     ],
 }
+
+
+# `image`-type field names per form, extracted from the Flutter app's
+# lib/data/survey_schema.json (see SurveySchema.imageFields in
+# lib/models/survey_field.dart, which this mirrors). Each entry is either
+# a top-level field name (found directly in a record's `values` dict) or a
+# tuple (repeat_name, field_name) for fields nested inside a repeat
+# section's instances (found in a record's `repeats[repeat_name][i]` dict).
+# Used by form_records.html to detect which values are base64-encoded JPEG
+# photos and render them as <img> tags instead of raw text.
+IMAGE_FIELDS_BY_FORM = {
+    "pose_cameras": {
+        "top": ["photo_dispositive"],
+        "repeats": {},
+    },
+    "chimpanzes_recce": {
+        "top": [],
+        "repeats": {},
+    },
+    "poisson": {
+        "top": [],
+        "repeats": {"identification_espece": ["photo_habitat", "photo_espece"]},
+    },
+    "flore": {
+        "top": [],
+        "repeats": {"identification_espece": ["photo_espece", "photo_habitat"]},
+    },
+    "oiseaux": {
+        "top": [],
+        "repeats": {"identificatin_espece": ["photo_habitat", "photo_espece"]},
+    },
+    "reptiles": {
+        "top": [],
+        "repeats": {"identification_espece": ["photo_habitat", "photo_especee"]},
+    },
+    "amphibiens": {
+        "top": [],
+        "repeats": {"identification_espece": ["photo_especee", "photo_habitat"]},
+    },
+    "mammiferes": {
+        "top": [],
+        "repeats": {"identification_espece": ["photo_habitat", "photo_espece"]},
+    },
+    "infrastructures": {
+        "top": [],
+        "repeats": {"infrastructures": ["photo"]},
+    },
+    "patrimoine_culturel": {
+        "top": ["num_photo_site"],
+        "repeats": {},
+    },
+    "socioeconomique": {
+        "top": [],
+        "repeats": {},
+    },
+}
+
+
+def image_fields_for(form_key: str):
+    """Returns the IMAGE_FIELDS_BY_FORM entry for form_key, defaulting to
+    an empty (no images) definition for unknown/legacy forms."""
+    return IMAGE_FIELDS_BY_FORM.get(form_key, {"top": [], "repeats": {}})

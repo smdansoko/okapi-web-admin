@@ -51,18 +51,32 @@
               {% for key, val in v.items() %}
               <tr>
                 <td style="width:220px; font-weight:600; color:#666;">{{ key }}</td>
-                <td>{{ val }}</td>
+                <td>
+                  {% if key in image_fields.top and val %}
+                    <img src="data:image/jpeg;base64,{{ val }}" alt="{{ key }}" class="js-photo-thumb" style="max-width:140px; max-height:140px; border-radius:6px; cursor:pointer; border:1px solid #ddd;">
+                  {% else %}
+                    {{ val }}
+                  {% endif %}
+                </td>
               </tr>
               {% endfor %}
               {% if r.repeats %}
                 {% for rep_key, rep_list in (r.repeats or {}).items() %}
+                {% set rep_img_fields = image_fields.repeats.get(rep_key, []) %}
                 <tr>
                   <td style="font-weight:600; color:#666;">{{ rep_key }} ({{ rep_list|length }})</td>
                   <td>
                     {% for item in rep_list %}
                       <div style="margin-bottom:6px; padding:6px; background:#f7f4f2; border-radius:6px;">
                         {% for ik, iv in item.items() %}
-                          <span style="margin-right:10px;"><strong>{{ ik }}:</strong> {{ iv }}</span>
+                          {% if ik in rep_img_fields and iv %}
+                            <div style="display:inline-block; margin-right:10px; vertical-align:top;">
+                              <strong style="display:block; font-size:11px;">{{ ik }}</strong>
+                              <img src="data:image/jpeg;base64,{{ iv }}" alt="{{ ik }}" class="js-photo-thumb" style="max-width:110px; max-height:110px; border-radius:6px; cursor:pointer; border:1px solid #ddd;">
+                            </div>
+                          {% else %}
+                            <span style="margin-right:10px;"><strong>{{ ik }}:</strong> {{ iv }}</span>
+                          {% endif %}
                         {% endfor %}
                       </div>
                     {% endfor %}
@@ -88,9 +102,22 @@
 <script>
 document.addEventListener('click', function (e) {
   const btn = e.target.closest('.js-toggle-details');
-  if (!btn) return;
-  const row = document.getElementById(btn.dataset.target);
-  if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+  if (btn) {
+    const row = document.getElementById(btn.dataset.target);
+    if (row) row.style.display = row.style.display === 'none' ? '' : 'none';
+    return;
+  }
+  const thumb = e.target.closest('.js-photo-thumb');
+  if (thumb) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+    const img = document.createElement('img');
+    img.src = thumb.src;
+    img.style.cssText = 'max-width:92vw;max-height:92vh;border-radius:6px;';
+    overlay.appendChild(img);
+    overlay.addEventListener('click', function () { overlay.remove(); });
+    document.body.appendChild(overlay);
+  }
 });
 </script>
 {% endblock %}

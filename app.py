@@ -44,7 +44,7 @@ from rapport_docx import generate_rapport_docx
 from rapport_patrimoine_data import build_patrimoine_report_data
 from rapport_patrimoine_docx import generate_rapport_patrimoine_docx
 from facturation_data import build_lot_superficie_rows, build_invoice_workbook
-from survey_forms import FORM_DEFS, FORMS_BY_MODULE, FORM_TITLES, forms_for_module, STAT_FIELDS_BY_FORM
+from survey_forms import FORM_DEFS, FORMS_BY_MODULE, FORM_TITLES, forms_for_module, STAT_FIELDS_BY_FORM, image_fields_for
 from survey_excel_export import build_survey_form_workbook, build_survey_module_workbook
 
 app = Flask(__name__)
@@ -525,6 +525,7 @@ def biodiversite_form_records(form_key):
         form_key=form_key,
         form_title=FORM_TITLES.get(form_key, form_key),
         records=records,
+        image_fields=image_fields_for(form_key),
         now=datetime.now(),
     )
 
@@ -560,6 +561,7 @@ def social_form_records(form_key):
         form_key=form_key,
         form_title=FORM_TITLES.get(form_key, form_key),
         records=records,
+        image_fields=image_fields_for(form_key),
         now=datetime.now(),
     )
 
