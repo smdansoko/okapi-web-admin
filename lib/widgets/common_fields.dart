@@ -2,6 +2,67 @@ import 'package:flutter/material.dart';
 import '../models/choice_item.dart';
 import '../services/reference_data_service.dart';
 
+/// Wraps a bare input widget (dropdown, date picker, etc.) with the
+/// standard survey-form field presentation: the field's **label** shown as
+/// a bold "box title" above the input, and — when present — its **hint**
+/// shown right below as a smaller explanatory caption of what to fill in.
+/// The technical ODK `name` is intentionally never passed to this widget by
+/// callers, so it never reaches the UI.
+///
+/// Used by [ChoiceDropdown]/[LabeledTextField]/[DateField] so every survey
+/// field (all 11 BIODIVERSITE/SOCIAL forms) gets this consistent
+/// title-then-explanation layout automatically.
+class FieldWithHint extends StatelessWidget {
+  final String label;
+  final String? hint;
+  final bool required;
+  final Widget child;
+
+  const FieldWithHint({
+    super.key,
+    required this.label,
+    required this.child,
+    this.hint,
+    this.required = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final trimmedHint = hint?.trim();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 15,
+              color: Colors.black87,
+            ),
+            children: [
+              TextSpan(text: label),
+              if (required)
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(color: Colors.red),
+                ),
+            ],
+          ),
+        ),
+        if (trimmedHint != null && trimmedHint.isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(
+            trimmedHint,
+            style: TextStyle(fontSize: 12.5, color: Colors.grey.shade600),
+          ),
+        ],
+        const SizedBox(height: 6),
+        child,
+      ],
+    );
+  }
+}
+
 /// Resolves a project-aware choices.json list name: when [project] is
 /// 'simandou' and a '<base>_simandou' list exists, that list is used
 /// instead of the default (WCAG/SMB) '<base>' list. Falls back to [base]
@@ -23,6 +84,7 @@ String projectListName(String base, String? project) {
 class ChoiceDropdown extends StatelessWidget {
   final String listName;
   final String label;
+  final String? hint;
   final String? value;
   final String? filterType;
   final bool required;
@@ -35,6 +97,7 @@ class ChoiceDropdown extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onChanged,
+    this.hint,
     this.filterType,
     this.required = false,
     this.validator,
@@ -47,24 +110,29 @@ class ChoiceDropdown extends StatelessWidget {
       filterType,
     );
     final validValue = items.any((c) => c.name == value) ? value : null;
-    return DropdownButtonFormField<String>(
-      initialValue: validValue,
-      isExpanded: true,
-      decoration: InputDecoration(label: Text(required ? '$label *' : label)),
-      items: items
-          .map(
-            (c) => DropdownMenuItem(
-              value: c.name,
-              child: Text(c.label, overflow: TextOverflow.ellipsis),
-            ),
-          )
-          .toList(),
-      onChanged: onChanged,
-      validator:
-          validator ??
-          (required
-              ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null
-              : null),
+    return FieldWithHint(
+      label: label,
+      hint: hint,
+      required: required,
+      child: DropdownButtonFormField<String>(
+        initialValue: validValue,
+        isExpanded: true,
+        decoration: const InputDecoration(border: OutlineInputBorder()),
+        items: items
+            .map(
+              (c) => DropdownMenuItem(
+                value: c.name,
+                child: Text(c.label, overflow: TextOverflow.ellipsis),
+              ),
+            )
+            .toList(),
+        onChanged: onChanged,
+        validator:
+            validator ??
+            (required
+                ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null
+                : null),
+      ),
     );
   }
 }
@@ -72,6 +140,7 @@ class ChoiceDropdown extends StatelessWidget {
 /// Generic labeled text field.
 class LabeledTextField extends StatelessWidget {
   final String label;
+  final String? hint;
   final String? initialValue;
   final TextEditingController? controller;
   final bool required;
@@ -84,6 +153,7 @@ class LabeledTextField extends StatelessWidget {
   const LabeledTextField({
     super.key,
     required this.label,
+    this.hint,
     this.initialValue,
     this.controller,
     this.required = false,
@@ -96,23 +166,28 @@ class LabeledTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: controller,
-      initialValue: controller == null ? initialValue : null,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      readOnly: readOnly,
-      decoration: InputDecoration(
-        label: Text(required ? '$label *' : label),
-        filled: readOnly,
-        fillColor: readOnly ? Colors.grey.shade100 : null,
+    return FieldWithHint(
+      label: label,
+      hint: hint,
+      required: required,
+      child: TextFormField(
+        controller: controller,
+        initialValue: controller == null ? initialValue : null,
+        keyboardType: keyboardType,
+        maxLines: maxLines,
+        readOnly: readOnly,
+        decoration: InputDecoration(
+          border: const OutlineInputBorder(),
+          filled: readOnly,
+          fillColor: readOnly ? Colors.grey.shade100 : null,
+        ),
+        onChanged: onChanged,
+        validator:
+            validator ??
+            (required
+                ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null
+                : null),
       ),
-      onChanged: onChanged,
-      validator:
-          validator ??
-          (required
-              ? (v) => (v == null || v.isEmpty) ? 'Champ requis' : null
-              : null),
     );
   }
 }
@@ -120,6 +195,7 @@ class LabeledTextField extends StatelessWidget {
 /// Date picker field.
 class DateField extends StatelessWidget {
   final String label;
+  final String? hint;
   final DateTime? value;
   final bool required;
   final ValueChanged<DateTime?> onChanged;
@@ -129,6 +205,7 @@ class DateField extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onChanged,
+    this.hint,
     this.required = false,
   });
 
@@ -137,25 +214,30 @@ class DateField extends StatelessWidget {
     final text = value == null
         ? ''
         : '${value!.day.toString().padLeft(2, '0')}/${value!.month.toString().padLeft(2, '0')}/${value!.year}';
-    return TextFormField(
-      readOnly: true,
-      controller: TextEditingController(text: text),
-      decoration: InputDecoration(
-        label: Text(required ? '$label *' : label),
-        suffixIcon: const Icon(Icons.calendar_today, size: 18),
+    return FieldWithHint(
+      label: label,
+      hint: hint,
+      required: required,
+      child: TextFormField(
+        readOnly: true,
+        controller: TextEditingController(text: text),
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          suffixIcon: Icon(Icons.calendar_today, size: 18),
+        ),
+        validator: required
+            ? (v) => (value == null) ? 'Champ requis' : null
+            : null,
+        onTap: () async {
+          final picked = await showDatePicker(
+            context: context,
+            initialDate: value ?? DateTime.now(),
+            firstDate: DateTime(1900),
+            lastDate: DateTime.now(),
+          );
+          if (picked != null) onChanged(picked);
+        },
       ),
-      validator: required
-          ? (v) => (value == null) ? 'Champ requis' : null
-          : null,
-      onTap: () async {
-        final picked = await showDatePicker(
-          context: context,
-          initialDate: value ?? DateTime.now(),
-          firstDate: DateTime(1900),
-          lastDate: DateTime.now(),
-        );
-        if (picked != null) onChanged(picked);
-      },
     );
   }
 }

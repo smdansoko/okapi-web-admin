@@ -70,7 +70,7 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
       }
 
       if (node.isGroup) {
-        widgets.add(SectionHeader(title: node.label ?? node.name));
+        widgets.add(SectionHeader(title: _groupLabel(node)));
         widgets.addAll(_buildNodes(node.children, ctx));
         widgets.add(const SizedBox(height: 8));
         continue;
@@ -121,7 +121,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
         final filterType = evaluator.filterValueFor(node.choiceFilter);
         return ChoiceDropdown(
           listName: node.listName ?? '',
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           value: ctx[node.name]?.toString(),
           filterType: filterType,
           required: node.required,
@@ -134,7 +135,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
       case 'select_multiple':
         return _MultiSelectField(
           listName: node.listName ?? '',
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           selected:
               (ctx[node.name] as List?)?.map((e) => e.toString()).toList() ??
               const [],
@@ -153,7 +155,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
           dv = DateTime.tryParse(raw);
         }
         return DateField(
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           value: dv,
           required: node.required,
           onChanged: (d) {
@@ -164,7 +167,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
 
       case 'time':
         return _TimeField(
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           value: ctx[node.name]?.toString(),
           required: node.required,
           onChanged: (v) {
@@ -175,7 +179,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
 
       case 'integer':
         return LabeledTextField(
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           initialValue: ctx[node.name]?.toString(),
           required: node.required,
           readOnly: node.readOnly,
@@ -188,7 +193,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
 
       case 'decimal':
         return LabeledTextField(
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           initialValue: ctx[node.name]?.toString(),
           required: node.required,
           readOnly: node.readOnly,
@@ -201,7 +207,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
 
       case 'geopoint':
         return _GeopointField(
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           value: ctx[node.name]?.toString(),
           onChanged: (v) {
             ctx[node.name] = v;
@@ -210,7 +217,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
 
       case 'image':
         return SurveyPhotoField(
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           base64Data: ctx[node.name]?.toString(),
           required: node.required,
           onChanged: (v) {
@@ -222,7 +230,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
       case 'text':
       default:
         return LabeledTextField(
-          label: node.label ?? node.name,
+          label: _fieldLabel(node),
+          hint: node.hint,
           initialValue: ctx[node.name]?.toString(),
           required: node.required,
           readOnly: node.readOnly,
@@ -232,6 +241,23 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
           },
         );
     }
+  }
+
+  /// The field's display title, shown in bold above its input. Falls back
+  /// to a generic placeholder — NEVER to the raw ODK `name` — so the
+  /// technical field name is never visible to the user filling the form,
+  /// even in the unlikely case a field is missing a `label` in the schema.
+  String _fieldLabel(SurveyNode node) {
+    final label = node.label?.trim();
+    if (label != null && label.isNotEmpty) return label;
+    return 'Champ sans titre';
+  }
+
+  /// Same safeguard as [_fieldLabel], for group/repeat section titles.
+  String _groupLabel(SurveyNode node) {
+    final label = node.label?.trim();
+    if (label != null && label.isNotEmpty) return label;
+    return 'Section';
   }
 
   String? _constraintValidator(
@@ -250,10 +276,10 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
   Widget _buildRepeat(SurveyNode node, Map<String, dynamic> ctx) {
     final list = widget.repeats.putIfAbsent(node.name, () => []);
     return RepeatSection<Map<String, dynamic>>(
-      title: node.label ?? node.name,
+      title: _groupLabel(node),
       icon: Icons.list_alt,
       items: list,
-      itemTitle: (item, i) => '${node.label ?? node.name} #${i + 1}',
+      itemTitle: (item, i) => '${_groupLabel(node)} #${i + 1}',
       itemSubtitle: (item, i) {
         final firstFieldNode = node.children.firstWhere(
           (c) => c.isField,
@@ -272,7 +298,7 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
         }
         final saved = await showFormDialog<Map<String, dynamic>>(
           context: context,
-          title: 'Ajouter — ${node.label ?? node.name}',
+          title: 'Ajouter — ${_groupLabel(node)}',
           contentBuilder: (ctx2) =>
               _RepeatInstanceEditor(children: node.children, entry: entry),
           onSave: () => entry,
@@ -291,7 +317,7 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
         }
         final saved = await showFormDialog<Map<String, dynamic>>(
           context: context,
-          title: 'Modifier — ${node.label ?? node.name}',
+          title: 'Modifier — ${_groupLabel(node)}',
           contentBuilder: (ctx2) =>
               _RepeatInstanceEditor(children: node.children, entry: entry),
           onSave: () => entry,
@@ -355,6 +381,7 @@ class _RepeatInstanceEditorState extends State<_RepeatInstanceEditor> {
 /// built-in showTimePicker).
 class _TimeField extends StatelessWidget {
   final String label;
+  final String? hint;
   final String? value;
   final bool required;
   final ValueChanged<String?> onChanged;
@@ -363,33 +390,39 @@ class _TimeField extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onChanged,
+    this.hint,
     this.required = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      readOnly: true,
-      controller: TextEditingController(text: value ?? ''),
-      decoration: InputDecoration(
-        label: Text(required ? '$label *' : label),
-        suffixIcon: const Icon(Icons.access_time, size: 18),
+    return FieldWithHint(
+      label: label,
+      hint: hint,
+      required: required,
+      child: TextFormField(
+        readOnly: true,
+        controller: TextEditingController(text: value ?? ''),
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          suffixIcon: Icon(Icons.access_time, size: 18),
+        ),
+        validator: required
+            ? (v) => (value == null || value!.isEmpty) ? 'Champ requis' : null
+            : null,
+        onTap: () async {
+          final initial = _parseTime(value) ?? TimeOfDay.now();
+          final picked = await showTimePicker(
+            context: context,
+            initialTime: initial,
+          );
+          if (picked != null) {
+            final text =
+                '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+            onChanged(text);
+          }
+        },
       ),
-      validator: required
-          ? (v) => (value == null || value!.isEmpty) ? 'Champ requis' : null
-          : null,
-      onTap: () async {
-        final initial = _parseTime(value) ?? TimeOfDay.now();
-        final picked = await showTimePicker(
-          context: context,
-          initialTime: initial,
-        );
-        if (picked != null) {
-          final text =
-              '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-          onChanged(text);
-        }
-      },
     );
   }
 
@@ -408,6 +441,7 @@ class _TimeField extends StatelessWidget {
 /// existing app's convention of manual lat/lon text entry (structure_dialogs).
 class _GeopointField extends StatefulWidget {
   final String label;
+  final String? hint;
   final String? value;
   final ValueChanged<String?> onChanged;
 
@@ -415,6 +449,7 @@ class _GeopointField extends StatefulWidget {
     required this.label,
     required this.value,
     required this.onChanged,
+    this.hint,
   });
 
   @override
@@ -454,42 +489,42 @@ class _GeopointFieldState extends State<_GeopointField> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-        ),
-        const SizedBox(height: 6),
-        Row(
-          children: [
-            Expanded(
-              child: TextFormField(
-                controller: _latCtrl,
-                decoration: const InputDecoration(labelText: 'Latitude'),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                  signed: true,
-                ),
-                onChanged: (_) => _emit(),
+    return FieldWithHint(
+      label: widget.label,
+      hint: widget.hint,
+      child: Row(
+        children: [
+          Expanded(
+            child: TextFormField(
+              controller: _latCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Latitude',
+                border: OutlineInputBorder(),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: TextFormField(
-                controller: _lonCtrl,
-                decoration: const InputDecoration(labelText: 'Longitude'),
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
-                  signed: true,
-                ),
-                onChanged: (_) => _emit(),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+                signed: true,
               ),
+              onChanged: (_) => _emit(),
             ),
-          ],
-        ),
-      ],
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: TextFormField(
+              controller: _lonCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Longitude',
+                border: OutlineInputBorder(),
+              ),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+                signed: true,
+              ),
+              onChanged: (_) => _emit(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -500,6 +535,7 @@ class _GeopointFieldState extends State<_GeopointField> {
 class _MultiSelectField extends StatefulWidget {
   final String listName;
   final String label;
+  final String? hint;
   final List<String> selected;
   final ValueChanged<List<String>> onChanged;
 
@@ -508,6 +544,7 @@ class _MultiSelectField extends StatefulWidget {
     required this.label,
     required this.selected,
     required this.onChanged,
+    this.hint,
   });
 
   @override
@@ -526,44 +563,38 @@ class _MultiSelectFieldState extends State<_MultiSelectField> {
   @override
   Widget build(BuildContext context) {
     final items = ReferenceDataService.instance.choices(widget.listName);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+    return FieldWithHint(
+      label: widget.label,
+      hint: widget.hint,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8),
         ),
-        const SizedBox(height: 6),
-        Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          constraints: const BoxConstraints(maxHeight: 220),
-          child: SingleChildScrollView(
-            child: Column(
-              children: items.map((c) {
-                final checked = _selected.contains(c.name);
-                return CheckboxListTile(
-                  dense: true,
-                  value: checked,
-                  title: Text(c.label, style: const TextStyle(fontSize: 13)),
-                  onChanged: (v) {
-                    setState(() {
-                      if (v == true) {
-                        _selected.add(c.name);
-                      } else {
-                        _selected.remove(c.name);
-                      }
-                    });
-                    widget.onChanged(_selected);
-                  },
-                );
-              }).toList(),
-            ),
+        constraints: const BoxConstraints(maxHeight: 220),
+        child: SingleChildScrollView(
+          child: Column(
+            children: items.map((c) {
+              final checked = _selected.contains(c.name);
+              return CheckboxListTile(
+                dense: true,
+                value: checked,
+                title: Text(c.label, style: const TextStyle(fontSize: 13)),
+                onChanged: (v) {
+                  setState(() {
+                    if (v == true) {
+                      _selected.add(c.name);
+                    } else {
+                      _selected.remove(c.name);
+                    }
+                  });
+                  widget.onChanged(_selected);
+                },
+              );
+            }).toList(),
           ),
         ),
-      ],
+      ),
     );
   }
 }

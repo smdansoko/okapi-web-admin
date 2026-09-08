@@ -3,12 +3,14 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
+import 'common_fields.dart';
 
 /// Reusable photo capture field for `image`-type SurveyNodes, following the
 /// exact camera/gallery + base64 storage pattern used in
 /// menage_form_screen.dart's `_pickPhotoBase64` / `_photoPickerBox`.
 class SurveyPhotoField extends StatefulWidget {
   final String label;
+  final String? hint;
   final String? base64Data;
   final ValueChanged<String?> onChanged;
   final bool required;
@@ -18,6 +20,7 @@ class SurveyPhotoField extends StatefulWidget {
     required this.label,
     required this.base64Data,
     required this.onChanged,
+    this.hint,
     this.required = false,
   });
 
@@ -77,62 +80,57 @@ class _SurveyPhotoFieldState extends State<SurveyPhotoField> {
         bytes = null;
       }
     }
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          widget.required ? '${widget.label} *' : widget.label,
-          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-        ),
-        const SizedBox(height: 6),
-        InkWell(
-          onTap: () async {
-            final result = await _pickPhotoBase64();
-            if (result != null) widget.onChanged(result);
-          },
-          borderRadius: BorderRadius.circular(8),
-          child: Container(
-            width: 120,
-            height: 120,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade400),
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.grey.shade100,
-            ),
-            child: bytes != null
-                ? Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.memory(bytes, fit: BoxFit.cover),
-                      ),
-                      Positioned(
-                        top: 2,
-                        right: 2,
-                        child: InkWell(
-                          onTap: () => widget.onChanged(null),
-                          child: const CircleAvatar(
-                            radius: 12,
-                            backgroundColor: OkapiColors.error,
-                            child: Icon(
-                              Icons.close,
-                              size: 14,
-                              color: Colors.white,
-                            ),
+    return FieldWithHint(
+      label: widget.label,
+      hint: widget.hint,
+      required: widget.required,
+      child: InkWell(
+        onTap: () async {
+          final result = await _pickPhotoBase64();
+          if (result != null) widget.onChanged(result);
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey.shade400),
+            borderRadius: BorderRadius.circular(8),
+            color: Colors.grey.shade100,
+          ),
+          child: bytes != null
+              ? Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.memory(bytes, fit: BoxFit.cover),
+                    ),
+                    Positioned(
+                      top: 2,
+                      right: 2,
+                      child: InkWell(
+                        onTap: () => widget.onChanged(null),
+                        child: const CircleAvatar(
+                          radius: 12,
+                          backgroundColor: OkapiColors.error,
+                          child: Icon(
+                            Icons.close,
+                            size: 14,
+                            color: Colors.white,
                           ),
                         ),
                       ),
-                    ],
-                  )
-                : const Icon(
-                    Icons.add_a_photo_outlined,
-                    color: Colors.grey,
-                    size: 32,
-                  ),
-          ),
+                    ),
+                  ],
+                )
+              : const Icon(
+                  Icons.add_a_photo_outlined,
+                  color: Colors.grey,
+                  size: 32,
+                ),
         ),
-      ],
+      ),
     );
   }
 }
