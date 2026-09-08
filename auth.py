@@ -52,6 +52,7 @@ MODULE_LABELS = {m["code"]: m["label"] for m in MODULES}
 _PARC_ENDPOINTS = {
     "dashboard", "dashboard_stats", "menages_list", "menage_detail",
     "contracts_list", "export_contract", "preview_contract",
+    "purge_synced_contract_data",
     "photos_directory", "photos_directory_upload", "individu_photo",
     "individu_photo_field", "individu_photos_manage", "individu_photo_crop",
     "compensation_page", "compensation_export",

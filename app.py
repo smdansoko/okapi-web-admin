@@ -16,7 +16,16 @@ import sqlite3
 import uuid
 from datetime import datetime
 
-from flask import Flask, render_template, request, jsonify, send_file, abort
+from flask import (
+    Flask,
+    render_template,
+    request,
+    jsonify,
+    send_file,
+    abort,
+    redirect,
+    url_for,
+)
 from werkzeug.security import generate_password_hash, check_password_hash
 
 import db
@@ -644,6 +653,26 @@ def rapport_patrimoine_export_docx():
         mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         as_attachment=True,
         download_name=filename,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Purge synced champs/structures data (admin only) - clears the old
+# "contrats à générer" by deleting the underlying Enquêtes Champs/
+# Structures records synced from the tablets for the current project.
+# Ménages are NEVER touched by this action.
+# ---------------------------------------------------------------------------
+
+@app.route("/contracts/purge-synced-data", methods=["POST"])
+@auth.admin_required
+def purge_synced_contract_data():
+    champs_deleted, structures_deleted = db.purge_champs_and_structures()
+    return redirect(
+        url_for(
+            "dashboard",
+            purged_champs=champs_deleted,
+            purged_structures=structures_deleted,
+        )
     )
 
 

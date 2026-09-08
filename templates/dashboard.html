@@ -7,6 +7,17 @@
   <a href="{{ url_for('dashboard_stats') }}" class="dash-tab">Statistiques détaillées</a>
 </div>
 
+{% if request.args.get('purged_champs') is not none %}
+<div class="panel" style="background:#eafaf1; border:1px solid #a3d9b1;">
+  <strong>✅ Données synchronisées supprimées :</strong>
+  {{ request.args.get('purged_champs') }} enquête(s) champs et
+  {{ request.args.get('purged_structures') }} enquête(s) structures ont été
+  supprimées (données envoyées par les tablettes). Les ménages n'ont pas été
+  modifiés. Les « Contrats à générer » sont maintenant recalculés à partir
+  des données restantes.
+</div>
+{% endif %}
+
 <div class="cards-row">
   <div class="stat-card">
     <div class="icon">🏠</div>
@@ -129,5 +140,23 @@
     (écran Ménages / Tableau de bord) pour déclencher cette synchronisation.
   </p>
 </div>
+
+{% if auth_user and auth_user.role == 'admin' %}
+<div class="panel">
+  <h2>Supprimer les données synchronisées (Champs / Structures)</h2>
+  <p style="font-size:13px; color:#666;">
+    Supprime toutes les <strong>enquêtes Champs</strong> et <strong>enquêtes Structures</strong>
+    envoyées par les tablettes pour ce projet, afin que les anciens
+    « Contrats à générer » disparaissent. <strong>Les ménages ne sont jamais
+    touchés</strong> par cette action. Chaque tablette purgera aussi sa
+    copie locale de ces enregistrements lors de sa prochaine synchronisation
+    (« Actualiser »).
+  </p>
+  <form method="post" action="{{ url_for('purge_synced_contract_data') }}"
+        onsubmit="return confirm('Confirmez-vous la suppression de TOUTES les enquêtes Champs et Structures synchronisées pour ce projet ? Les ménages ne seront pas affectés. Cette action est irréversible.');">
+    <button type="submit" class="btn small maroon">🗑️ Supprimer les données synchronisées (Champs/Structures)</button>
+  </form>
+</div>
+{% endif %}
 
 {% endblock %}

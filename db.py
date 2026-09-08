@@ -315,6 +315,61 @@ def record_deletion(record_type: str, record_id: str, tablette: str = "",
         conn.close()
 
 
+def purge_champs_and_structures():
+    """Deletes ALL 'Enquêtes Champs' and 'Enquêtes Structures' records
+    synced from the tablets for the CURRENTLY ACTIVE PROJECT ONLY (see
+    get_conn()/set_current_project() - each project has its own database
+    file, so this never touches another project's data).
+
+    This is what actually makes the old "contrats à générer" disappear
+    from the Contrats page / dashboard batch table, since those are
+    entirely computed on the fly from the champs/structures records (see
+    contract_rows.py) - there is no separate "contracts" table to clear.
+
+    Ménages are INTENTIONALLY left completely untouched, per explicit
+    requirement ("supprime les données synchronisées des tablettes sans
+    toucher aux ménages").
+
+    A deletion tombstone is recorded for every purged record so that
+    every tablet also purges its own local copy on its next "Actualiser"
+    pull (mirrors record_deletion()'s tombstone behaviour), keeping the
+    web admin and every mobile device in sync after the purge.
+
+    Returns (champs_count, structures_count) - the number of records
+    deleted of each kind, for the confirmation message shown to the
+    admin.
+    """
+    with _lock:
+        conn = get_conn()
+        champ_ids = [r["id"] for r in conn.execute("SELECT id FROM champs").fetchall()]
+        structure_ids = [
+            r["id"] for r in conn.execute("SELECT id FROM structures").fetchall()
+        ]
+        for cid in champ_ids:
+            conn.execute(
+                """INSERT INTO deleted_records (record_type, record_id, tablette, device_id, deleted_at)
+                   VALUES ('champ', ?, '', '', datetime('now'))
+                   ON CONFLICT(record_type, record_id) DO UPDATE SET
+                     deleted_at=excluded.deleted_at
+                """,
+                (cid,),
+            )
+        for sid in structure_ids:
+            conn.execute(
+                """INSERT INTO deleted_records (record_type, record_id, tablette, device_id, deleted_at)
+                   VALUES ('structure', ?, '', '', datetime('now'))
+                   ON CONFLICT(record_type, record_id) DO UPDATE SET
+                     deleted_at=excluded.deleted_at
+                """,
+                (sid,),
+            )
+        conn.execute("DELETE FROM champs")
+        conn.execute("DELETE FROM structures")
+        conn.commit()
+        conn.close()
+        return len(champ_ids), len(structure_ids)
+
+
 def all_deletions(since: str = None):
     """Returns all deletion tombstones (optionally only those recorded
     after [since], an ISO datetime string) as a list of

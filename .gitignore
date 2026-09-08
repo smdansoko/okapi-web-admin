@@ -6,6 +6,7 @@ data/simandou.db
 data/smb.db
 flask.log
 server.log
+web_admin.log
 # Phase 4: uploaded member photos are large binary field-collection data,
 # not source code - never committed to git, but the directory structure
 # itself is preserved via .gitkeep files (see data/photos/*/.gitkeep).
