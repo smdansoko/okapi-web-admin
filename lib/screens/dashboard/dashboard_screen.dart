@@ -63,7 +63,7 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(width: 16),
                     const Expanded(
                       child: Text(
-                        'OKAPI Environnement Conseil\nSuivi des enquêtes et compensations — WCAG',
+                        'OKAPI Environnement Conseil\nSuivi des enquêtes et compensations',
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,

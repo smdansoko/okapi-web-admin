@@ -66,11 +66,6 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _save,
-        icon: const Icon(Icons.save_rounded),
-        label: const Text('Enregistrer'),
-      ),
     );
   }
 }
