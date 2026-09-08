@@ -259,15 +259,22 @@ class AppDataProvider extends ChangeNotifier {
   ) => _storage.clearPendingDeletions(keys);
 
   // -------- Aggregates for dashboard --------
-  int get totalMenages => _menages.length;
+  // IMPORTANT: these MUST read the project-filtered getters (menages/champs/
+  // structures) rather than the raw private lists (_menages/_champs/
+  // _structures), otherwise the dashboard shows the exact same totals for
+  // every project (this was reported as "je vois les mêmes statistiques des
+  // ménages partout" — the fix is that every aggregate below is scoped to
+  // the currently active project, matching the already-filtered list
+  // getters above).
+  int get totalMenages => menages.length;
   int get totalIndividus =>
-      _menages.fold(0, (sum, m) => sum + m.individus.length);
+      menages.fold(0, (sum, m) => sum + m.individus.length);
   int get totalParcelles =>
-      _champs.fold(0, (sum, c) => sum + c.parcelles.length);
+      champs.fold(0, (sum, c) => sum + c.parcelles.length);
   int get totalStructures =>
-      _structures.fold(0, (sum, s) => sum + s.structures.length);
+      structures.fold(0, (sum, s) => sum + s.structures.length);
 
-  double get totalSuperficieParcelles => _champs.fold(
+  double get totalSuperficieParcelles => champs.fold(
     0.0,
     (sum, c) =>
         sum + c.parcelles.fold(0.0, (s2, p) => s2 + p.superficieParcelle),
