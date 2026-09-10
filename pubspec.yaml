@@ -68,6 +68,10 @@ dependencies:
   http: ^1.2.2
   file_picker: ^11.0.3
 
+  # GPS point capture ("Enregistrer le point GPS" buttons), with accuracy
+  # check (max 5m) before accepting a reading.
+  geolocator: 13.0.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/structure.dart';
 import '../../widgets/common_fields.dart';
+import '../../widgets/gps_capture_button.dart';
 
 const _uuid = Uuid();
 
@@ -49,6 +50,7 @@ Future<StructureItem?> showStructureDialog(
   String? materiauxPeinture = existing?.materiauxPeinture;
   String? materiauxCarrelage = existing?.materiauxCarrelage;
   String etatStructure = existing?.etatStructure ?? '';
+  double? gpsAccuracy;
 
   bool usesMateriaux(String type) {
     if (project == 'simandou') {
@@ -106,6 +108,7 @@ Future<StructureItem?> showStructureDialog(
                         child: LabeledTextField(
                           label: 'Latitude',
                           controller: latCtrl,
+                          readOnly: true,
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                             signed: true,
@@ -117,6 +120,7 @@ Future<StructureItem?> showStructureDialog(
                         child: LabeledTextField(
                           label: 'Longitude',
                           controller: lonCtrl,
+                          readOnly: true,
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
                             signed: true,
@@ -124,6 +128,15 @@ Future<StructureItem?> showStructureDialog(
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: 8),
+                  GpsCaptureButton(
+                    lastAccuracy: gpsAccuracy,
+                    onCaptured: (point) => setDialogState(() {
+                      latCtrl.text = point.latitude.toString();
+                      lonCtrl.text = point.longitude.toString();
+                      gpsAccuracy = point.accuracy;
+                    }),
                   ),
                   if (showMateriaux) ...[
                     const SizedBox(height: 16),

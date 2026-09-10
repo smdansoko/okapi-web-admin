@@ -3,6 +3,7 @@ import '../models/survey_field.dart';
 import '../services/reference_data_service.dart';
 import '../services/survey_expression_evaluator.dart';
 import 'common_fields.dart';
+import 'gps_capture_button.dart';
 import 'location_picker.dart';
 import 'repeat_section.dart';
 import 'survey_photo_field.dart';
@@ -182,7 +183,7 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
           label: _fieldLabel(node),
           hint: node.hint,
           initialValue: ctx[node.name]?.toString(),
-          required: node.required,
+          required: _effectiveRequired(node),
           readOnly: node.readOnly,
           keyboardType: TextInputType.number,
           onChanged: (v) {
@@ -196,7 +197,7 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
           label: _fieldLabel(node),
           hint: node.hint,
           initialValue: ctx[node.name]?.toString(),
-          required: node.required,
+          required: _effectiveRequired(node),
           readOnly: node.readOnly,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           onChanged: (v) {
@@ -233,7 +234,7 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
           label: _fieldLabel(node),
           hint: node.hint,
           initialValue: ctx[node.name]?.toString(),
-          required: node.required,
+          required: _effectiveRequired(node),
           readOnly: node.readOnly,
           maxLines: node.appearance == 'multiline' ? 3 : 1,
           onChanged: (v) {
@@ -242,6 +243,16 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
         );
     }
   }
+
+  /// A field the user can never type into (auto-generated / calculated,
+  /// `readOnly == true`) must never be marked "required" for form
+  /// validation purposes — the user has no way to satisfy that constraint
+  /// by hand. Auto-generated values are computed live by the
+  /// `calculation` evaluator above (see `_buildNodes`) before this widget
+  /// is even built, so the field is effectively always filled anyway; only
+  /// the visual "*" / validator requirement is suppressed here.
+  bool _effectiveRequired(SurveyNode node) =>
+      node.required && !node.readOnly;
 
   /// The field's display title, shown in bold above its input. Falls back
   /// to a generic placeholder — NEVER to the raw ODK `name` — so the
@@ -265,7 +276,9 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
     SurveyExpressionEvaluator evaluator,
     String? v,
   ) {
-    if (node.required && (v == null || v.isEmpty)) return 'Champ requis';
+    if (_effectiveRequired(node) && (v == null || v.isEmpty)) {
+      return 'Champ requis';
+    }
     if (node.constraint != null && v != null && v.isNotEmpty) {
       final ok = evaluator.evaluateConstraint(node.constraint, v);
       if (!ok) return 'Valeur invalide (${node.constraint})';
@@ -459,6 +472,7 @@ class _GeopointField extends StatefulWidget {
 class _GeopointFieldState extends State<_GeopointField> {
   late TextEditingController _latCtrl;
   late TextEditingController _lonCtrl;
+  double? _accuracy;
 
   @override
   void initState() {
@@ -492,36 +506,53 @@ class _GeopointFieldState extends State<_GeopointField> {
     return FieldWithHint(
       label: widget.label,
       hint: widget.hint,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: TextFormField(
-              controller: _latCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Latitude',
-                border: OutlineInputBorder(),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  controller: _latCtrl,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Latitude',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                    signed: true,
+                  ),
+                  onChanged: (_) => _emit(),
+                ),
               ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-                signed: true,
+              const SizedBox(width: 12),
+              Expanded(
+                child: TextFormField(
+                  controller: _lonCtrl,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Longitude',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                    signed: true,
+                  ),
+                  onChanged: (_) => _emit(),
+                ),
               ),
-              onChanged: (_) => _emit(),
-            ),
+            ],
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TextFormField(
-              controller: _lonCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Longitude',
-                border: OutlineInputBorder(),
-              ),
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-                signed: true,
-              ),
-              onChanged: (_) => _emit(),
-            ),
+          const SizedBox(height: 8),
+          GpsCaptureButton(
+            lastAccuracy: _accuracy,
+            onCaptured: (point) => setState(() {
+              _latCtrl.text = point.latitude.toString();
+              _lonCtrl.text = point.longitude.toString();
+              _accuracy = point.accuracy;
+              _emit();
+            }),
           ),
         ],
       ),

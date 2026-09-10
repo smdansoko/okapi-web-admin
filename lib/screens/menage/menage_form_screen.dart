@@ -10,6 +10,7 @@ import '../../services/app_data_provider.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 import '../../widgets/common_fields.dart';
+import '../../widgets/gps_capture_button.dart';
 import '../../widgets/location_picker.dart';
 import '../../widgets/repeat_section.dart';
 
@@ -36,6 +37,7 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
   late TextEditingController _codeMenageCtrl;
   late TextEditingController _latCtrl;
   late TextEditingController _lonCtrl;
+  double? _gpsAccuracy;
   late TextEditingController _nomRepondantCtrl;
   late TextEditingController _telRepondantCtrl;
   late TextEditingController _numeroPieceRepondantCtrl;
@@ -738,6 +740,7 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                   child: LabeledTextField(
                     label: 'Latitude (GPS)',
                     controller: _latCtrl,
+                    readOnly: true,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                       signed: true,
@@ -749,6 +752,7 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                   child: LabeledTextField(
                     label: 'Longitude (GPS)',
                     controller: _lonCtrl,
+                    readOnly: true,
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                       signed: true,
@@ -756,6 +760,15 @@ class _MenageFormScreenState extends State<MenageFormScreen> {
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 8),
+            GpsCaptureButton(
+              lastAccuracy: _gpsAccuracy,
+              onCaptured: (point) => setState(() {
+                _latCtrl.text = point.latitude.toString();
+                _lonCtrl.text = point.longitude.toString();
+                _gpsAccuracy = point.accuracy;
+              }),
             ),
             const SizedBox(height: 16),
             const SectionHeader(

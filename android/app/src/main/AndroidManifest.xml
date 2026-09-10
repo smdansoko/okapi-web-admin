@@ -2,6 +2,11 @@
     <!-- Required for the "Synchroniser" feature: sending survey data to the
          OKAPI Web Admin server over HTTP(S). -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Required for the "Enregistrer le point GPS" feature (automatic GPS
+         coordinate capture with accuracy check) on latitude/longitude and
+         geopoint fields throughout the survey forms. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="Okapi Survey"
         android:name="${applicationName}"
