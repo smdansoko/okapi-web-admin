@@ -5,8 +5,8 @@ self-registration `users` table in db.py, which is a completely separate
 concept - mobile field-agent accounts vs. these 2 web-admin operator
 accounts):
 
-  - dsmariame / TinaDans10@   -> role "admin"        (full access)
-  - okapisurvey / OAKPI2026@  -> role "gestionnaire"  (no access to /users)
+  - dsmariame / TinaDans10@         -> role "admin"        (full access)
+  - okapi survey / OKAPI!!!!2026@   -> role "gestionnaire"  (no access to /users)
 
 After login, the user must pick a PROJECT (SIMANDOU / WCAG / SMB) and then
 a MODULE (PARC / SOCIAL / BIODIVERSITÉ). Only PARC is implemented today
@@ -26,7 +26,7 @@ import db
 
 USERS = {
     "dsmariame": {"password": "TinaDans10@", "role": "admin", "label": "Administrateur principal"},
-    "okapisurvey": {"password": "OAKPI2026@", "role": "gestionnaire", "label": "Gestionnaire"},
+    "okapi survey": {"password": "OKAPI!!!!2026@", "role": "gestionnaire", "label": "Gestionnaire"},
 }
 
 PROJECTS = [

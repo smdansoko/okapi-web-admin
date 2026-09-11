@@ -1704,14 +1704,22 @@ def api_register():
 
 
 def _mobile_admin_user(username: str):
-    """The OKAPI Web Admin's own hardcoded "Administrateur principal"
-    account (dsmariame) can also log into the MOBILE app directly, with
-    full access to all 3 modules (PARC + BIODIVERSITÉ + SOCIAL) -
-    regardless of statut restrictions applied to regular field-agent
-    accounts. Returns a synthetic, always-approved AppUser-shaped dict, or
-    None if `username` doesn't match this special account."""
+    """Both OKAPI Web Admin hardcoded accounts ("Administrateur principal" /
+    dsmariame AND "Gestionnaire" / okapi survey) can also log into the
+    MOBILE app directly, with full access to all 3 modules (PARC +
+    BIODIVERSITÉ + SOCIAL) - regardless of statut restrictions applied to
+    regular field-agent accounts. The Gestionnaire gets the exact same
+    mobile-app access/permissions as the Administrateur principal (same
+    "statut" value drives every access-control check throughout the app -
+    see SessionService.allowedModulesForStatut / canDeleteRecords in the
+    Flutter app); the ONLY thing reserved to the Administrateur principal
+    is the Web Admin's own "/users" tab (mobile account approval), which is
+    gated separately by @auth.admin_required (role == "admin" only) and is
+    entirely unrelated to this mobile-login special-case. Returns a
+    synthetic, always-approved AppUser-shaped dict, or None if `username`
+    doesn't match either of these 2 special web-admin accounts."""
     account = auth.USERS.get(username)
-    if not account or account.get("role") != "admin":
+    if not account or account.get("role") not in ("admin", "gestionnaire"):
         return None
     return {
         "id": f"webadmin-{username}",
@@ -1735,9 +1743,11 @@ def api_login():
     username = (payload.get("username") or "").strip().lower()
     password = payload.get("password") or ""
 
-    # Special-case: the web admin's own "Administrateur principal" account
-    # can log into the mobile app too, with full PARC+BIODIVERSITÉ+SOCIAL
-    # access, bypassing the regular field-agent users table entirely.
+    # Special-case: the web admin's own "Administrateur principal" AND
+    # "Gestionnaire" accounts can both log into the mobile app too, with
+    # full PARC+BIODIVERSITÉ+SOCIAL access (same "statut" for both -> same
+    # mobile permissions), bypassing the regular field-agent users table
+    # entirely.
     admin_account = auth.USERS.get(username)
     if admin_account and admin_account.get("password") == password:
         return jsonify({
