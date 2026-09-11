@@ -938,6 +938,11 @@ def menages_list():
     menages = db.all_menages()
     search = (request.args.get("q", "") or "").strip().lower()
     village_filter = request.args.get("village", "")
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+    except (TypeError, ValueError):
+        page = 1
+    per_page = 30
 
     villages = sorted({m.get("village", "") for m in menages if m.get("village")})
 
@@ -970,13 +975,27 @@ def menages_list():
 
     rows.sort(key=lambda r: (r["village"], r["chef_nom"]))
 
+    # Pagination: 30 rows per page (Excel-like), with a "Suivant"/"Précédent"
+    # control at the bottom of the list instead of rendering everything at
+    # once (per requirement: "affichage limité à 30 lignes").
+    total_filtered = len(rows)
+    total_pages = max(1, (total_filtered + per_page - 1) // per_page)
+    page = min(page, total_pages)
+    start = (page - 1) * per_page
+    page_rows = rows[start:start + per_page]
+
     return render_template(
         "menages.html",
-        rows=rows,
+        rows=page_rows,
         villages=villages,
         search=search,
         selected_village=village_filter,
         total_menages=len(menages),
+        page=page,
+        total_pages=total_pages,
+        total_filtered=total_filtered,
+        has_next=page < total_pages,
+        has_prev=page > 1,
     )
 
 

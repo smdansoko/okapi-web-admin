@@ -15,7 +15,7 @@
   </form>
 
   {% if rows %}
-  <table class="data-table">
+  <table class="data-table compact-table excel-row-table">
     <thead>
       <tr>
         <th>Code ménage</th>
@@ -43,6 +43,20 @@
       {% endfor %}
     </tbody>
   </table>
+
+  <div class="pagination-bar">
+    <span class="pagination-info">
+      Page {{ page }} / {{ total_pages }} — {{ total_filtered }} ménage(s) au total (30 par page)
+    </span>
+    <div class="pagination-controls">
+      {% if has_prev %}
+      <a class="btn small" href="{{ url_for('menages_list', q=search, village=selected_village, page=page-1) }}">&laquo; Précédent</a>
+      {% endif %}
+      {% if has_next %}
+      <a class="btn small" href="{{ url_for('menages_list', q=search, village=selected_village, page=page+1) }}">Suivant &raquo;</a>
+      {% endif %}
+    </div>
+  </div>
   {% else %}
   <div class="empty-state">Aucun ménage trouvé.</div>
   {% endif %}

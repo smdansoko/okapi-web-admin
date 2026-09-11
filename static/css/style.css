@@ -198,6 +198,34 @@ table.data-table.compact-table .badge {
   font-size: 10px;
 }
 
+/* Excel-like row height (~15px font) for the Ménages list, per requirement
+   "diminue à la taille 15 comme pour les tableurs Excel". */
+table.data-table.excel-row-table {
+  font-size: 12px;
+}
+table.data-table.excel-row-table th,
+table.data-table.excel-row-table td {
+  padding: 3px 8px;
+  line-height: 15px;
+}
+
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.pagination-info {
+  font-size: 12.5px;
+  color: #666;
+}
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+}
+
 .btn {
   display: inline-block;
   background: var(--dark-green);
