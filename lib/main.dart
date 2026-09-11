@@ -10,17 +10,8 @@ import 'screens/auth/auth_gate.dart';
 /// All 11 BIODIVERSITE/SOCIAL survey form keys (see lib/data/survey_schema.json),
 /// used to bulk-load SurveyDataProvider at startup.
 const List<String> kAllSurveyFormKeys = [
-  'pose_cameras',
-  'chimpanzes_recce',
-  'poisson',
-  'flore',
-  'oiseaux',
-  'reptiles',
-  'amphibiens',
-  'mammiferes',
-  'infrastructures',
-  'patrimoine_culturel',
-  'socioeconomique',
+  ...kBiodiversiteFormKeys,
+  ...kSocialFormKeys,
 ];
 
 Future<void> main() async {

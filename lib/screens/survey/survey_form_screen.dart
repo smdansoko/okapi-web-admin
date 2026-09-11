@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/survey_field.dart';
 import '../../models/survey_record.dart';
+import '../../services/auth_service.dart';
 import '../../services/survey_data_provider.dart';
 import '../../widgets/survey_form_renderer.dart';
 
@@ -29,6 +30,22 @@ class _SurveyFormScreenState extends State<SurveyFormScreen> {
     _record =
         widget.existing ??
         SurveyRecord(formKey: widget.schema.key, values: {}, repeats: {});
+    // "Patrimoine culturel" form: the "Numéro de la tablette" field
+    // (equipe_enquete) is readOnly and must always reflect the tablet
+    // number selected by the current user when creating their account —
+    // auto-filled here on new records (never overwritten on an existing
+    // record being edited).
+    if (widget.schema.key == 'patrimoine_culturel' && widget.existing == null) {
+      _prefillTablette();
+    }
+  }
+
+  Future<void> _prefillTablette() async {
+    final user = await AuthService.instance.currentUser;
+    if (!mounted || user == null || user.tablette.isEmpty) return;
+    setState(() {
+      _record.values['equipe_enquete'] = user.tablette;
+    });
   }
 
   Future<void> _save() async {

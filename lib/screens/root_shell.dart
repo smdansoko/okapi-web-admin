@@ -112,17 +112,17 @@ class _RootShellState extends State<RootShell> {
             accentColor: OkapiColors.secondary,
           ),
           SurveyModuleScreen(module: 'BIODIVERSITE', moduleTitle: 'Biodiversité'),
-          SyncScreen(),
+          SyncScreen(moduleCode: 'biodiversite'),
         ];
       case 'social':
-        return const [
-          ModuleDashboardScreen(
+        return [
+          const ModuleDashboardScreen(
             module: 'SOCIAL',
             moduleTitle: 'Social',
             accentColor: OkapiColors.primary,
           ),
-          SurveyModuleScreen(module: 'SOCIAL', moduleTitle: 'Social'),
-          SyncScreen(),
+          const SurveyModuleScreen(module: 'SOCIAL', moduleTitle: 'Social'),
+          const SyncScreen(moduleCode: 'social'),
         ];
       default: // 'parc'
         return [
@@ -131,7 +131,7 @@ class _RootShellState extends State<RootShell> {
           ChampsListScreen(projectCode: widget.projectCode),
           StructuresListScreen(projectCode: widget.projectCode),
           ContractsScreen(projectCode: widget.projectCode),
-          const SyncScreen(),
+          const SyncScreen(moduleCode: 'parc'),
         ];
     }
   }

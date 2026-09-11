@@ -88,6 +88,7 @@ class ChoiceDropdown extends StatelessWidget {
   final String? value;
   final String? filterType;
   final bool required;
+  final bool readOnly;
   final ValueChanged<String?> onChanged;
   final String? Function(String?)? validator;
 
@@ -100,6 +101,7 @@ class ChoiceDropdown extends StatelessWidget {
     this.hint,
     this.filterType,
     this.required = false,
+    this.readOnly = false,
     this.validator,
   });
 
@@ -110,6 +112,30 @@ class ChoiceDropdown extends StatelessWidget {
       filterType,
     );
     final validValue = items.any((c) => c.name == value) ? value : null;
+    // A read-only select field (e.g. "Numéro de la tablette", auto-filled
+    // from the logged-in user's account) is shown as a plain disabled
+    // dropdown — the value is still visible but cannot be changed.
+    if (readOnly) {
+      final displayLabel = validValue != null
+          ? (items.firstWhere((c) => c.name == validValue).label)
+          : '';
+      return FieldWithHint(
+        label: label,
+        hint: hint,
+        required: false,
+        child: InputDecorator(
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            filled: true,
+            fillColor: Color(0xFFF0F0F0),
+          ),
+          child: Text(
+            displayLabel.isNotEmpty ? displayLabel : '—',
+            style: const TextStyle(color: Colors.black87),
+          ),
+        ),
+      );
+    }
     return FieldWithHint(
       label: label,
       hint: hint,

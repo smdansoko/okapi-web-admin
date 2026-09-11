@@ -36,12 +36,21 @@ const String _kChefDEquipeStatut = "Chef d'équipe";
 const Set<String> _kPushDeniedStatuts = {SessionService.kEnqueteur};
 
 /// "Synchroniser" tab: lets the field team push all locally collected data
-/// (Ménages, Enquêtes Champs, Enquêtes Structures — including the recent
-/// updates: member photos/CNI, numéro de lot from numBatch, etc.) to the
-/// separate OKAPI Web Admin server, where it becomes available for
+/// to the separate OKAPI Web Admin server, where it becomes available for
 /// contract PDF export and compensation table (Excel) export.
+///
+/// Synchronization is now scoped PER MODULE via [moduleCode]
+/// ('parc' / 'biodiversite' / 'social'), mirroring the total separation
+/// already enforced elsewhere in the app (RootShell/SessionService):
+///   - PARC          -> pushes/pulls ONLY Ménages, Enquêtes Champs,
+///                      Enquêtes Structures (+ photos/contrats-related
+///                      data, handled by their own dedicated sections
+///                      further down this screen).
+///   - BIODIVERSITÉ  -> pushes/pulls ONLY the 8 BIODIVERSITÉ survey forms.
+///   - SOCIAL        -> pushes/pulls ONLY the 3 SOCIAL survey forms.
 class SyncScreen extends StatefulWidget {
-  const SyncScreen({super.key});
+  final String moduleCode; // 'parc' / 'biodiversite' / 'social'
+  const SyncScreen({super.key, this.moduleCode = 'parc'});
 
   @override
   State<SyncScreen> createState() => _SyncScreenState();
@@ -49,7 +58,6 @@ class SyncScreen extends StatefulWidget {
 
 class _SyncScreenState extends State<SyncScreen> {
   final _urlController = TextEditingController();
-  final _deviceNameController = TextEditingController();
 
   bool _loadingPrefs = true;
   bool _syncing = false;
@@ -72,7 +80,21 @@ class _SyncScreenState extends State<SyncScreen> {
 
   AppUser? _currentUser;
   bool get _canSynchronize =>
-      _currentUser != null && !_kPushDeniedStatuts.contains(_currentUser!.statut);
+      _currentUser != null &&
+      !_kPushDeniedStatuts.contains(_currentUser!.statut);
+
+  /// Only the main administrator account may see/edit the server URL —
+  /// every other user gets a fixed, hidden server address (still fully
+  /// functional under the hood, just not shown/editable in the UI).
+  bool get _isAdmin =>
+      _currentUser?.statut == SessionService.kAdministrateurPrincipal;
+
+  /// "Nom de cet appareil" is now ALWAYS the currently logged-in user's
+  /// own name — never freely editable — so every sync/log entry on the
+  /// server is unambiguously traceable to the person who sent it.
+  String get _deviceDisplayName => (_currentUser?.nomPrenom.isNotEmpty ?? false)
+      ? _currentUser!.nomPrenom
+      : 'Utilisateur inconnu';
 
   @override
   void initState() {
@@ -85,16 +107,20 @@ class _SyncScreenState extends State<SyncScreen> {
     final user = await AuthService.instance.currentUser;
     if (!mounted) return;
     setState(() => _currentUser = user);
+    // Keep the persisted "device name" in sync with the current user's own
+    // name, so every sync request sent to the server is correctly
+    // attributed even though the field is no longer editable.
+    if (user != null) {
+      await SyncService.instance.setDeviceName(user.nomPrenom);
+    }
   }
 
   Future<void> _loadPrefs() async {
     final url = await SyncService.instance.serverUrl;
-    final name = await SyncService.instance.deviceName;
     final last = await SyncService.instance.lastSyncAt;
     if (!mounted) return;
     setState(() {
       _urlController.text = url;
-      _deviceNameController.text = name;
       _lastSyncAt = last;
       _loadingPrefs = false;
     });
@@ -103,13 +129,15 @@ class _SyncScreenState extends State<SyncScreen> {
   @override
   void dispose() {
     _urlController.dispose();
-    _deviceNameController.dispose();
     super.dispose();
   }
 
   Future<void> _saveServerSettings() async {
+    // The server URL is only ever changed via the (admin-only) text field;
+    // for non-admin users _urlController simply mirrors the already-saved
+    // value untouched, so saving it back is harmless.
     await SyncService.instance.setServerUrl(_urlController.text);
-    await SyncService.instance.setDeviceName(_deviceNameController.text);
+    await SyncService.instance.setDeviceName(_deviceDisplayName);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -135,18 +163,26 @@ class _SyncScreenState extends State<SyncScreen> {
   /// Restricts the data about to be pushed to the server to ONLY the
   /// records that belong to the current "Chef d'équipe" account's own
   /// tablette (device/tablet number), per the "chef ne synchronise que sa
-  /// tablette" requirement. Each Menage/EnqueteChamp/EnqueteStructure
-  /// record carries its own `tablette` field (filled in via the
-  /// "Tablette" dropdown on the survey forms). If the logged-in chef has
-  /// no tablette assigned to their account (older accounts created before
-  /// this field existed), sync is not restricted (backward compatibility)
-  /// but a warning is shown so the issue can be corrected.
+  /// tablette" requirement, AND to the current module ('parc' /
+  /// 'biodiversite' / 'social') — total separation: PARC synchronizes
+  /// ONLY Ménages/Champs/Structures (+ their photos/contrats, handled by
+  /// their own dedicated sections further down), BIODIVERSITÉ and SOCIAL
+  /// never touch this PARC data at all. Each Menage/EnqueteChamp/
+  /// EnqueteStructure record carries its own `tablette` field (filled in
+  /// via the "Tablette" dropdown on the survey forms). If the logged-in
+  /// chef has no tablette assigned to their account (older accounts
+  /// created before this field existed), sync is not restricted
+  /// (backward compatibility) but a warning is shown so the issue can be
+  /// corrected.
   ({
     List<Menage> menages,
     List<EnqueteChamp> champs,
     List<EnqueteStructure> structures,
   })
   _dataForSync(AppDataProvider data) {
+    if (widget.moduleCode != 'parc') {
+      return (menages: const [], champs: const [], structures: const []);
+    }
     final myTablette = _currentUser?.tablette ?? '';
     if (myTablette.isEmpty) {
       return (
@@ -162,6 +198,20 @@ class _SyncScreenState extends State<SyncScreen> {
           .where((s) => s.tablette == myTablette)
           .toList(),
     );
+  }
+
+  /// The survey form keys ('pose_cameras', 'patrimoine_culturel', etc.)
+  /// relevant to the CURRENT module only — PARC has none (its data is
+  /// Ménages/Champs/Structures, handled by [_dataForSync] instead).
+  List<String> get _formKeysForModule {
+    switch (widget.moduleCode) {
+      case 'biodiversite':
+        return kBiodiversiteFormKeys;
+      case 'social':
+        return kSocialFormKeys;
+      default:
+        return const [];
+    }
   }
 
   Future<void> _synchronize() async {
@@ -201,7 +251,7 @@ class _SyncScreenState extends State<SyncScreen> {
     }
     final toSync = _dataForSync(data);
     final surveyRecordsToSync = {
-      for (final key in kAllSurveyFormKeys) key: surveyData.recordsFor(key),
+      for (final key in _formKeysForModule) key: surveyData.recordsFor(key),
     };
 
     setState(() {
@@ -209,7 +259,11 @@ class _SyncScreenState extends State<SyncScreen> {
       _lastResult = null;
     });
 
-    final pendingDeletions = data.pendingDeletions;
+    // Ménage/Champ/Structure deletion tombstones only ever apply to PARC —
+    // never sent alongside a BIODIVERSITÉ/SOCIAL-only sync.
+    final pendingDeletions = widget.moduleCode == 'parc'
+        ? data.pendingDeletions
+        : <Map<String, dynamic>>[];
 
     final result = await SyncService.instance.syncAll(
       menages: toSync.menages,
@@ -274,13 +328,25 @@ class _SyncScreenState extends State<SyncScreen> {
     final result = await SyncService.instance.pullFromServer();
 
     if (result.success) {
-      await data.mergeFromServer(
-        menages: result.menages,
-        champs: result.champs,
-        structures: result.structures,
-        deletions: result.deletions,
-      );
-      await surveyData.mergeFromServer(result.surveyRecords);
+      // Total separation on pull too: PARC only merges Ménages/Champs/
+      // Structures; BIODIVERSITÉ/SOCIAL only merge their own survey
+      // records (filtered to this module's form keys), even though the
+      // server response itself contains everything for the project.
+      if (widget.moduleCode == 'parc') {
+        await data.mergeFromServer(
+          menages: result.menages,
+          champs: result.champs,
+          structures: result.structures,
+          deletions: result.deletions,
+        );
+      } else {
+        final allowedKeys = _formKeysForModule.toSet();
+        final filteredRecords = {
+          for (final entry in result.surveyRecords.entries)
+            if (allowedKeys.contains(entry.key)) entry.key: entry.value,
+        };
+        await surveyData.mergeFromServer(filteredRecords);
+      }
     }
 
     if (!mounted) return;
@@ -291,13 +357,16 @@ class _SyncScreenState extends State<SyncScreen> {
     });
 
     if (result.success) {
+      final summary = widget.moduleCode == 'parc'
+          ? 'Ménages: ${result.menages.length} · '
+                'Champs: ${result.champs.length} · '
+                'Structures: ${result.structures.length}'
+          : '${SessionService.labelForModule(widget.moduleCode)}: '
+                '${_formKeysForModule.fold<int>(0, (sum, k) => sum + (result.surveyRecords[k]?.length ?? 0))} '
+                'fiche(s)';
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-            'Actualisation réussie ✔ — Ménages: ${result.menages.length} · '
-            'Champs: ${result.champs.length} · '
-            'Structures: ${result.structures.length}',
-          ),
+          content: Text('Actualisation réussie ✔ — $summary'),
           backgroundColor: OkapiColors.secondary,
         ),
       );
@@ -312,7 +381,8 @@ class _SyncScreenState extends State<SyncScreen> {
   }
 
   bool get _canResetData =>
-      _currentUser != null && _kResetAllowedStatuts.contains(_currentUser!.statut);
+      _currentUser != null &&
+      _kResetAllowedStatuts.contains(_currentUser!.statut);
 
   /// Wipes ALL data currently saved locally on THIS device (Ménages,
   /// Enquêtes Champs/Structures — superficie parcelles, etc. — and every
@@ -361,7 +431,9 @@ class _SyncScreenState extends State<SyncScreen> {
             child: const Text('Annuler'),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red.shade700),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade700,
+            ),
             onPressed: () => Navigator.of(ctx).pop(
               confirmController.text.trim().toUpperCase() == 'REINITIALISER',
             ),
@@ -496,7 +568,8 @@ class _SyncScreenState extends State<SyncScreen> {
                             height: 56,
                             width: 56,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                            errorBuilder: (_, __, ___) =>
+                                const SizedBox.shrink(),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -536,42 +609,54 @@ class _SyncScreenState extends State<SyncScreen> {
                           spacing: 12,
                           runSpacing: 12,
                           children: [
-                            _CountChip(
-                              icon: Icons.groups_rounded,
-                              label: 'Ménages',
-                              count: data.totalMenages,
-                              color: OkapiColors.primary,
-                            ),
-                            _CountChip(
-                              icon: Icons.person_rounded,
-                              label: 'Individus',
-                              count: data.totalIndividus,
-                              color: OkapiColors.secondary,
-                            ),
-                            _CountChip(
-                              icon: Icons.grass_rounded,
-                              label: 'Enquêtes Champs',
-                              count: data.champs.length,
-                              color: const Color(0xFFC77B00),
-                            ),
-                            _CountChip(
-                              icon: Icons.home_work_rounded,
-                              label: 'Enquêtes Structures',
-                              count: data.structures.length,
-                              color: const Color(0xFF1F5A8F),
-                            ),
-                            _CountChip(
-                              icon: Icons.eco_rounded,
-                              label: 'Biodiversité',
-                              count: surveyData.totalBiodiversiteRecords,
-                              color: OkapiColors.secondary,
-                            ),
-                            _CountChip(
-                              icon: Icons.people_alt_rounded,
-                              label: 'Social',
-                              count: surveyData.totalSocialRecords,
-                              color: OkapiColors.primary,
-                            ),
+                            // PARC-only chips: Ménages/Individus/Champs/
+                            // Structures never shown while in the
+                            // BIODIVERSITÉ or SOCIAL module (total
+                            // separation between modules).
+                            if (widget.moduleCode == 'parc') ...[
+                              _CountChip(
+                                icon: Icons.groups_rounded,
+                                label: 'Ménages',
+                                count: data.totalMenages,
+                                color: OkapiColors.primary,
+                              ),
+                              _CountChip(
+                                icon: Icons.person_rounded,
+                                label: 'Individus',
+                                count: data.totalIndividus,
+                                color: OkapiColors.secondary,
+                              ),
+                              _CountChip(
+                                icon: Icons.grass_rounded,
+                                label: 'Enquêtes Champs',
+                                count: data.champs.length,
+                                color: const Color(0xFFC77B00),
+                              ),
+                              _CountChip(
+                                icon: Icons.home_work_rounded,
+                                label: 'Enquêtes Structures',
+                                count: data.structures.length,
+                                color: const Color(0xFF1F5A8F),
+                              ),
+                            ],
+                            // BIODIVERSITÉ-only chip: never shown in PARC
+                            // or SOCIAL.
+                            if (widget.moduleCode == 'biodiversite')
+                              _CountChip(
+                                icon: Icons.eco_rounded,
+                                label: 'Biodiversité',
+                                count: surveyData.totalBiodiversiteRecords,
+                                color: OkapiColors.secondary,
+                              ),
+                            // SOCIAL-only chip: never shown in PARC or
+                            // BIODIVERSITÉ.
+                            if (widget.moduleCode == 'social')
+                              _CountChip(
+                                icon: Icons.people_alt_rounded,
+                                label: 'Social',
+                                count: surveyData.totalSocialRecords,
+                                color: OkapiColors.primary,
+                              ),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -587,8 +672,12 @@ class _SyncScreenState extends State<SyncScreen> {
                             const SizedBox(width: 6),
                             Expanded(
                               child: Text(
-                                'Inclut les photos (profil + CNI recto/verso), le numéro de lot '
-                                '(N° de batch) et toutes les informations des contrats.',
+                                widget.moduleCode == 'parc'
+                                    ? 'Inclut les photos (profil + CNI recto/verso), le numéro de lot '
+                                          '(N° de batch) et toutes les informations des contrats.'
+                                    : 'Seules les fiches du module '
+                                          '${SessionService.labelForModule(widget.moduleCode)} '
+                                          'sont concernées par cette synchronisation.',
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey.shade700,
@@ -618,23 +707,65 @@ class _SyncScreenState extends State<SyncScreen> {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        TextField(
-                          controller: _urlController,
-                          keyboardType: TextInputType.url,
-                          decoration: const InputDecoration(
-                            labelText: 'Adresse du serveur (URL)',
-                            hintText: 'https://exemple.okapi-admin.com',
-                            prefixIcon: Icon(Icons.link),
-                            border: OutlineInputBorder(),
+                        // The server address is only ever visible/editable
+                        // by the main administrator account — every other
+                        // user gets a discreet "connected" indicator
+                        // instead, without exposing the underlying URL.
+                        if (_isAdmin)
+                          TextField(
+                            controller: _urlController,
+                            keyboardType: TextInputType.url,
+                            decoration: const InputDecoration(
+                              labelText: 'Adresse du serveur (URL)',
+                              hintText: 'https://exemple.okapi-admin.com',
+                              prefixIcon: Icon(Icons.link),
+                              border: OutlineInputBorder(),
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.lock_outline,
+                                  size: 18,
+                                  color: Colors.grey.shade600,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Serveur configuré par l\'administrateur principal.',
+                                    style: TextStyle(
+                                      fontSize: 12.5,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         const SizedBox(height: 12),
+                        // "Nom de cet appareil" = the logged-in user's own
+                        // name, always, never editable — every sync
+                        // request is unambiguously traceable to the
+                        // person who sent it.
                         TextField(
-                          controller: _deviceNameController,
+                          enabled: false,
+                          controller: TextEditingController(
+                            text: _deviceDisplayName,
+                          ),
                           decoration: const InputDecoration(
-                            labelText: 'Nom de cet appareil (optionnel)',
-                            hintText: 'ex: Tablette Enquêteur 1',
-                            prefixIcon: Icon(Icons.tablet_android),
+                            labelText: 'Nom de cet appareil',
+                            prefixIcon: Icon(Icons.person_outline),
                             border: OutlineInputBorder(),
                           ),
                         ),
@@ -693,12 +824,18 @@ class _SyncScreenState extends State<SyncScreen> {
                               ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        TextButton.icon(
-                          onPressed: _saveServerSettings,
-                          icon: const Icon(Icons.save_outlined, size: 18),
-                          label: const Text('Enregistrer les paramètres'),
-                        ),
+                        // Nothing left to manually save for non-admins:
+                        // the server URL is fixed/hidden and the device
+                        // name is now always the logged-in user's own
+                        // name (synced automatically in _loadCurrentUser).
+                        if (_isAdmin) ...[
+                          const SizedBox(height: 8),
+                          TextButton.icon(
+                            onPressed: _saveServerSettings,
+                            icon: const Icon(Icons.save_outlined, size: 18),
+                            label: const Text('Enregistrer les paramètres'),
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -931,9 +1068,12 @@ class _SyncScreenState extends State<SyncScreen> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        'Récupère les ménages, enquêtes champs et structures enregistrés '
-                        'sur les AUTRES tablettes et les rend immédiatement disponibles '
-                        'ici (listes déroulantes Ménage / Propriétaire).',
+                        widget.moduleCode == 'parc'
+                            ? 'Récupère les ménages, enquêtes champs et structures enregistrés '
+                                  'sur les AUTRES tablettes et les rend immédiatement disponibles '
+                                  'ici (listes déroulantes Ménage / Propriétaire).'
+                            : 'Récupère les fiches ${SessionService.labelForModule(widget.moduleCode)} '
+                                  'enregistrées sur les AUTRES tablettes.',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey.shade700,
@@ -979,9 +1119,13 @@ class _SyncScreenState extends State<SyncScreen> {
                         if (_lastPullResult!.success) ...[
                           const SizedBox(height: 6),
                           Text(
-                            'Reçu du serveur — Ménages: ${_lastPullResult!.menages.length} · '
-                            'Champs: ${_lastPullResult!.champs.length} · '
-                            'Structures: ${_lastPullResult!.structures.length}',
+                            widget.moduleCode == 'parc'
+                                ? 'Reçu du serveur — Ménages: ${_lastPullResult!.menages.length} · '
+                                      'Champs: ${_lastPullResult!.champs.length} · '
+                                      'Structures: ${_lastPullResult!.structures.length}'
+                                : 'Reçu du serveur — '
+                                      '${_formKeysForModule.fold<int>(0, (sum, k) => sum + (_lastPullResult!.surveyRecords[k]?.length ?? 0))} '
+                                      'fiche(s) ${SessionService.labelForModule(widget.moduleCode)}',
                             style: const TextStyle(fontSize: 12),
                           ),
                         ],
@@ -992,98 +1136,102 @@ class _SyncScreenState extends State<SyncScreen> {
                 const SizedBox(height: 24),
 
                 // ---- Photos hors-ligne (téléchargement des photos web) ----
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Photos des membres (hors-ligne)',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Télécharge sur cet appareil les photos des membres '
-                          'téléversées par l\'administrateur sur le site web '
-                          '(répertoire photos), afin qu\'elles restent '
-                          'disponibles dans les contrats même SANS connexion '
-                          'internet par la suite.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey.shade700,
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: _downloadingPhotos
-                                ? null
-                                : _downloadPhotos,
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: OkapiColors.primary,
-                              side: const BorderSide(
-                                color: OkapiColors.primary,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                              ),
-                            ),
-                            icon: _downloadingPhotos
-                                ? const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  )
-                                : const Icon(Icons.photo_library_rounded),
-                            label: Text(
-                              _downloadingPhotos
-                                  ? (_photosTotal > 0
-                                        ? 'Téléchargement… $_photosDone/$_photosTotal'
-                                        : 'Préparation…')
-                                  : 'Télécharger les photos pour utilisation hors-ligne',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
+                // PARC-only: member photos are only ever used in
+                // compensation contracts, which live exclusively under
+                // PARC.
+                if (widget.moduleCode == 'parc')
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Photos des membres (hors-ligne)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
                             ),
                           ),
-                        ),
-                        if (_photosResultMessage != null) ...[
-                          const SizedBox(height: 10),
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: _photosResultOk == true
-                                  ? OkapiColors.secondary.withValues(
-                                      alpha: 0.08,
+                          const SizedBox(height: 8),
+                          Text(
+                            'Télécharge sur cet appareil les photos des membres '
+                            'téléversées par l\'administrateur sur le site web '
+                            '(répertoire photos), afin qu\'elles restent '
+                            'disponibles dans les contrats même SANS connexion '
+                            'internet par la suite.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: _downloadingPhotos
+                                  ? null
+                                  : _downloadPhotos,
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: OkapiColors.primary,
+                                side: const BorderSide(
+                                  color: OkapiColors.primary,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                              ),
+                              icon: _downloadingPhotos
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
                                     )
-                                  : Colors.red.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
+                                  : const Icon(Icons.photo_library_rounded),
+                              label: Text(
+                                _downloadingPhotos
+                                    ? (_photosTotal > 0
+                                          ? 'Téléchargement… $_photosDone/$_photosTotal'
+                                          : 'Préparation…')
+                                    : 'Télécharger les photos pour utilisation hors-ligne',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                          if (_photosResultMessage != null) ...[
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
                                 color: _photosResultOk == true
                                     ? OkapiColors.secondary.withValues(
-                                        alpha: 0.3,
+                                        alpha: 0.08,
                                       )
-                                    : Colors.red.withValues(alpha: 0.3),
+                                    : Colors.red.withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: _photosResultOk == true
+                                      ? OkapiColors.secondary.withValues(
+                                          alpha: 0.3,
+                                        )
+                                      : Colors.red.withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Text(
+                                _photosResultMessage!,
+                                style: const TextStyle(fontSize: 12.5),
                               ),
                             ),
-                            child: Text(
-                              _photosResultMessage!,
-                              style: const TextStyle(fontSize: 12.5),
-                            ),
-                          ),
+                          ],
                         ],
-                      ],
+                      ),
                     ),
                   ),
-                ),
                 const SizedBox(height: 24),
 
                 // ---- Réinitialiser les données locales ----
@@ -1130,11 +1278,15 @@ class _SyncScreenState extends State<SyncScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: OutlinedButton.icon(
-                              onPressed: _resettingData ? null : _confirmResetData,
+                              onPressed: _resettingData
+                                  ? null
+                                  : _confirmResetData,
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: Colors.red.shade700,
                                 side: BorderSide(color: Colors.red.shade700),
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                               ),
                               icon: _resettingData
                                   ? const SizedBox(

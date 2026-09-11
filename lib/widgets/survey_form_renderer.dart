@@ -126,7 +126,8 @@ class _SurveyFormRendererState extends State<SurveyFormRenderer> {
           hint: node.hint,
           value: ctx[node.name]?.toString(),
           filterType: filterType,
-          required: node.required,
+          required: _effectiveRequired(node),
+          readOnly: node.readOnly,
           onChanged: (v) {
             ctx[node.name] = v;
             _touch();

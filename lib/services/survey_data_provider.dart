@@ -2,6 +2,27 @@ import 'package:flutter/foundation.dart';
 import '../models/survey_record.dart';
 import 'storage_service.dart';
 
+/// The 8 BIODIVERSITÉ survey form keys (see lib/data/survey_schema.json).
+/// Exposed as a top-level constant so other files (SyncScreen) can filter
+/// data by module without duplicating this list.
+const List<String> kBiodiversiteFormKeys = [
+  'pose_cameras',
+  'chimpanzes_recce',
+  'poisson',
+  'flore',
+  'oiseaux',
+  'reptiles',
+  'amphibiens',
+  'mammiferes',
+];
+
+/// The 3 SOCIAL survey form keys (see lib/data/survey_schema.json).
+const List<String> kSocialFormKeys = [
+  'infrastructures',
+  'patrimoine_culturel',
+  'socioeconomique',
+];
+
 /// Central state holder for the 11 BIODIVERSITE/SOCIAL survey forms
 /// (Pose caméras, Chimpanzés Recce, Poisson, Flore, Oiseaux, Reptiles,
 /// Amphibiens, Mammifères, Infrastructures de base, Patrimoine culturel,
@@ -119,22 +140,21 @@ class SurveyDataProvider extends ChangeNotifier {
   // -------- Aggregates for dashboard --------
   int totalFor(String formKey) => countFor(formKey);
 
-  int get totalBiodiversiteRecords {
-    const keys = [
-      'pose_cameras',
-      'chimpanzes_recce',
-      'poisson',
-      'flore',
-      'oiseaux',
-      'reptiles',
-      'amphibiens',
-      'mammiferes',
-    ];
-    return keys.fold(0, (sum, k) => sum + countFor(k));
-  }
+  int get totalBiodiversiteRecords =>
+      kBiodiversiteFormKeys.fold(0, (sum, k) => sum + countFor(k));
 
-  int get totalSocialRecords {
-    const keys = ['infrastructures', 'patrimoine_culturel', 'socioeconomique'];
-    return keys.fold(0, (sum, k) => sum + countFor(k));
-  }
+  int get totalSocialRecords =>
+      kSocialFormKeys.fold(0, (sum, k) => sum + countFor(k));
+
+  /// All BIODIVERSITÉ records across all 8 forms, keyed by formKey — used
+  /// by SyncScreen to push/pull ONLY this module's data.
+  Map<String, List<SurveyRecord>> recordsForBiodiversite() => {
+    for (final key in kBiodiversiteFormKeys) key: recordsFor(key),
+  };
+
+  /// All SOCIAL records across all 3 forms, keyed by formKey — used by
+  /// SyncScreen to push/pull ONLY this module's data.
+  Map<String, List<SurveyRecord>> recordsForSocial() => {
+    for (final key in kSocialFormKeys) key: recordsFor(key),
+  };
 }

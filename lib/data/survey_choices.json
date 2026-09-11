@@ -12055,5 +12055,57 @@
       "label": "Autre",
       "type": null
     }
+  ],
+  "sv_tablette": [
+    {
+      "name": "1",
+      "label": "1",
+      "type": null
+    },
+    {
+      "name": "2",
+      "label": "2",
+      "type": null
+    },
+    {
+      "name": "3",
+      "label": "3",
+      "type": null
+    },
+    {
+      "name": "4",
+      "label": "4",
+      "type": null
+    },
+    {
+      "name": "5",
+      "label": "5",
+      "type": null
+    },
+    {
+      "name": "6",
+      "label": "6",
+      "type": null
+    },
+    {
+      "name": "7",
+      "label": "7",
+      "type": null
+    },
+    {
+      "name": "8",
+      "label": "8",
+      "type": null
+    },
+    {
+      "name": "9",
+      "label": "9",
+      "type": null
+    },
+    {
+      "name": "10",
+      "label": "10",
+      "type": null
+    }
   ]
 }
