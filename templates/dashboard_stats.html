@@ -39,6 +39,14 @@
 
   <div class="panel">
     <h2>Répartition par type de contrat</h2>
+    {% if type_contrat_counts and type_contrat_counts.values() | sum > 0 %}
+    <div class="chart-box h-220">
+      <canvas
+        data-chart-type="doughnut"
+        data-labels='{{ type_contrat_counts.keys() | list | tojson }}'
+        data-values='{{ type_contrat_counts.values() | list | tojson }}'></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Type</th><th>Nombre d'enquêtes champs</th></tr></thead>
       <tbody>
@@ -51,6 +59,17 @@
 
   <div class="panel">
     <h2>Montant par catégorie de compensation</h2>
+    {% if montant_par_categorie and montant_par_categorie | map("last") | sum > 0 %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ montant_par_categorie | map("first") | list | tojson }}'
+        data-values='{{ montant_par_categorie | map("last") | list | tojson }}'
+        data-series-name="Montant (GNF)"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Catégorie</th><th>Montant (GNF)</th></tr></thead>
       <tbody>
@@ -63,6 +82,14 @@
 
   <div class="panel">
     <h2>Répartition par région</h2>
+    {% if par_region %}
+    <div class="chart-box h-220">
+      <canvas
+        data-chart-type="pie"
+        data-labels='{{ par_region | map("first") | list | tojson }}'
+        data-values='{{ par_region | map("last") | list | tojson }}'></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Région</th><th>Ménages</th></tr></thead>
       <tbody>
@@ -75,6 +102,17 @@
 
   <div class="panel">
     <h2>Répartition par préfecture</h2>
+    {% if par_prefecture %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ par_prefecture | map("first") | list | tojson }}'
+        data-values='{{ par_prefecture | map("last") | list | tojson }}'
+        data-series-name="Ménages"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Préfecture</th><th>Ménages</th></tr></thead>
       <tbody>
@@ -87,6 +125,17 @@
 
   <div class="panel">
     <h2>Top villages (par nombre de ménages)</h2>
+    {% if par_village %}
+    <div class="chart-box h-300">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ par_village | map("first") | list | tojson }}'
+        data-values='{{ par_village | map("last") | list | tojson }}'
+        data-series-name="Ménages"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Village</th><th>Ménages</th></tr></thead>
       <tbody>
@@ -99,6 +148,14 @@
 
   <div class="panel">
     <h2>Démographie — sexe</h2>
+    {% if sexe_counts and sexe_counts.values() | sum > 0 %}
+    <div class="chart-box h-220">
+      <canvas
+        data-chart-type="doughnut"
+        data-labels='{{ sexe_counts.keys() | list | tojson }}'
+        data-values='{{ sexe_counts.values() | list | tojson }}'></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Sexe</th><th>Individus</th></tr></thead>
       <tbody>
@@ -111,6 +168,16 @@
 
   <div class="panel">
     <h2>Démographie — tranches d'âge</h2>
+    {% if age_buckets and age_buckets.values() | sum > 0 %}
+    <div class="chart-box h-220">
+      <canvas
+        data-chart-type="bar"
+        data-single-color="1"
+        data-labels='{{ age_buckets.keys() | list | tojson }}'
+        data-values='{{ age_buckets.values() | list | tojson }}'
+        data-series-name="Individus"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Tranche d'âge</th><th>Individus</th></tr></thead>
       <tbody>
@@ -123,6 +190,17 @@
 
   <div class="panel">
     <h2>Types de terrain les plus fréquents</h2>
+    {% if type_terrain_counts %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ type_terrain_counts | map("first") | list | tojson }}'
+        data-values='{{ type_terrain_counts | map("last") | list | tojson }}'
+        data-series-name="Occurrences"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Type de terrain</th><th>Occurrences</th></tr></thead>
       <tbody>
@@ -135,6 +213,17 @@
 
   <div class="panel">
     <h2>Cultures annuelles les plus fréquentes</h2>
+    {% if culture_annuelle_counts %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ culture_annuelle_counts | map("first") | list | tojson }}'
+        data-values='{{ culture_annuelle_counts | map("last") | list | tojson }}'
+        data-series-name="Occurrences"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Culture</th><th>Occurrences</th></tr></thead>
       <tbody>
@@ -147,6 +236,17 @@
 
   <div class="panel">
     <h2>Cultures pérennes les plus fréquentes</h2>
+    {% if culture_perenne_counts %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ culture_perenne_counts | map("first") | list | tojson }}'
+        data-values='{{ culture_perenne_counts | map("last") | list | tojson }}'
+        data-series-name="Occurrences"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Espèce</th><th>Occurrences</th></tr></thead>
       <tbody>
@@ -159,6 +259,17 @@
 
   <div class="panel">
     <h2>Espèces sauvages les plus fréquentes</h2>
+    {% if espece_sauvage_counts %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ espece_sauvage_counts | map("first") | list | tojson }}'
+        data-values='{{ espece_sauvage_counts | map("last") | list | tojson }}'
+        data-series-name="Occurrences"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Espèce</th><th>Occurrences</th></tr></thead>
       <tbody>
@@ -171,6 +282,17 @@
 
   <div class="panel">
     <h2>Bois d'œuvre les plus fréquents</h2>
+    {% if bois_doeuvre_counts %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ bois_doeuvre_counts | map("first") | list | tojson }}'
+        data-values='{{ bois_doeuvre_counts | map("last") | list | tojson }}'
+        data-series-name="Occurrences"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Espèce</th><th>Occurrences</th></tr></thead>
       <tbody>
@@ -183,6 +305,17 @@
 
   <div class="panel">
     <h2>Types de structures les plus fréquents</h2>
+    {% if type_structure_counts %}
+    <div class="chart-box h-300">
+      <canvas
+        data-chart-type="bar"
+        data-horizontal="1"
+        data-single-color="1"
+        data-labels='{{ type_structure_counts | map("first") | list | tojson }}'
+        data-values='{{ type_structure_counts | map("last") | list | tojson }}'
+        data-series-name="Occurrences"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>Type de structure</th><th>Occurrences</th></tr></thead>
       <tbody>
@@ -231,6 +364,17 @@
 
   <div class="panel">
     <h2>Contrats par lot (non fusionnés)</h2>
+    {% if contracts_per_batch %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-labels='{{ contracts_per_batch | map(attribute="num_batch") | list | tojson }}'
+        data-values='{{ contracts_per_batch | map(attribute="owners_count") | list | tojson }}'
+        data-values2='{{ contracts_per_batch | map(attribute="contracts_count") | list | tojson }}'
+        data-series-name="PAP distincts"
+        data-series2-name="Contrats à générer"></canvas>
+    </div>
+    {% endif %}
     <table class="data-table">
       <thead><tr><th>N° de lot</th><th>PAP distincts</th><th>Contrats à générer</th></tr></thead>
       <tbody>
@@ -273,6 +417,14 @@
   <div class="panel">
     <h2>Activité de synchronisation (14 derniers jours avec activité)</h2>
     {% if sync_timeline %}
+    {% set timeline_sorted = sync_timeline | sort(attribute=0) %}
+    <div class="chart-box h-220">
+      <canvas
+        data-chart-type="line"
+        data-labels='{{ timeline_sorted | map("first") | list | tojson }}'
+        data-values='{{ timeline_sorted | map("last") | list | tojson }}'
+        data-series-name="Synchronisations"></canvas>
+    </div>
     <table class="data-table">
       <thead><tr><th>Date</th><th>Nombre de synchronisations</th></tr></thead>
       <tbody>

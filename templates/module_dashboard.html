@@ -44,6 +44,15 @@
 <div class="panel">
   <h2>Répartition par formulaire</h2>
   {% if form_rows %}
+  {% set nonzero_forms = form_rows | selectattr("count", "gt", 0) | list %}
+  {% if nonzero_forms %}
+  <div class="chart-box h-260">
+    <canvas
+      data-chart-type="doughnut"
+      data-labels='{{ nonzero_forms | map(attribute="title") | list | tojson }}'
+      data-values='{{ nonzero_forms | map(attribute="count") | list | tojson }}'></canvas>
+  </div>
+  {% endif %}
   <table class="data-table">
     <thead>
       <tr>
@@ -80,6 +89,12 @@
     <div style="flex:1; min-width:260px;">
       <h3 style="font-size:14px; margin:0 0 8px;">Par région</h3>
       {% if region_rows %}
+      <div class="chart-box h-220">
+        <canvas
+          data-chart-type="pie"
+          data-labels='{{ region_rows | map(attribute="region") | list | tojson }}'
+          data-values='{{ region_rows | map(attribute="count") | list | tojson }}'></canvas>
+      </div>
       <table class="data-table compact-table">
         <thead><tr><th>Région</th><th>Fiches</th></tr></thead>
         <tbody>
@@ -95,6 +110,15 @@
     <div style="flex:1; min-width:260px;">
       <h3 style="font-size:14px; margin:0 0 8px;">Par préfecture (top 15)</h3>
       {% if prefecture_rows %}
+      <div class="chart-box h-260">
+        <canvas
+          data-chart-type="bar"
+          data-horizontal="1"
+          data-single-color="1"
+          data-labels='{{ prefecture_rows | map(attribute="prefecture") | list | tojson }}'
+          data-values='{{ prefecture_rows | map(attribute="count") | list | tojson }}'
+          data-series-name="Fiches"></canvas>
+      </div>
       <table class="data-table compact-table">
         <thead><tr><th>Préfecture</th><th>Fiches</th></tr></thead>
         <tbody>
@@ -119,8 +143,17 @@
     <div class="stats-panel-block" style="flex:1 1 300px; min-width:280px; border:1px solid #e6dfd6; border-radius:8px; padding:12px 14px; background:#fbfaf8;">
       <h3 style="font-size:14px; margin:0 0 6px;">{{ fs.emoji }} {{ fs.title }} <span style="color:#999; font-weight:400;">({{ fs.count }})</span></h3>
       {% for b in fs.breakdowns %}
-      <div style="margin-bottom:10px;">
+      <div style="margin-bottom:14px;">
         <div style="font-size:12px; font-weight:600; color:#666; margin-bottom:4px;">{{ b.label }}</div>
+        <div class="chart-box h-220">
+          <canvas
+            data-chart-type="bar"
+            data-horizontal="1"
+            data-single-color="1"
+            data-labels='{{ b.top | map("first") | list | tojson }}'
+            data-values='{{ b.top | map("last") | list | tojson }}'
+            data-series-name="{{ b.label }}"></canvas>
+        </div>
         <table class="data-table compact-table" style="margin:0;">
           <tbody>
             {% for value, count in b.top %}
@@ -139,6 +172,14 @@
 {% if sync_timeline %}
 <div class="panel">
   <h2>Activité de synchronisation (14 derniers jours actifs)</h2>
+  {% set timeline_sorted = sync_timeline | sort(attribute=0) %}
+  <div class="chart-box h-220">
+    <canvas
+      data-chart-type="line"
+      data-labels='{{ timeline_sorted | map("first") | list | tojson }}'
+      data-values='{{ timeline_sorted | map("last") | list | tojson }}'
+      data-series-name="Fiches synchronisées"></canvas>
+  </div>
   <table class="data-table compact-table">
     <thead><tr><th>Date</th><th>Fiches synchronisées</th></tr></thead>
     <tbody>

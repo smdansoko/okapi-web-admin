@@ -58,9 +58,51 @@
   {% endif %}
 </div>
 
+<div class="charts-two-col">
+  <div class="panel">
+    <h2>Composition des données synchronisées</h2>
+    {% if counts.menages or counts.champs or counts.structures %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="doughnut"
+        data-labels='{{ ["Ménages", "Enquêtes Champs", "Enquêtes Structures"] | tojson }}'
+        data-values='{{ [counts.menages, counts.champs, counts.structures] | tojson }}'></canvas>
+    </div>
+    {% else %}
+    <div class="empty-state">Aucune donnée synchronisée pour le moment.</div>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <h2>PAP &amp; contrats par lot</h2>
+    {% if batch_rows %}
+    <div class="chart-box h-260">
+      <canvas
+        data-chart-type="bar"
+        data-labels='{{ batch_rows | map(attribute="num_batch") | list | tojson }}'
+        data-values='{{ batch_rows | map(attribute="owners_count") | list | tojson }}'
+        data-values2='{{ batch_rows | map(attribute="contracts_count") | list | tojson }}'
+        data-series-name="PAP concernés"
+        data-series2-name="Contrats à générer"></canvas>
+    </div>
+    {% else %}
+    <div class="empty-state">Aucune donnée disponible.</div>
+    {% endif %}
+  </div>
+</div>
+
 <div class="panel">
   <h2>Répartition par lot (numéro de batch)</h2>
   {% if batch_rows %}
+  <div class="chart-box h-260">
+    <canvas
+      data-chart-type="bar"
+      data-horizontal="1"
+      data-single-color="1"
+      data-labels='{{ batch_rows | map(attribute="num_batch") | list | tojson }}'
+      data-values='{{ batch_rows | map(attribute="total_montant") | list | tojson }}'
+      data-series-name="Montant estimé (GNF)"></canvas>
+  </div>
   <table class="data-table">
     <thead>
       <tr>

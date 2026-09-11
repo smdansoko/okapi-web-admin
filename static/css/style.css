@@ -354,6 +354,52 @@ footer.app-footer {
 
 .stats-grid .panel { margin-bottom: 0; }
 
+.chart-box {
+  position: relative;
+  width: 100%;
+  margin-bottom: 4px;
+}
+
+.chart-box.h-220 { height: 220px; }
+.chart-box.h-260 { height: 260px; }
+.chart-box.h-300 { height: 300px; }
+.chart-box.h-340 { height: 340px; }
+
+.panel-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.panel-tab-btn {
+  border: 1px solid var(--grey-border);
+  background: #fff;
+  color: #666;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.panel-tab-btn:hover { border-color: var(--maroon); color: var(--maroon); }
+
+.panel-tab-btn.active {
+  background: var(--maroon);
+  color: #fff;
+  border-color: var(--maroon);
+}
+
+.panel-view { display: none; }
+.panel-view.active { display: block; }
+
+.charts-two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 20px;
+}
+
 code.mono {
   background: var(--grey-light);
   padding: 2px 6px;
